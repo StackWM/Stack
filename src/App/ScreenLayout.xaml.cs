@@ -4,17 +4,14 @@
     using System.Linq;
     using System.Windows;
     using System.Diagnostics;
-    using System.Windows.Media;
-    using LostTech.Stack.Compat;
-    using LostTech.Stack.Layouts;
     using LostTech.Windows;
 
     /// <summary>
-    /// Interaction logic for LayoutEditor.xaml
+    /// Interaction logic for ScreenLayout.xaml
     /// </summary>
-    public partial class LayoutEditor : Window
+    public partial class ScreenLayout : Window
     {
-        public LayoutEditor()
+        public ScreenLayout()
         {
             InitializeComponent();
         }

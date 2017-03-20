@@ -62,7 +62,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="LayoutEditor.xaml">
+    <Compile Include="Zones\Zone.cs" />
+    <Page Include="ScreenLayout.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -71,15 +72,17 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Compat\RectangleCompat.cs" />
-    <Compile Include="Layouts\Layout.cs" />
-    <Compile Include="Layouts\Zone.cs" />
-    <Compile Include="LayoutEditor.xaml.cs">
-      <DependentUpon>LayoutEditor.xaml</DependentUpon>
+    <Compile Include="ScreenLayout.xaml.cs">
+      <DependentUpon>ScreenLayout.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="MyPos.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

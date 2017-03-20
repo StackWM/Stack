@@ -1,0 +1,7 @@
+﻿<Grid
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:zones="clr-namespace:LostTech.Stack.Zones;assembly=Stack">
+  <TextBlock VerticalAlignment="Top" HorizontalAlignment="Left">Top Left</TextBlock>
+  <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Right">Bottom Right</TextBlock>
+  <zones:Zone/>
+</Grid>
