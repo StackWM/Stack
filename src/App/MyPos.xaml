@@ -1,0 +1,19 @@
+﻿<Window x:Class="LostTech.Stack.MyPos"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LostTech.Stack"
+        mc:Ignorable="d"
+        Title="MyPos" Height="300" Width="400" LocationChanged="Window_LocationChanged"
+        MinWidth="400"
+        SizeToContent="WidthAndHeight">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Name="PosLeft" Grid.Column="0"/>
+        <TextBlock Name="PosTop" Grid.Column="1" Text="{Binding StringFormat=x{0}}"/>
+    </Grid>
+</Window>
