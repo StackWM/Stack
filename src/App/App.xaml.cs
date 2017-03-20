@@ -15,19 +15,37 @@
     using System.Xml;
     using System.Windows.Markup;
     using static System.FormattableString;
+    using Gma.System.MouseKeyHook;
 
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
+        IKeyboardMouseEvents hook;
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
             this.StartLayout();
+            // TODO: MIT license for MouseKeyboardActivityMonitor
+            this.hook = Hook.GlobalEvents();
+            this.hook.MouseDownExt += this.GlobalMouseDown;
+
             //this.MainWindow = new MyPos();
             //this.MainWindow.Show();
+        }
+
+        void GlobalMouseDown(object sender, MouseEventExtArgs mouseEventExtArgs)
+        {
+
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            this.hook.Dispose();
+
+            base.OnExit(e);
         }
 
         void StartLayout()
