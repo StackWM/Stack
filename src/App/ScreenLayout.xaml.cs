@@ -1,9 +1,12 @@
-﻿namespace LostTech.Stack
+﻿using System.Windows.Media;
+
+namespace LostTech.Stack
 {
     using System;
     using System.Linq;
     using System.Windows;
     using System.Diagnostics;
+    using LostTech.Stack.Zones;
     using LostTech.Windows;
 
     /// <summary>
@@ -15,6 +18,9 @@
         {
             InitializeComponent();
         }
+
+        public Screen Screen
+        { get { return (Screen) this.DataContext; } set { this.DataContext = value; } }
 
         public void AdjustToClientArea(Screen screen)
         {
@@ -31,6 +37,11 @@
             var dimensions = transformFromDevice.Transform(size);
             this.Width = dimensions.X;
             this.Height = dimensions.Y;
+        }
+
+        internal Zone GetZone(Point dropPoint)
+        {
+            return VisualTreeHelper.HitTest(this, dropPoint).VisualHit as Zone;
         }
     }
 }
