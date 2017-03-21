@@ -59,7 +59,7 @@
                 screenLayout.Hide();
             }
             User32.SetForegroundWindow(window);
-            if (Math.Abs(dx) < DragThreshold || Math.Abs(dy) < DragThreshold)
+            if (Math.Abs(dx) < DragThreshold && Math.Abs(dy) < DragThreshold)
                 return;
 
             var screen = this.screenLayouts.SingleOrDefault(layout => layout.GetPhysicalBounds().Contains(dropPoint));
@@ -71,7 +71,7 @@
                 return;
             Rect targetBounds = zone.GetPhysicalBounds();
             if (!User32.MoveWindow(window, (int) targetBounds.Left, (int) targetBounds.Top, (int) targetBounds.Width,
-                (int) targetBounds.Height, false))
+                (int) targetBounds.Height, true))
                 throw new System.ComponentModel.Win32Exception();
         }
 
@@ -126,7 +126,7 @@
                 layout.Closed += (sender, args) => this.Shutdown();
                 layout.DataContext = screen;
                 this.MainWindow = layout;
-                layout.Hide();
+                //layout.Hide();
                 screenLayouts.Add(layout);
             }
             this.screenLayouts = screenLayouts;
@@ -160,9 +160,7 @@
 
         FrameworkElement MakeDefaultLayout() => new Grid {
             Children = {
-                new Zone {
-                    Background = Brushes.Gray,
-                },
+                new Zone {},
             }
         };
 
