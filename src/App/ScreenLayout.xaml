@@ -5,7 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LostTech.Stack"
         mc:Ignorable="d"
+        AllowsTransparency="True" Opacity="0.7"
         Title="Layout Editor" Height="350" Width="525" ResizeMode="NoResize" WindowStyle="None">
+    <Window.Resources>
+        <ResourceDictionary Source="Themes/Generic.xaml"/>
+    </Window.Resources>
     <Grid>
         <Button VerticalAlignment="Top" HorizontalAlignment="Right">X</Button>
         <Button VerticalAlignment="Bottom" HorizontalAlignment="Left">Y</Button>

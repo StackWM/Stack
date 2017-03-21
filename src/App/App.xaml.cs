@@ -19,7 +19,6 @@
     using Gma.System.MouseKeyHook;
     using Application = System.Windows.Application;
     using Screen = LostTech.Windows.Screen;
-    using System.Drawing;
     using LostTech.Stack.Compat;
     using LostTech.Stack.Zones;
     using PInvoke;
@@ -56,20 +55,23 @@
             var dropPoint = @event.Location.ToWPF();
             var window = this.dragOperation.Window;
             this.dragOperation = null;
+            foreach (var screenLayout in this.screenLayouts) {
+                screenLayout.Hide();
+            }
+            User32.SetForegroundWindow(window);
             if (Math.Abs(dx) < DragThreshold || Math.Abs(dy) < DragThreshold)
                 return;
 
             var screen = this.screenLayouts.SingleOrDefault(layout => layout.GetPhysicalBounds().Contains(dropPoint));
             if (screen == null)
                 return;
-            var relativeDropPoint =
-                screen.Screen.PresentationSource.CompositionTarget.TransformFromDevice.Transform(dropPoint);
+            var relativeDropPoint = screen.PointFromScreen(dropPoint);
             var zone = screen.GetZone(relativeDropPoint);
             if (zone == null)
                 return;
             Rect targetBounds = zone.GetPhysicalBounds();
             if (!User32.MoveWindow(window, (int) targetBounds.Left, (int) targetBounds.Top, (int) targetBounds.Width,
-                (int) targetBounds.Height, true))
+                (int) targetBounds.Height, false))
                 throw new System.ComponentModel.Win32Exception();
         }
 
@@ -88,6 +90,10 @@
                 User32.ChildWindowFromPointExFlags.CWP_SKIPINVISIBLE);
             if (child == IntPtr.Zero)
                 return null;
+            foreach (var screenLayout in this.screenLayouts) {
+                screenLayout.Show();
+                screenLayout.Activate();
+            }
             return new WindowDragOperation(child, location);
         }
 
@@ -120,6 +126,7 @@
                 layout.Closed += (sender, args) => this.Shutdown();
                 layout.DataContext = screen;
                 this.MainWindow = layout;
+                layout.Hide();
                 screenLayouts.Add(layout);
             }
             this.screenLayouts = screenLayouts;
@@ -153,7 +160,9 @@
 
         FrameworkElement MakeDefaultLayout() => new Grid {
             Children = {
-                new Zone(),
+                new Zone {
+                    Background = Brushes.Gray,
+                },
             }
         };
 

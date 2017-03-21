@@ -41,7 +41,15 @@ namespace LostTech.Stack
 
         internal Zone GetZone(Point dropPoint)
         {
-            return VisualTreeHelper.HitTest(this, dropPoint).VisualHit as Zone;
+            Zone result = null;
+            VisualTreeHelper.HitTest(this,
+                target => {
+                    result = target as Zone;
+                    return result == null ? HitTestFilterBehavior.Continue : HitTestFilterBehavior.Stop;
+                },
+                _ => HitTestResultBehavior.Stop,
+                new PointHitTestParameters(dropPoint));
+            return result;
         }
     }
 }
