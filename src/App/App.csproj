@@ -80,6 +80,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DebugHelper.cs" />
     <Compile Include="PixelTools.cs" />
     <Compile Include="WindowDragOperation.cs" />
     <Compile Include="Zones\Zone.cs" />

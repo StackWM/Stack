@@ -22,6 +22,7 @@
     using LostTech.Stack.Compat;
     using LostTech.Stack.Zones;
     using PInvoke;
+    using DragDropEffects = System.Windows.DragDropEffects;
 
     /// <summary>
     /// Interaction logic for App.xaml
@@ -36,13 +37,54 @@
             base.OnStartup(e);
 
             this.StartLayout();
-            // TODO: MIT license for MouseKeyboardActivityMonitor
-            this.hook = Hook.GlobalEvents();
-            this.hook.MouseDownExt += this.GlobalMouseDown;
-            this.hook.MouseUpExt += this.GlobalMouseUp;
 
             //this.MainWindow = new MyPos();
             //this.MainWindow.Show();
+        }
+
+        private void GlobalKeyDown(object sender, KeyEventArgs @event)
+        {
+            if (@event.KeyData == Keys.Escape && this.dragOperation != null) {
+                StopDrag(this.dragOperation.Window);
+                return;
+            }
+        }
+
+        private void GlobalMouseMove(object sender, MouseEventExtArgs @event)
+        {
+            if (this.dragOperation == null)
+                return;
+
+            var location = GetCursorPos();
+            var dx = location.X - this.dragOperation.StartLocation.X;
+            var dy = location.Y - this.dragOperation.StartLocation.Y;
+            var currentPosition = location;
+            if (Math.Abs(dx) < DragThreshold && Math.Abs(dy) < DragThreshold)
+                return;
+
+            var screen = this.screenLayouts.FirstOrDefault(layout => layout.GetPhysicalBounds().Contains(currentPosition));
+            if (screen == null) {
+                if (this.dragOperation.CurrentZone != null)
+                    this.dragOperation.CurrentZone.IsDragMouseOver = false;
+                return;
+            }
+            var relativeDropPoint = screen.PointFromScreen(currentPosition);
+            var zone = screen.GetZone(relativeDropPoint);
+            if (zone == null) {
+                if (this.dragOperation.CurrentZone != null)
+                    this.dragOperation.CurrentZone.IsDragMouseOver = false;
+                return;
+            }
+
+            if (zone == this.dragOperation.CurrentZone) {
+                this.dragOperation.CurrentZone.IsDragMouseOver = true;
+                return;
+            }
+
+            if (this.dragOperation.CurrentZone != null)
+                this.dragOperation.CurrentZone.IsDragMouseOver = false;
+            zone.IsDragMouseOver = true;
+            this.dragOperation.CurrentZone = zone;
         }
 
         private void GlobalMouseUp(object sender, MouseEventExtArgs @event)
@@ -50,15 +92,12 @@
             if (@event.Button != MouseButtons.Middle || this.dragOperation == null)
                 return;
 
-            var dx = @event.Location.X - this.dragOperation.StartLocation.X;
-            var dy = @event.Location.Y - this.dragOperation.StartLocation.Y;
-            var dropPoint = @event.Location.ToWPF();
+            var location = GetCursorPos();
+            var dx = location.X - this.dragOperation.StartLocation.X;
+            var dy = location.Y - this.dragOperation.StartLocation.Y;
+            var dropPoint = location;
             var window = this.dragOperation.Window;
-            this.dragOperation = null;
-            foreach (var screenLayout in this.screenLayouts) {
-                screenLayout.Hide();
-            }
-            User32.SetForegroundWindow(window);
+            this.StopDrag(window);
             if (Math.Abs(dx) < DragThreshold && Math.Abs(dy) < DragThreshold)
                 return;
 
@@ -75,19 +114,39 @@
                 throw new System.ComponentModel.Win32Exception();
         }
 
+        static Point GetCursorPos()
+        {
+            if (!User32.GetCursorPos(out var cursorPos))
+                throw new System.ComponentModel.Win32Exception();
+            return new Point(cursorPos.x, cursorPos.y);
+        }
+
+        void StopDrag(IntPtr window)
+        {
+            if (this.dragOperation.CurrentZone != null)
+                this.dragOperation.CurrentZone.IsDragMouseOver = false;
+            this.dragOperation = null;
+            foreach (var screenLayout in this.screenLayouts) {
+                screenLayout.Hide();
+            }
+            User32.SetForegroundWindow(window);
+        }
+
         void GlobalMouseDown(object sender, MouseEventExtArgs @event)
         {
             if (@event.Button != MouseButtons.Middle)
                 return;
 
-            this.dragOperation = DragStart(@event.Location);
+            this.dragOperation = DragStart(GetCursorPos());
         }
 
-        private WindowDragOperation DragStart(System.Drawing.Point location)
+        private WindowDragOperation DragStart(Point location)
         {
             var desktop = User32.GetDesktopWindow();
-            var child = User32.ChildWindowFromPointEx(desktop, new POINT {x = location.X, y = location.Y},
+            var point = new POINT {x = (int)location.X, y = (int)location.Y};
+            var child = User32.ChildWindowFromPointEx(desktop, point,
                 User32.ChildWindowFromPointExFlags.CWP_SKIPINVISIBLE);
+            //var child = User32.WindowFromPhysicalPoint(point);
             if (child == IntPtr.Zero)
                 return null;
             foreach (var screenLayout in this.screenLayouts) {
@@ -106,6 +165,8 @@
 
         void StartLayout()
         {
+            this.BindHandlers();
+
             var layoutDirectory = AppData.CreateSubdirectory(@"Layouts\Default");
             var defaultLayout = new Lazy<FrameworkElement>(() => this.LoadLayoutOrDefault(layoutDirectory, "Default.xaml"));
             var primary = Screen.Primary;
@@ -130,6 +191,16 @@
                 screenLayouts.Add(layout);
             }
             this.screenLayouts = screenLayouts;
+        }
+
+        private void BindHandlers()
+        {
+            // TODO: MIT license for MouseKeyboardActivityMonitor
+            this.hook = Hook.GlobalEvents();
+            this.hook.MouseDownExt += this.GlobalMouseDown;
+            this.hook.MouseUpExt += this.GlobalMouseUp;
+            this.hook.MouseMoveExt += this.GlobalMouseMove;
+            this.hook.KeyDown += this.GlobalKeyDown;
         }
 
         private FrameworkElement LoadLayoutOrDefault(DirectoryInfo layoutDirectory, string fileName)

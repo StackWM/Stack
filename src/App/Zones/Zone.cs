@@ -14,6 +14,7 @@
     using System.Windows.Media.Imaging;
     using System.Windows.Navigation;
     using System.Windows.Shapes;
+    using static DebugHelper;
 
     /// <summary>
     /// Follow steps 1a or 1b and then 2 to use this custom control in a XAML file.
@@ -50,5 +51,15 @@
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Zone), new FrameworkPropertyMetadata(typeof(Zone)));
         }
+
+        public Zone() { }
+
+        public bool IsDragMouseOver {
+            get { return (bool)GetValue(IsDragMouseOverProperty); }
+            set { SetValue(IsDragMouseOverProperty, value); }
+        }
+
+        public static readonly DependencyProperty IsDragMouseOverProperty =
+            DependencyProperty.Register("IsDragMouseOver", typeof(bool), typeof(Zone), new PropertyMetadata(false));
     }
 }

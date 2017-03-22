@@ -1,16 +1,18 @@
 ﻿namespace LostTech.Stack
 {
+    using LostTech.Stack.Zones;
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using System.Windows;
 
     class WindowDragOperation
     {
         public IntPtr Window { get; }
         public Point StartLocation { get; }
+        public Zone CurrentZone { get; set; }
 
         public WindowDragOperation(IntPtr window, Point startLocation)
         {
