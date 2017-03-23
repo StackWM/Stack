@@ -17,6 +17,8 @@
         </Setter>
         <Setter Property="Background" Value="White"/>
         <Setter Property="Opacity" Value="0.7"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="Black"/>
         <Style.Triggers>
             <Trigger Property="IsDragMouseOver" Value="True">
                 <Setter Property="Opacity" Value="1"/>
