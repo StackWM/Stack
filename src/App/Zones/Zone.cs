@@ -61,5 +61,13 @@
 
         public static readonly DependencyProperty IsDragMouseOverProperty =
             DependencyProperty.Register("IsDragMouseOver", typeof(bool), typeof(Zone), new PropertyMetadata(false));
+
+        public Zone Target
+        {
+            get { return (Zone)GetValue(TargetProperty) ?? this; }
+            set { SetValue(TargetProperty, value); }
+        }
+        public static readonly DependencyProperty TargetProperty =
+            DependencyProperty.Register(nameof(Target), typeof(Zone), typeof(Zone), new PropertyMetadata(null));
     }
 }

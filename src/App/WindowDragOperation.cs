@@ -13,6 +13,7 @@
         public IntPtr Window { get; }
         public Point StartLocation { get; }
         public Zone CurrentZone { get; set; }
+        public IntPtr OriginalActiveWindow { get; set; }
 
         public WindowDragOperation(IntPtr window, Point startLocation)
         {

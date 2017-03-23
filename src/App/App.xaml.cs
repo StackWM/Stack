@@ -108,7 +108,7 @@
             var zone = screen.GetZone(relativeDropPoint);
             if (zone == null)
                 return;
-            Rect targetBounds = zone.GetPhysicalBounds();
+            Rect targetBounds = zone.Target.GetPhysicalBounds();
             if (!User32.MoveWindow(window, (int) targetBounds.Left, (int) targetBounds.Top, (int) targetBounds.Width,
                 (int) targetBounds.Height, true))
                 throw new System.ComponentModel.Win32Exception();
@@ -125,11 +125,11 @@
         {
             if (this.dragOperation.CurrentZone != null)
                 this.dragOperation.CurrentZone.IsDragMouseOver = false;
-            this.dragOperation = null;
             foreach (var screenLayout in this.screenLayouts) {
                 screenLayout.Hide();
             }
-            User32.SetForegroundWindow(window);
+            User32.SetForegroundWindow(this.dragOperation.OriginalActiveWindow);
+            this.dragOperation = null;
         }
 
         void GlobalMouseDown(object sender, MouseEventExtArgs @event)
@@ -147,13 +147,15 @@
             var child = User32.ChildWindowFromPointEx(desktop, point,
                 User32.ChildWindowFromPointExFlags.CWP_SKIPINVISIBLE);
             //var child = User32.WindowFromPhysicalPoint(point);
-            if (child == IntPtr.Zero)
+            if (child == IntPtr.Zero || true.Equals(User32.GetWindowText(child)?.EndsWith("Remote Desktop Connection")))
                 return null;
             foreach (var screenLayout in this.screenLayouts) {
                 screenLayout.Show();
                 screenLayout.Activate();
             }
-            return new WindowDragOperation(child, location);
+            return new WindowDragOperation(child, location) {
+                OriginalActiveWindow = User32.GetForegroundWindow(),
+            };
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -187,7 +189,7 @@
                 layout.Closed += (sender, args) => this.Shutdown();
                 layout.DataContext = screen;
                 this.MainWindow = layout;
-                //layout.Hide();
+                layout.Hide();
                 screenLayouts.Add(layout);
             }
             this.screenLayouts = screenLayouts;
