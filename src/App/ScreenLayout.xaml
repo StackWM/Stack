@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         AllowsTransparency="True" Opacity="0.7" Background="Transparent"
         ShowInTaskbar="False"
+        Topmost="True"
         Title="Layout Editor" Height="350" Width="525" ResizeMode="NoResize" WindowStyle="None">
     <Window.Resources>
         <ResourceDictionary Source="Themes/Generic.xaml"/>
