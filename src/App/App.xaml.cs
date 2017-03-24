@@ -32,6 +32,8 @@
         IKeyboardMouseEvents hook;
         WindowDragOperation dragOperation;
         ICollection<ScreenLayout> screenLayouts;
+        private NotifyIcon trayIcon;
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -161,6 +163,7 @@
         protected override void OnExit(ExitEventArgs e)
         {
             this.hook.Dispose();
+            this.trayIcon?.Dispose();
 
             base.OnExit(e);
         }
@@ -168,6 +171,8 @@
         void StartLayout()
         {
             this.BindHandlers();
+
+            StartTrayIcon();
 
             var layoutDirectory = AppData.CreateSubdirectory(@"Layouts\Default");
             var defaultLayout = new Lazy<FrameworkElement>(() => this.LoadLayoutOrDefault(layoutDirectory, "Default.xaml"));
@@ -177,7 +182,8 @@
                 .Select(screenIndex => LoadLayoutOrDefault(layoutDirectory, Invariant($"{screenIndex:D3}.xaml")))
                 .ToArray();
             var screenLayouts = new List<ScreenLayout>();
-            for (var screenIndex = 0; screenIndex < screens.Length; screenIndex++) {
+            for (var screenIndex = 0; screenIndex < screens.Length; screenIndex++)
+            {
                 var screen = screens[screenIndex];
                 var layout = new ScreenLayout();
                 // windows must be visible before calling AdjustToClientArea,
@@ -193,6 +199,22 @@
                 screenLayouts.Add(layout);
             }
             this.screenLayouts = screenLayouts;
+        }
+
+        private void StartTrayIcon()
+        {
+            var bitmap = new System.Drawing.Bitmap(32, 32);
+
+            this.trayIcon = new NotifyIcon {
+                ContextMenu = new System.Windows.Forms.ContextMenu {
+                    MenuItems = {
+                        new System.Windows.Forms.MenuItem("Exit", onClick: (_, __) => this.Shutdown())
+                    },
+                },
+                Icon = System.Drawing.Icon.FromHandle(bitmap.GetHicon()),
+                Text = nameof(LostTech.Stack),
+                Visible = true,
+            };
         }
 
         private void BindHandlers()
