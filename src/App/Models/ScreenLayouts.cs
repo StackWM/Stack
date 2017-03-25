@@ -18,7 +18,7 @@ namespace LostTech.Stack.Models
         {
             if (screen == null)
                 throw new ArgumentNullException(nameof(screen));
-            return this.Map.FirstOrDefault(kv => kv.Key == screen.Name).Value;
+            return this.Map.FirstOrDefault(kv => kv.Key == screen.ID).Value;
         }
     }
 }
