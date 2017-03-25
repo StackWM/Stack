@@ -9,6 +9,7 @@
     using System.Windows;
     using LostTech.Stack.Compat;
     using FormsScreen = System.Windows.Forms.Screen;
+    using static System.FormattableString;
 
     public sealed class Screen
     {
@@ -37,6 +38,7 @@
 
         // TODO: track updates
         public PresentationSource PresentationSource { get; }
+        public string Name => Invariant($"{Array.IndexOf(AllScreens.ToArray(), this):D3}");
 
         public static Screen Primary => AllScreens.Single(screen => screen.screen.Primary);
         public static IEnumerable<Screen> AllScreens { get; } =

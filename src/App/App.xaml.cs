@@ -5,6 +5,7 @@
     using System.ComponentModel;
     using System.Configuration;
     using System.Diagnostics;
+    using System.Globalization;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -20,9 +21,13 @@
     using Application = System.Windows.Application;
     using Screen = LostTech.Windows.Screen;
     using LostTech.Stack.Compat;
+    using LostTech.Stack.InternalExtensions;
+    using LostTech.Stack.Models;
     using LostTech.Stack.Zones;
+    using PCLStorage;
     using PInvoke;
     using DragDropEffects = System.Windows.DragDropEffects;
+    using FileAccess = PCLStorage.FileAccess;
 
     /// <summary>
     /// Interaction logic for App.xaml
@@ -33,12 +38,24 @@
         WindowDragOperation dragOperation;
         ICollection<ScreenLayout> screenLayouts;
         private NotifyIcon trayIcon;
+        IFolder localSettings;
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            this.StartLayout();
+            if (e.Args.Contains("--restart")) {
+                var self = Process.GetCurrentProcess();
+                foreach (var process in Process.GetProcessesByName("Stack.exe")) {
+                    if (process.Id != self.Id)
+                        process.CloseMainWindow();
+                }
+            }
+
+            this.localSettings = await FileSystem.Current.GetFolderFromPathAsync(AppData.FullName);
+            var settings = await StackSettings.Load(this.localSettings);
+
+            await this.StartLayout(settings);
 
             //this.MainWindow = new MyPos();
             //this.MainWindow.Show();
@@ -168,18 +185,17 @@
             base.OnExit(e);
         }
 
-        void StartLayout()
+        async Task StartLayout(StackSettings stackSettings)
         {
             this.BindHandlers();
 
-            StartTrayIcon();
+            var layoutsDirectory = await this.localSettings.CreateFolderAsync("Layouts", CreationCollisionOption.OpenIfExists);
 
-            var layoutDirectory = AppData.CreateSubdirectory(@"Layouts\Default");
-            var defaultLayout = new Lazy<FrameworkElement>(() => this.LoadLayoutOrDefault(layoutDirectory, "Default.xaml"));
+            var defaultLayout = new Lazy<FrameworkElement>(() => this.LoadLayoutOrDefault(layoutsDirectory, "Default.xaml").Result);
             var primary = Screen.Primary;
             var screens = Screen.AllScreens.ToArray();
-            var layouts = Enumerable.Range(0, screens.Length)
-                .Select(screenIndex => LoadLayoutOrDefault(layoutDirectory, Invariant($"{screenIndex:D3}.xaml")))
+            var layouts = screens
+                .Select(screen => GetLayoutForScreen(screen, stackSettings, layoutsDirectory))
                 .ToArray();
             var screenLayouts = new List<ScreenLayout>();
             for (var screenIndex = 0; screenIndex < screens.Length; screenIndex++)
@@ -199,22 +215,16 @@
                 screenLayouts.Add(layout);
             }
             this.screenLayouts = screenLayouts;
+
+            this.trayIcon = await TrayIcon.StartTrayIcon(layoutsDirectory, stackSettings);
         }
 
-        private void StartTrayIcon()
+        async Task<FrameworkElement> GetLayoutForScreen(Screen screen, StackSettings settings, IFolder layoutsDirectory)
         {
-            var bitmap = new System.Drawing.Bitmap(32, 32);
-
-            this.trayIcon = new NotifyIcon {
-                ContextMenu = new System.Windows.Forms.ContextMenu {
-                    MenuItems = {
-                        new System.Windows.Forms.MenuItem("Exit", onClick: (_, __) => this.Shutdown())
-                    },
-                },
-                Icon = System.Drawing.Icon.FromHandle(bitmap.GetHicon()),
-                Text = nameof(LostTech.Stack),
-                Visible = true,
-            };
+            var layout = settings.LayoutMap.GetPreferredLayout(screen);
+            if (layout == null)
+                return this.MakeDefaultLayout();
+            return await LoadLayoutOrDefault(layoutsDirectory, layout);
         }
 
         private void BindHandlers()
@@ -227,7 +237,7 @@
             this.hook.KeyDown += this.GlobalKeyDown;
         }
 
-        private FrameworkElement LoadLayoutOrDefault(DirectoryInfo layoutDirectory, string fileName)
+        private async Task<FrameworkElement> LoadLayoutOrDefault(IFolder layoutDirectory, string fileName)
         {
             // TODO: SEC: untrusted XAML https://msdn.microsoft.com/en-us/library/ee856646(v=vs.110).aspx
 
@@ -236,18 +246,17 @@
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentNullException(nameof(fileName));
 
-            if (!layoutDirectory.Exists)
-                return this.MakeDefaultLayout();
 
             if (Path.GetInvalidFileNameChars().Any(fileName.Contains))
                 throw new ArgumentException();
 
-            var fullName = Path.Combine(layoutDirectory.FullName, fileName);
-            if (!File.Exists(fullName))
+            var file = await layoutDirectory.GetFileOrNull(fileName);
+            if (file == null)
                 return this.MakeDefaultLayout();
 
-            using (var xmlReader = XmlReader.Create(fullName)) {
-                var layout = (FrameworkElement) XamlReader.Load(xmlReader);
+            using (var stream = await file.OpenAsync(FileAccess.Read))
+            using (var xmlReader = XmlReader.Create(stream)) {
+                var layout = (FrameworkElement)XamlReader.Load(xmlReader);
                 Debug.WriteLine($"loaded layout {fileName}");
                 return layout;
             }
