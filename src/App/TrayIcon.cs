@@ -17,7 +17,7 @@
             var contextMenu = new ContextMenu();
 
             foreach (var screen in Screen.AllScreens) {
-                var menu = new MenuItem(screen.Name);
+                var menu = new MenuItem(screen.Name) { DefaultItem = screen.IsPrimary };
                 foreach (var file in await layoutsFolder.GetFilesAsync()) {
                     if (Path.GetExtension(file.Name) != ".xaml")
                         continue;

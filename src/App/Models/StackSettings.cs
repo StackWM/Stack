@@ -8,8 +8,9 @@
     {
         readonly IFolder localSettings;
 
-        public ScreenLayouts LayoutMap { get; private set; }
+        public ScreenLayouts LayoutMap { get; set; }
 
+        public StackSettings() { }
         private StackSettings(IFolder localSettings)
         {
             this.localSettings = localSettings ?? throw new ArgumentNullException(nameof(localSettings));

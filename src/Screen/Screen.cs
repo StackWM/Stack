@@ -40,6 +40,7 @@
         public PresentationSource PresentationSource { get; }
         public string ID => Invariant($"{Array.IndexOf(AllScreens.ToArray(), this):D3}");
         public string Name => Invariant($"{this.ID} ({this.screen.Bounds.Width}x{this.screen.Bounds.Height})");
+        public bool IsPrimary => this.screen.Primary;
 
         public static Screen Primary => AllScreens.Single(screen => screen.screen.Primary);
         public static IEnumerable<Screen> AllScreens { get; } =

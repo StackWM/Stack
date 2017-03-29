@@ -2,32 +2,26 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Configuration;
     using System.Diagnostics;
-    using System.Globalization;
+    using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
     using System.Windows;
-    using System.Windows.Media;
-    using System.IO;
-    using System.Reflection;
     using System.Windows.Controls;
     using System.Windows.Forms;
-    using System.Xml;
     using System.Windows.Markup;
-    using static System.FormattableString;
+    using System.Xml;
     using Gma.System.MouseKeyHook;
-    using Application = System.Windows.Application;
-    using Screen = LostTech.Windows.Screen;
-    using LostTech.Stack.Compat;
+    using LostTech.App;
     using LostTech.Stack.InternalExtensions;
     using LostTech.Stack.Models;
     using LostTech.Stack.Zones;
     using PCLStorage;
     using PInvoke;
-    using DragDropEffects = System.Windows.DragDropEffects;
+    using Application = System.Windows.Application;
     using FileAccess = PCLStorage.FileAccess;
+    using Screen = LostTech.Windows.Screen;
 
     /// <summary>
     /// Interaction logic for App.xaml
@@ -38,7 +32,7 @@
         WindowDragOperation dragOperation;
         ICollection<ScreenLayout> screenLayouts;
         private NotifyIcon trayIcon;
-        IFolder localSettings;
+        IFolder localSettingsFolder;
 
         protected override async void OnStartup(StartupEventArgs e)
         {
@@ -52,8 +46,10 @@
                 }
             }
 
-            this.localSettings = await FileSystem.Current.GetFolderFromPathAsync(AppData.FullName);
-            var settings = await StackSettings.Load(this.localSettings);
+            this.localSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(AppData.FullName);
+            var localSettings = XmlSettings.Create(this.localSettingsFolder);
+            var screenLayouts = await localSettings.Load<ScreenLayouts, ScreenLayouts>("LayoutMap.xml");
+            var settings = new StackSettings {LayoutMap = screenLayouts?.Value ?? new ScreenLayouts()};
 
             await this.StartLayout(settings);
 
@@ -189,14 +185,14 @@
         {
             this.BindHandlers();
 
-            var layoutsDirectory = await this.localSettings.CreateFolderAsync("Layouts", CreationCollisionOption.OpenIfExists);
+            var layoutsDirectory = await this.localSettingsFolder.CreateFolderAsync("Layouts", CreationCollisionOption.OpenIfExists);
 
             var defaultLayout = new Lazy<FrameworkElement>(() => this.LoadLayoutOrDefault(layoutsDirectory, "Default.xaml").Result);
             var primary = Screen.Primary;
             var screens = Screen.AllScreens.ToArray();
-            var layouts = screens
+            FrameworkElement[] layouts = await Task.WhenAll(screens
                 .Select(screen => GetLayoutForScreen(screen, stackSettings, layoutsDirectory))
-                .ToArray();
+                .ToArray());
             var screenLayouts = new List<ScreenLayout>();
             for (var screenIndex = 0; screenIndex < screens.Length; screenIndex++)
             {
