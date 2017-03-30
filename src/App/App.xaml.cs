@@ -33,6 +33,7 @@
         ICollection<ScreenLayout> screenLayouts;
         private NotifyIcon trayIcon;
         IFolder localSettingsFolder;
+        SettingsSet<ScreenLayouts, ScreenLayouts> screenLayoutSettings;
 
         protected override async void OnStartup(StartupEventArgs e)
         {
@@ -48,8 +49,16 @@
 
             this.localSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(AppData.FullName);
             var localSettings = XmlSettings.Create(this.localSettingsFolder);
-            var screenLayouts = await localSettings.Load<ScreenLayouts, ScreenLayouts>("LayoutMap.xml");
-            var settings = new StackSettings {LayoutMap = screenLayouts?.Value ?? new ScreenLayouts()};
+            try {
+                screenLayoutSettings = await localSettings.LoadOrCreate<ScreenLayouts, ScreenLayouts>("LayoutMap.xml");
+            }
+            catch (Exception) {
+                var brokenFile = await this.localSettingsFolder.GetFileAsync("LayoutMap.xml");
+                await brokenFile.DeleteAsync();
+                this.screenLayoutSettings = await localSettings.LoadOrCreate<ScreenLayouts, ScreenLayouts>("LayoutMap.xml");
+            }
+            screenLayoutSettings.Autosave = true;
+            var settings = new StackSettings {LayoutMap = screenLayoutSettings.Value};
 
             await this.StartLayout(settings);
 
@@ -173,12 +182,23 @@
             };
         }
 
-        protected override void OnExit(ExitEventArgs e)
+        public async void BeginShutdown()
         {
             this.hook.Dispose();
             this.trayIcon?.Dispose();
 
-            base.OnExit(e);
+            if (this.screenLayoutSettings != null)
+            {
+                this.screenLayoutSettings.GetType()
+                    .GetMethod("ScheduleSave", BindingFlags.Instance | BindingFlags.NonPublic)
+                    .Invoke(this.screenLayoutSettings, new object[0]);
+                await this.screenLayoutSettings.DisposeAsync();
+
+                await Task.Delay(5000);
+                Debug.WriteLine("delayed message");
+            }
+
+            this.Shutdown();
         }
 
         async Task StartLayout(StackSettings stackSettings)
@@ -204,7 +224,7 @@
                 layout.AdjustToClientArea(screen);
                 layout.Content = layouts[screenIndex];
                 layout.Title = $"{screenIndex}:{layout.Left}x{layout.Top}";
-                layout.Closed += (sender, args) => this.Shutdown();
+                layout.Closed += (sender, args) => this.BeginShutdown();
                 layout.DataContext = screen;
                 this.MainWindow = layout;
                 layout.Hide();
@@ -212,7 +232,7 @@
             }
             this.screenLayouts = screenLayouts;
 
-            this.trayIcon = await TrayIcon.StartTrayIcon(layoutsDirectory, stackSettings);
+            this.trayIcon = (await TrayIcon.StartTrayIcon(layoutsDirectory, stackSettings)).Icon;
         }
 
         async Task<FrameworkElement> GetLayoutForScreen(Screen screen, StackSettings settings, IFolder layoutsDirectory)
@@ -247,8 +267,10 @@
                 throw new ArgumentException();
 
             var file = await layoutDirectory.GetFileOrNull(fileName);
-            if (file == null)
+            if (file == null) {
+                Debug.WriteLine($"layout {fileName} was not found. loading default");
                 return this.MakeDefaultLayout();
+            }
 
             using (var stream = await file.OpenAsync(FileAccess.Read))
             using (var xmlReader = XmlReader.Create(stream)) {
