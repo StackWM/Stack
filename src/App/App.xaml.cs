@@ -189,9 +189,7 @@
 
             if (this.screenLayoutSettings != null)
             {
-                this.screenLayoutSettings.GetType()
-                    .GetMethod("ScheduleSave", BindingFlags.Instance | BindingFlags.NonPublic)
-                    .Invoke(this.screenLayoutSettings, new object[0]);
+                this.screenLayoutSettings.ScheduleSave();
                 await this.screenLayoutSettings.DisposeAsync();
 
                 await Task.Delay(5000);

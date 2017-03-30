@@ -47,7 +47,7 @@
       <HintPath>..\..\packages\JetBrains.Annotations.10.4.0\lib\net\JetBrains.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="LostTech.App.Settings, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LostTech.App.Settings.0.1.0-b2017032904\lib\netstandard1.4\LostTech.App.Settings.dll</HintPath>
+      <HintPath>..\..\packages\LostTech.App.Settings.0.1.0-b2017033001\lib\netstandard1.4\LostTech.App.Settings.dll</HintPath>
     </Reference>
     <Reference Include="LostTech.App.XmlSettings, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LostTech.App.XmlSettings.0.1.0-b2017032802\lib\netstandard1.4\LostTech.App.XmlSettings.dll</HintPath>
