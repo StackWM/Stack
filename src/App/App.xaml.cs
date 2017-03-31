@@ -10,6 +10,8 @@
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Forms;
+    using System.Windows.Input;
+    using System.Windows.Interop;
     using System.Windows.Markup;
     using System.Xml;
     using Gma.System.MouseKeyHook;
@@ -20,7 +22,10 @@
     using PCLStorage;
     using PInvoke;
     using Application = System.Windows.Application;
+    using DragAction = System.Windows.DragAction;
+    using DragDropEffects = System.Windows.DragDropEffects;
     using FileAccess = PCLStorage.FileAccess;
+    using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
     using Screen = LostTech.Windows.Screen;
 
     /// <summary>
@@ -34,18 +39,19 @@
         private NotifyIcon trayIcon;
         IFolder localSettingsFolder;
         SettingsSet<ScreenLayouts, ScreenLayouts> screenLayoutSettings;
+        readonly Window winApiHandler = new Window {
+            Opacity = 0,
+            AllowsTransparency = true,
+            ShowInTaskbar = false,
+            WindowStyle = WindowStyle.None,
+        };
+        private bool dirty;
 
         protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            if (e.Args.Contains("--restart")) {
-                var self = Process.GetCurrentProcess();
-                foreach (var process in Process.GetProcessesByName("Stack.exe")) {
-                    if (process.Id != self.Id)
-                        process.CloseMainWindow();
-                }
-            }
+            this.MainWindow = this.winApiHandler;
 
             this.localSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(AppData.FullName);
             var localSettings = XmlSettings.Create(this.localSettingsFolder);
@@ -62,6 +68,10 @@
 
             await this.StartLayout(settings);
 
+            this.SetupScreenHooks();
+
+            this.winApiHandler.Closed += (sender, args) => this.BeginShutdown();
+
             //this.MainWindow = new MyPos();
             //this.MainWindow.Show();
         }
@@ -69,15 +79,40 @@
         private void GlobalKeyDown(object sender, KeyEventArgs @event)
         {
             if (@event.KeyData == Keys.Escape && this.dragOperation != null) {
+                @event.Handled = true;
                 StopDrag(this.dragOperation.Window);
+                return;
+            }
+
+            if (@event.KeyData == Keys.Left && GetKeyboardModifiers() == ModifierKeys.Windows) {
+                @event.Handled = true;
                 return;
             }
         }
 
+        static ModifierKeys GetKeyboardModifiers()
+            => Keyboard.Modifiers | (IsWinDown() ? ModifierKeys.Windows : ModifierKeys.None);
+        static bool IsWinDown() => Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin);
+
         private void GlobalMouseMove(object sender, MouseEventExtArgs @event)
         {
-            if (this.dragOperation == null)
+            if (this.dragOperation == null) {
                 return;
+            }
+
+            if (!this.dragOperation.Activated) {
+                @event.Handled = true;
+                foreach (var screenLayout in this.screenLayouts)
+                {
+                    screenLayout.Show();
+                    if (this.dirty)
+                    {
+                        screenLayout.AdjustToClientArea();
+                    }
+                }
+                this.dirty = false;
+                this.dragOperation.Activated = true;
+            }
 
             var location = GetCursorPos();
             var dx = location.X - this.dragOperation.StartLocation.X;
@@ -88,26 +123,37 @@
 
             var screen = this.screenLayouts.FirstOrDefault(layout => layout.GetPhysicalBounds().Contains(currentPosition));
             if (screen == null) {
-                if (this.dragOperation.CurrentZone != null)
+                if (this.dragOperation.CurrentZone != null) {
                     this.dragOperation.CurrentZone.IsDragMouseOver = false;
+                    this.dragOperation.CurrentZone.ReleaseMouseCapture();
+                }
                 return;
             }
+
+            Debug.WriteLine(screen.CaptureMouse());
+
             var relativeDropPoint = screen.PointFromScreen(currentPosition);
             var zone = screen.GetZone(relativeDropPoint);
             if (zone == null) {
-                if (this.dragOperation.CurrentZone != null)
+                if (this.dragOperation.CurrentZone != null) {
                     this.dragOperation.CurrentZone.IsDragMouseOver = false;
+                    this.dragOperation.CurrentZone.ReleaseMouseCapture();
+                }
                 return;
             }
 
             if (zone == this.dragOperation.CurrentZone) {
                 this.dragOperation.CurrentZone.IsDragMouseOver = true;
+                Debug.WriteLine(this.dragOperation.CurrentZone.CaptureMouse());
                 return;
             }
 
-            if (this.dragOperation.CurrentZone != null)
+            if (this.dragOperation.CurrentZone != null) {
                 this.dragOperation.CurrentZone.IsDragMouseOver = false;
+                this.dragOperation.CurrentZone.ReleaseMouseCapture();
+            }
             zone.IsDragMouseOver = true;
+            Debug.WriteLine(zone.CaptureMouse());
             this.dragOperation.CurrentZone = zone;
         }
 
@@ -134,8 +180,16 @@
                 return;
             Rect targetBounds = zone.Target.GetPhysicalBounds();
             if (!User32.MoveWindow(window, (int) targetBounds.Left, (int) targetBounds.Top, (int) targetBounds.Width,
-                (int) targetBounds.Height, true))
-                throw new System.ComponentModel.Win32Exception();
+                (int) targetBounds.Height, true)) {
+                this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
+                this.trayIcon.BalloonTipTitle = "Can't move";
+                this.trayIcon.BalloonTipText = new System.ComponentModel.Win32Exception().Message;
+                this.trayIcon.ShowBalloonTip(1000);
+            }
+            else {
+                // TODO: option to not activate on move
+                User32.SetForegroundWindow(window);
+            }
         }
 
         static Point GetCursorPos()
@@ -147,9 +201,12 @@
 
         void StopDrag(IntPtr window)
         {
-            if (this.dragOperation.CurrentZone != null)
+            if (this.dragOperation.CurrentZone != null) {
                 this.dragOperation.CurrentZone.IsDragMouseOver = false;
+                this.dragOperation.CurrentZone.ReleaseMouseCapture();
+            }
             foreach (var screenLayout in this.screenLayouts) {
+                screenLayout.ReleaseMouseCapture();
                 screenLayout.Hide();
             }
             User32.SetForegroundWindow(this.dragOperation.OriginalActiveWindow);
@@ -173,10 +230,6 @@
             //var child = User32.WindowFromPhysicalPoint(point);
             if (child == IntPtr.Zero || true.Equals(User32.GetWindowText(child)?.EndsWith("Remote Desktop Connection")))
                 return null;
-            foreach (var screenLayout in this.screenLayouts) {
-                screenLayout.Show();
-                screenLayout.Activate();
-            }
             return new WindowDragOperation(child, location) {
                 OriginalActiveWindow = User32.GetForegroundWindow(),
             };
@@ -184,16 +237,19 @@
 
         public async void BeginShutdown()
         {
+            Debug.WriteLine("shutdown requested");
             this.hook.Dispose();
             this.trayIcon?.Dispose();
 
             if (this.screenLayoutSettings != null)
             {
                 this.screenLayoutSettings.ScheduleSave();
-                await this.screenLayoutSettings.DisposeAsync();
+                var settings = this.screenLayoutSettings;
+                this.screenLayoutSettings = null;
+                await settings.DisposeAsync();
 
-                await Task.Delay(5000);
-                Debug.WriteLine("delayed message");
+                //await Task.Delay(5000);
+                //Debug.WriteLine("delayed message");
             }
 
             this.Shutdown();
@@ -201,8 +257,6 @@
 
         async Task StartLayout(StackSettings stackSettings)
         {
-            this.BindHandlers();
-
             var layoutsDirectory = await this.localSettingsFolder.CreateFolderAsync("Layouts", CreationCollisionOption.OpenIfExists);
 
             var defaultLayout = new Lazy<FrameworkElement>(() => this.LoadLayoutOrDefault(layoutsDirectory, "Default.xaml").Result);
@@ -216,19 +270,23 @@
             {
                 var screen = screens[screenIndex];
                 var layout = new ScreenLayout();
+                layout.Closed += (sender, args) => this.BeginShutdown();
+                layout.QueryContinueDrag += (sender, args) => args.Action = DragAction.Cancel;
                 // windows must be visible before calling AdjustToClientArea,
                 // otherwise final position is unpredictable
+                layout.Opacity = 0;
                 layout.Show();
                 layout.AdjustToClientArea(screen);
                 layout.Content = layouts[screenIndex];
                 layout.Title = $"{screenIndex}:{layout.Left}x{layout.Top}";
-                layout.Closed += (sender, args) => this.BeginShutdown();
                 layout.DataContext = screen;
-                this.MainWindow = layout;
                 layout.Hide();
+                layout.Opacity = 0.7;
                 screenLayouts.Add(layout);
             }
             this.screenLayouts = screenLayouts;
+
+            this.BindHandlers();
 
             this.trayIcon = (await TrayIcon.StartTrayIcon(layoutsDirectory, stackSettings)).Icon;
         }
@@ -291,6 +349,24 @@
                 var path = Path.Combine(appData, "Lost Tech LLC", nameof(LostTech.Stack));
                 return Directory.CreateDirectory(path);
             }
+        }
+
+        private void SetupScreenHooks()
+        {
+            this.winApiHandler.Show();
+            var hwnd = (HwndSource)PresentationSource.FromVisual(this.winApiHandler);
+            hwnd.AddHook(this.OnWindowMessage);
+            this.winApiHandler.Hide();
+        }
+
+        private IntPtr OnWindowMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            switch ((User32.WindowMessage)msg) {
+            case User32.WindowMessage.WM_DISPLAYCHANGE:
+                this.dirty = true;
+                return IntPtr.Zero;
+            }
+            return IntPtr.Zero;
         }
 
         public static Version Version => Assembly.GetExecutingAssembly().GetName().Version;

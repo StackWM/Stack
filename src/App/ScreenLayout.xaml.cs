@@ -39,6 +39,14 @@ namespace LostTech.Stack
             this.Height = dimensions.Y;
         }
 
+        public void AdjustToClientArea()
+        {
+            if (this.DataContext is Screen screen)
+                this.AdjustToClientArea(screen);
+            else
+                throw new InvalidOperationException();
+        }
+
         internal Zone GetZone(Point dropPoint)
         {
             Zone result = null;
