@@ -45,14 +45,17 @@
     ///     <MyNamespace:Zone/>
     ///
     /// </summary>
-    public class Zone : Control
+    public class Zone : ContentControl
     {
         static Zone()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Zone), new FrameworkPropertyMetadata(typeof(Zone)));
         }
 
-        public Zone() { }
+        public Zone()
+        {
+            this.AllowDrop = true;
+        }
 
         public bool IsDragMouseOver {
             get { return (bool)GetValue(IsDragMouseOverProperty); }
