@@ -1,15 +1,14 @@
-﻿using System.Windows.Media;
-
-namespace LostTech.Stack
+﻿namespace LostTech.Stack
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Windows;
     using System.Diagnostics;
-    using System.Windows.Controls;
+    using System.Windows;
+    using System.Windows.Interop;
+    using System.Windows.Media;
     using LostTech.Stack.Zones;
     using LostTech.Windows;
+    using PInvoke;
 
     /// <summary>
     /// Interaction logic for ScreenLayout.xaml
@@ -19,6 +18,23 @@ namespace LostTech.Stack
         public ScreenLayout()
         {
             InitializeComponent();
+
+            this.Loaded += OnLoaded;
+        }
+
+        void OnLoaded(object sender, RoutedEventArgs routedEventArgs) {
+            var handle = (HwndSource)PresentationSource.FromVisual(this);
+            handle.AddHook(this.OnWindowMessage);
+        }
+
+        private IntPtr OnWindowMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            switch ((User32.WindowMessage) msg) {
+            case User32.WindowMessage.WM_SETTINGCHANGE:
+                this.AdjustToScreen();
+                break;
+            }
+            return IntPtr.Zero;
         }
 
         public Screen Screen
@@ -26,7 +42,7 @@ namespace LostTech.Stack
 
         public void AdjustToClientArea(Screen screen)
         {
-            if (screen  == null)
+            if (screen == null)
                 throw new ArgumentNullException(nameof(screen));
 
             Debug.WriteLine(screen.WorkingArea);
@@ -47,6 +63,27 @@ namespace LostTech.Stack
                 this.AdjustToClientArea(screen);
             else
                 throw new InvalidOperationException();
+        }
+
+        protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
+        {
+            base.OnDpiChanged(oldDpi, newDpi);
+
+            this.AdjustToScreen();
+        }
+
+        void AdjustToScreen()
+        {
+            if (this.Screen == null)
+                return;
+
+            var opacity = this.Opacity;
+            var visibility = this.Visibility;
+            this.Opacity = 0;
+            this.AdjustToClientArea(this.Screen);
+            this.Show();
+            this.Opacity = opacity;
+            this.Visibility = visibility;
         }
 
         public IEnumerable<Zone> Zones

@@ -16,7 +16,10 @@ namespace LostTech.Stack.Models
         public ObservableCollection<MutableKeyValuePair<string, string>> Map { get; }
             = new ObservableCollection<MutableKeyValuePair<string, string>>();
 
+#pragma warning disable 0067
+        // required for nested tracking
         public event PropertyChangedEventHandler PropertyChanged;
+#pragma warning restore 0067
 
         public ScreenLayouts Copy()
         {

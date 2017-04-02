@@ -15,18 +15,24 @@
         FormsScreen CurrentScreen
         {
             get {
-                if (this.dirty) {
-                    var newScreen = FormsScreen.AllScreens.FirstOrDefault(screen => screen.DeviceName == this.device);
-                    if (newScreen != null && newScreen != this.currentScreen) {
-                        this.currentScreen = newScreen;
-                        this.detectorWindow.Left = this.currentScreen.WorkingArea.Left;
-                        this.detectorWindow.Top = this.currentScreen.WorkingArea.Top;
-                        this.detectorWindow.Show();
-                        this.detectorWindow.Hide();
-                        this.dirty = false;
-                    }
-                }
+                this.EnsureUpToDate();
                 return this.currentScreen;
+            }
+        }
+
+        void EnsureUpToDate()
+        {
+            if (!this.dirty)
+                return;
+
+            var newScreen = FormsScreen.AllScreens.FirstOrDefault(screen => screen.DeviceName == this.device);
+            if (newScreen != null && newScreen != this.currentScreen) {
+                this.currentScreen = newScreen;
+                this.detectorWindow.Left = this.currentScreen.WorkingArea.Left;
+                this.detectorWindow.Top = this.currentScreen.WorkingArea.Top;
+                this.detectorWindow.Show();
+                this.detectorWindow.Hide();
+                this.dirty = false;
             }
         }
 
@@ -34,6 +40,7 @@
         FormsScreen currentScreen;
         bool dirty = false;
         readonly Window detectorWindow;
+        readonly PresentationSource presentationSource;
 
         Screen(FormsScreen screen)
         {
@@ -50,7 +57,7 @@
             };
             this.detectorWindow.Show();
             try {
-                this.PresentationSource = PresentationSource.FromVisual(this.detectorWindow);
+                this.presentationSource = PresentationSource.FromVisual(this.detectorWindow);
             }
             finally {
                 this.detectorWindow.Hide();
@@ -62,20 +69,26 @@
 
         IntPtr OnWindowMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            const int WM_WTSSESSION_CHANGE = 0x02B1;
             const int WM_DPICHANGED = 0x02E0;
 
             switch (msg) {
-            case WM_WTSSESSION_CHANGE:
             case WM_DPICHANGED:
                 this.dirty = true;
+                this.DpiChanged?.Invoke(this, EventArgs.Empty);
                 break;
             }
             return IntPtr.Zero;
         }
 
         // TODO: track updates
-        public PresentationSource PresentationSource { get; }
+        public PresentationSource PresentationSource
+        {
+            get {
+                this.EnsureUpToDate();
+                return this.presentationSource;
+            }
+        }
+
         public string ID => Invariant($"{Array.IndexOf(AllScreens.ToArray(), this):D3}");
         public string Name => Invariant($"{this.ID} ({this.CurrentScreen.Bounds.Width}x{this.CurrentScreen.Bounds.Height})");
         public bool IsPrimary => this.CurrentScreen.Primary;
@@ -85,5 +98,7 @@
             new ReadOnlyCollection<Screen>(FormsScreen.AllScreens.Select(formsScreen => new Screen(formsScreen)).ToArray());
 
         public Rect WorkingArea => this.CurrentScreen.WorkingArea.ToWPF();
+
+        public event EventHandler DpiChanged;
     }
 }

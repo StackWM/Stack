@@ -47,7 +47,6 @@
             ShowInTaskbar = false,
             WindowStyle = WindowStyle.None,
         };
-        private bool dirty;
         DragHook dragHook;
         KeyboardArrowBehavior keyboardArrowBehavior;
 
@@ -132,11 +131,7 @@
         {
             foreach (var screenLayout in this.screenLayouts) {
                 screenLayout.Show();
-                if (this.dirty || true) {
-                    screenLayout.AdjustToClientArea();
-                }
             }
-            this.dirty = false;
             this.dragOperation.Activated = true;
         }
 
@@ -364,11 +359,7 @@
 
         private IntPtr OnWindowMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            switch ((User32.WindowMessage)msg) {
-            case User32.WindowMessage.WM_DISPLAYCHANGE:
-                this.dirty = true;
-                return IntPtr.Zero;
-            }
+            //switch ((User32.WindowMessage)msg) {}
             return IntPtr.Zero;
         }
 
