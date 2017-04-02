@@ -3,9 +3,11 @@
 namespace LostTech.Stack
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Windows;
     using System.Diagnostics;
+    using System.Windows.Controls;
     using LostTech.Stack.Zones;
     using LostTech.Windows;
 
@@ -45,6 +47,24 @@ namespace LostTech.Stack
                 this.AdjustToClientArea(screen);
             else
                 throw new InvalidOperationException();
+        }
+
+        public IEnumerable<Zone> Zones
+        {
+            get {
+                var queue = new Queue<DependencyObject>();
+                queue.Enqueue(this);
+                while (queue.Count > 0) {
+                    var element = queue.Dequeue();
+                    if (element is Zone zone)
+                        yield return zone;
+
+                    int childrenCount = VisualTreeHelper.GetChildrenCount(element);
+                    for (int child = 0; child < childrenCount; child++) {
+                        queue.Enqueue(VisualTreeHelper.GetChild(element, child));
+                    }
+                }
+            }
         }
 
         internal Zone GetZone(Point dropPoint)

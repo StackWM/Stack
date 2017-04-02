@@ -16,6 +16,7 @@
     using System.Xml;
     using Gma.System.MouseKeyHook;
     using LostTech.App;
+    using LostTech.Stack.Behavior;
     using LostTech.Stack.InternalExtensions;
     using LostTech.Stack.Models;
     using LostTech.Stack.Utils;
@@ -25,7 +26,6 @@
     using PInvoke;
     using Application = System.Windows.Application;
     using DragAction = System.Windows.DragAction;
-    using DragDropEffects = System.Windows.DragDropEffects;
     using FileAccess = PCLStorage.FileAccess;
     using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
     using Screen = LostTech.Windows.Screen;
@@ -49,6 +49,7 @@
         };
         private bool dirty;
         DragHook dragHook;
+        KeyboardArrowBehavior keyboardArrowBehavior;
 
         protected override async void OnStartup(StartupEventArgs e)
         {
@@ -79,24 +80,6 @@
             //this.MainWindow.Show();
         }
 
-        private void GlobalKeyDown(object sender, KeyEventArgs @event)
-        {
-            if (@event.KeyData == Keys.Escape && this.dragOperation != null) {
-                @event.Handled = true;
-                StopDrag(this.dragOperation.Window);
-                return;
-            }
-
-            if (@event.KeyData == Keys.Left && GetKeyboardModifiers() == ModifierKeys.Windows) {
-                @event.Handled = true;
-                return;
-            }
-        }
-
-        static ModifierKeys GetKeyboardModifiers()
-            => Keyboard.Modifiers | (IsWinDown() ? ModifierKeys.Windows : ModifierKeys.None);
-        static bool IsWinDown() => Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin);
-
         private void OnDragMove(object sender, DragHookEventArgs @event)
         {
             if (this.dragOperation == null) {
@@ -119,35 +102,29 @@
             if (screen == null) {
                 if (this.dragOperation.CurrentZone != null) {
                     this.dragOperation.CurrentZone.IsDragMouseOver = false;
-                    // this.dragOperation.CurrentZone.ReleaseMouseCapture();
                 }
                 return;
             }
 
-            // Debug.WriteLine(screen.CaptureMouse());
 
             var relativeDropPoint = screen.PointFromScreen(currentPosition);
             var zone = screen.GetZone(relativeDropPoint);
             if (zone == null) {
                 if (this.dragOperation.CurrentZone != null) {
                     this.dragOperation.CurrentZone.IsDragMouseOver = false;
-                    // this.dragOperation.CurrentZone.ReleaseMouseCapture();
                 }
                 return;
             }
 
             if (zone == this.dragOperation.CurrentZone) {
                 this.dragOperation.CurrentZone.IsDragMouseOver = true;
-                // Debug.WriteLine(this.dragOperation.CurrentZone.CaptureMouse());
                 return;
             }
 
             if (this.dragOperation.CurrentZone != null) {
                 this.dragOperation.CurrentZone.IsDragMouseOver = false;
-                // this.dragOperation.CurrentZone.ReleaseMouseCapture();
             }
             zone.IsDragMouseOver = true;
-            // Debug.WriteLine(zone.CaptureMouse());
             this.dragOperation.CurrentZone = zone;
         }
 
@@ -184,6 +161,11 @@
             var zone = screen.GetZone(relativeDropPoint);
             if (zone == null)
                 return;
+            this.Move(window, zone);
+        }
+
+        void Move(IntPtr window, Zone zone)
+        {
             Rect targetBounds = zone.Target.GetPhysicalBounds();
             if (!User32.MoveWindow(window, (int) targetBounds.Left, (int) targetBounds.Top, (int) targetBounds.Width,
                 (int) targetBounds.Height, true)) {
@@ -205,15 +187,21 @@
             return new Point(cursorPos.x, cursorPos.y);
         }
 
+        private void GlobalKeyDown(object sender, KeyEventArgs @event)
+        {
+            if (@event.KeyData == Keys.Escape && this.dragOperation != null) {
+                @event.Handled = true;
+                StopDrag(this.dragOperation.Window);
+                return;
+            }
+        }
+
         void StopDrag(IntPtr window)
         {
             if (this.dragOperation.CurrentZone != null) {
                 this.dragOperation.CurrentZone.IsDragMouseOver = false;
-                // this.dragOperation.CurrentZone.ReleaseMouseCapture();
             }
             foreach (var screenLayout in this.screenLayouts) {
-                //screenLayout.ReleaseMouseCapture();
-                //User32.ReleaseCapture();
                 screenLayout.Hide();
             }
             User32.SetForegroundWindow(this.dragOperation.OriginalActiveWindow);
@@ -250,6 +238,7 @@
             Debug.WriteLine("shutdown requested");
             this.hook.Dispose();
             this.dragHook.Dispose();
+            this.keyboardArrowBehavior.Dispose();
             this.trayIcon?.Dispose();
 
             if (this.screenLayoutSettings != null)
@@ -314,6 +303,7 @@
         {
             // TODO: MIT license for MouseKeyboardActivityMonitor
             this.hook = Hook.GlobalEvents();
+            this.keyboardArrowBehavior = new KeyboardArrowBehavior(this.hook, this.screenLayouts, this.Move);
             this.dragHook = new DragHook(MouseButtons.Middle, this.hook);
             this.dragHook.DragStartPreview += this.OnDragStartPreview;
             this.dragHook.DragStart += this.OnDragStart;
