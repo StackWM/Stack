@@ -7,8 +7,8 @@
     <ProjectGuid>{19873EED-25C9-4663-A9A2-1075A940DFDA}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UWP</RootNamespace>
-    <AssemblyName>UWP</AssemblyName>
+    <RootNamespace>LostTech.Stack</RootNamespace>
+    <AssemblyName>Zones.UWP</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>

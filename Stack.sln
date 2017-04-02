@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{37EB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseKeyHook", "..\..\OSS\MouseKeyHook\MouseKeyHook\MouseKeyHook.csproj", "{F52AA97E-180A-40ED-8F2B-09080171D6C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UWP", "src\UWP\UWP.csproj", "{19873EED-25C9-4663-A9A2-1075A940DFDA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zones.UWP", "src\UWP\Zones.UWP.csproj", "{19873EED-25C9-4663-A9A2-1075A940DFDA}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C9C161DE-31A7-4426-B523-7302DFF6B66A} = {C9C161DE-31A7-4426-B523-7302DFF6B66A}
 	EndProjectSection
