@@ -185,6 +185,14 @@
     <Compile Include="WindowDragOperation.cs" />
     <Compile Include="Windows\DragHook.cs" />
     <Compile Include="Zones\Zone.cs" />
+    <EmbeddedResource Include="OOBLayouts\H 40 inch.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OOBLayouts\V Top+Rest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <Page Include="ScreenLayout.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -252,6 +260,16 @@
       <Name>Screen</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="AfterBuild">
+    <PropertyGroup>
+      <TargetUWP>..\UWP\Desktop\</TargetUWP>
+    </PropertyGroup>
+    <ItemGroup>
+      <Win32Binaries Include="$(TargetDir)\*.exe" />
+      <Win32Binaries Include="$(TargetDir)\*.dll" />
+      <Win32Binaries Include="$(TargetDir)\*.exe.config" />
+    </ItemGroup>
+    <Copy SourceFiles="@(Win32Binaries)" DestinationFolder="$(TargetUWP)" />
+  </Target>
 </Project>

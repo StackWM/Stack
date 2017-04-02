@@ -39,7 +39,7 @@
         WindowDragOperation dragOperation;
         ICollection<ScreenLayout> screenLayouts;
         private NotifyIcon trayIcon;
-        IFolder localSettingsFolder;
+        IFolder localSettingsFolder, roamingSettingsFolder;
         SettingsSet<ScreenLayouts, ScreenLayouts> screenLayoutSettings;
         readonly Window winApiHandler = new Window {
             Opacity = 0,
@@ -57,6 +57,7 @@
             this.MainWindow = this.winApiHandler;
 
             this.localSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(AppData.FullName);
+            this.roamingSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(RoamingAppData.FullName);
             var localSettings = XmlSettings.Create(this.localSettingsFolder);
             try {
                 screenLayoutSettings = await localSettings.LoadOrCreate<ScreenLayouts, ScreenLayouts>("LayoutMap.xml");
@@ -252,7 +253,9 @@
 
         async Task StartLayout(StackSettings stackSettings)
         {
-            var layoutsDirectory = await this.localSettingsFolder.CreateFolderAsync("Layouts", CreationCollisionOption.OpenIfExists);
+            var layoutsDirectory = await this.roamingSettingsFolder.CreateFolderAsync("Layouts", CreationCollisionOption.OpenIfExists);
+            if ((await layoutsDirectory.GetFilesAsync()).Count == 0)
+                await this.InstallDefaultLayouts(layoutsDirectory);
 
             var defaultLayout = new Lazy<FrameworkElement>(() => this.LoadLayoutOrDefault(layoutsDirectory, "Default.xaml").Result);
             var primary = Screen.Primary;
@@ -284,6 +287,23 @@
             this.BindHandlers();
 
             this.trayIcon = (await TrayIcon.StartTrayIcon(layoutsDirectory, stackSettings)).Icon;
+        }
+
+        async Task InstallDefaultLayouts(IFolder destination)
+        {
+            var resourceContainer = Assembly.GetExecutingAssembly();
+            var prefix = this.GetType().Namespace + ".OOBLayouts.";
+            foreach (var resource in resourceContainer.GetManifestResourceNames()
+                                                      .Where(name => name.StartsWith(prefix))) {
+                var name = resource.Substring(prefix.Length);
+                using (var stream = resourceContainer.GetManifestResourceStream(resource)) {
+                    var file = await destination.CreateFileAsync(name, CreationCollisionOption.FailIfExists).ConfigureAwait(false);
+                    using (var targetStream = await file.OpenAsync(FileAccess.ReadAndWrite).ConfigureAwait(false)) {
+                        await stream.CopyToAsync(targetStream).ConfigureAwait(false);
+                        targetStream.Close();
+                    }
+                }
+            }
         }
 
         async Task<FrameworkElement> GetLayoutForScreen(Screen screen, StackSettings settings, IFolder layoutsDirectory)
@@ -344,6 +364,15 @@
             get {
                 // TODO: implement roaming
                 var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var path = Path.Combine(appData, "Lost Tech LLC", nameof(LostTech.Stack));
+                return Directory.CreateDirectory(path);
+            }
+        }
+
+        public static DirectoryInfo RoamingAppData
+        {
+            get {
+                var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 var path = Path.Combine(appData, "Lost Tech LLC", nameof(LostTech.Stack));
                 return Directory.CreateDirectory(path);
             }
