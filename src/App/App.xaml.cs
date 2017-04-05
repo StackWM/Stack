@@ -29,6 +29,7 @@
     using FileAccess = PCLStorage.FileAccess;
     using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
     using Screen = LostTech.Windows.Screen;
+    using static PInvoke.User32;
 
     /// <summary>
     /// Interaction logic for App.xaml
@@ -53,6 +54,9 @@
         protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            if (e.Args.Contains("--jit-debugging"))
+                EnableJitDebugging();
 
             this.MainWindow = this.winApiHandler;
 
@@ -80,6 +84,11 @@
             //this.MainWindow.Show();
         }
 
+        static void EnableJitDebugging()
+        {
+            AppDomain.CurrentDomain.UnhandledException += (_, args) => Debugger.Launch();
+        }
+
         private void OnDragMove(object sender, DragHookEventArgs @event)
         {
             if (this.dragOperation == null) {
@@ -92,11 +101,7 @@
             }
 
             var location = GetCursorPos();
-            var dx = location.X - this.dragOperation.StartLocation.X;
-            var dy = location.Y - this.dragOperation.StartLocation.Y;
             var currentPosition = location;
-            if (Math.Abs(dx) < DragThreshold && Math.Abs(dy) < DragThreshold)
-                return;
 
             var screen = this.screenLayouts.FirstOrDefault(layout => layout.GetPhysicalBounds().Contains(currentPosition));
             if (screen == null) {
@@ -142,13 +147,9 @@
                 return;
 
             var location = GetCursorPos();
-            var dx = location.X - this.dragOperation.StartLocation.X;
-            var dy = location.Y - this.dragOperation.StartLocation.Y;
             var dropPoint = location;
             var window = this.dragOperation.Window;
             this.StopDrag(window);
-            if (Math.Abs(dx) < DragThreshold && Math.Abs(dy) < DragThreshold)
-                return;
 
             var screen = this.screenLayouts.SingleOrDefault(layout => layout.GetPhysicalBounds().Contains(dropPoint));
             if (screen == null)
@@ -215,16 +216,15 @@
             args.Handled = DragStart(new Point(args.X, args.Y)) != null;
         }
 
-        private WindowDragOperation DragStart(Point location)
+        WindowDragOperation DragStart(Point location)
         {
-            var desktop = User32.GetDesktopWindow();
-            var point = new POINT {x = (int)location.X, y = (int)location.Y};
-            var child = User32.ChildWindowFromPointEx(desktop, point,
-                User32.ChildWindowFromPointExFlags.CWP_SKIPINVISIBLE);
-            //var child = User32.WindowFromPhysicalPoint(point);
+            //var point = new POINT { x = (int)location.X, y = (int)location.Y };
+            User32.GetCursorPos(out var point);
+            var desktop = GetDesktopWindow();
+            var child = ChildWindowFromPointEx(desktop, point, ChildWindowFromPointExFlags.CWP_SKIPINVISIBLE);
             if (child == IntPtr.Zero || true.Equals(User32.GetWindowText(child)?.EndsWith("Remote Desktop Connection")))
                 return null;
-            return new WindowDragOperation(child, location) {
+            return new WindowDragOperation(child) {
                 OriginalActiveWindow = User32.GetForegroundWindow(),
             };
         }
