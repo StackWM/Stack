@@ -9,6 +9,7 @@
     using LostTech.Stack.Compat;
     using FormsScreen = System.Windows.Forms.Screen;
     using static System.FormattableString;
+    using PInvoke;
 
     public sealed class Screen
     {
@@ -69,10 +70,9 @@
 
         IntPtr OnWindowMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            const int WM_DPICHANGED = 0x02E0;
-
-            switch (msg) {
-            case WM_DPICHANGED:
+            switch ((User32.WindowMessage)msg) {
+            case User32.WindowMessage.WM_DPICHANGED:
+            case User32.WindowMessage.WM_SETTINGCHANGE:
                 this.dirty = true;
                 this.DpiChanged?.Invoke(this, EventArgs.Empty);
                 break;
