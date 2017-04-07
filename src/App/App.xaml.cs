@@ -6,6 +6,7 @@
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
@@ -22,6 +23,7 @@
     using LostTech.Stack.Utils;
     using LostTech.Stack.Windows;
     using LostTech.Stack.Zones;
+    using Microsoft.HockeyApp;
     using PCLStorage;
     using PInvoke;
     using Application = System.Windows.Application;
@@ -58,6 +60,8 @@
             if (e.Args.Contains("--jit-debugging"))
                 EnableJitDebugging();
 
+            await EnableHockeyApp();
+
             this.MainWindow = this.winApiHandler;
 
             this.localSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(AppData.FullName);
@@ -82,6 +86,20 @@
 
             //this.MainWindow = new MyPos();
             //this.MainWindow.Show();
+        }
+
+        static Task EnableHockeyApp()
+        {
+#if DEBUG
+            HockeyClient.Current.Configure("be80a4a0381c4c37bc187d593ac460f9 ");
+            ((HockeyClient)HockeyClient.Current).OnHockeySDKInternalException += (sender, args) =>
+            {
+                if (Debugger.IsAttached) { Debugger.Break(); }
+            };
+#else
+            HockeyClient.Current.Configure("6037e69fa4944acc9d83ef7682e60732");
+#endif
+            return HockeyClient.Current.SendCrashesAsync();
         }
 
         static void EnableJitDebugging()
@@ -207,23 +225,29 @@
 
         void OnDragStart(object sender, DragHookEventArgs @event)
         {
-            this.dragOperation = DragStart(new Point(@event.X, @event.Y));
+            this.dragOperation = this.DragStart();
             @event.Handled = this.dragOperation != null;
         }
 
         void OnDragStartPreview(object sender, DragHookEventArgs args)
         {
-            args.Handled = DragStart(new Point(args.X, args.Y)) != null;
+            args.Handled = this.DragStart() != null;
         }
 
-        WindowDragOperation DragStart(Point location)
+        WindowDragOperation DragStart()
         {
             //var point = new POINT { x = (int)location.X, y = (int)location.Y };
             User32.GetCursorPos(out var point);
             var desktop = GetDesktopWindow();
             var child = ChildWindowFromPointEx(desktop, point, ChildWindowFromPointExFlags.CWP_SKIPINVISIBLE);
-            if (child == IntPtr.Zero || true.Equals(User32.GetWindowText(child)?.EndsWith("Remote Desktop Connection")))
+            try {
+                if (child == IntPtr.Zero || true.Equals(User32.GetWindowText(child)
+                        ?.EndsWith("Remote Desktop Connection")))
+                    return null;
+            }
+            catch (Win32Exception) {
                 return null;
+            }
             return new WindowDragOperation(child) {
                 OriginalActiveWindow = User32.GetForegroundWindow(),
             };
@@ -249,6 +273,13 @@
             }
 
             this.Shutdown();
+        }
+
+        protected override void OnExit(ExitEventArgs exitArgs)
+        {
+            base.OnExit(exitArgs);
+            HockeyClient.Current.Flush();
+            Thread.Sleep(1000);
         }
 
         async Task StartLayout(StackSettings stackSettings)
