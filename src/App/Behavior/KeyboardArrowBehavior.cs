@@ -75,7 +75,8 @@
                 info.rcWindow.right - info.rcWindow.left,
                 info.rcWindow.bottom - info.rcWindow.top);
             var windowCenter = windowBounds.Center();
-            var allZones = this.screenLayouts.SelectMany(screen => screen.Zones);
+            var allZones = this.screenLayouts.SelectMany(screen => screen.Zones)
+                .Where(zone => zone.Target == null || zone.Equals(zone.Target));
             var sameCenter = allZones.Where(zone => zone.GetPhysicalBounds().Center()
                                             .Equals(windowCenter, epsilon: Epsilon)).ToArray();
             // it only affects cases when centers match

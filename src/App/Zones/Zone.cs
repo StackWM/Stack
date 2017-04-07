@@ -72,5 +72,14 @@
         }
         public static readonly DependencyProperty TargetProperty =
             DependencyProperty.Register(nameof(Target), typeof(Zone), typeof(Zone), new PropertyMetadata(null));
+
+        public Zone GetFinalTarget()
+        {
+            var result = this;
+            while (result.Target != null && !result.Equals(result.Target)) {
+                result = result.Target;
+            }
+            return result;
+        }
     }
 }

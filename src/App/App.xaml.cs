@@ -113,7 +113,7 @@
 
 
             var relativeDropPoint = screen.PointFromScreen(currentPosition);
-            var zone = screen.GetZone(relativeDropPoint);
+            var zone = screen.GetZone(relativeDropPoint)?.GetFinalTarget();
             if (zone == null) {
                 if (this.dragOperation.CurrentZone != null) {
                     this.dragOperation.CurrentZone.IsDragMouseOver = false;
@@ -155,7 +155,7 @@
             if (screen == null)
                 return;
             var relativeDropPoint = screen.PointFromScreen(dropPoint);
-            var zone = screen.GetZone(relativeDropPoint);
+            var zone = screen.GetZone(relativeDropPoint)?.GetFinalTarget();
             if (zone == null)
                 return;
             this.Move(window, zone);
