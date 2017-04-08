@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.12
+VisualStudioVersion = 15.0.26403.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App", "src\App\App.csproj", "{C9C161DE-31A7-4426-B523-7302DFF6B66A}"
 EndProject
@@ -14,15 +14,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{37EB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseKeyHook", "..\..\OSS\MouseKeyHook\MouseKeyHook\MouseKeyHook.csproj", "{F52AA97E-180A-40ED-8F2B-09080171D6C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zones.UWP", "src\UWP\Zones.UWP.csproj", "{19873EED-25C9-4663-A9A2-1075A940DFDA}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C9C161DE-31A7-4426-B523-7302DFF6B66A} = {C9C161DE-31A7-4426-B523-7302DFF6B66A}
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repo", "Repo", "{55FC7D5D-8916-4720-B14D-464B3FEDE46D}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 	EndProjectSection
+EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Stack.Setup", "src\Setup\Stack.Setup.wixproj", "{1A3D79A3-8EA3-4FC4-B78B-3E73A2998782}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,27 +81,18 @@ Global
 		{F52AA97E-180A-40ED-8F2B-09080171D6C7}.Release|x64.Build.0 = Release|Any CPU
 		{F52AA97E-180A-40ED-8F2B-09080171D6C7}.Release|x86.ActiveCfg = Release|Any CPU
 		{F52AA97E-180A-40ED-8F2B-09080171D6C7}.Release|x86.Build.0 = Release|Any CPU
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Debug|Any CPU.ActiveCfg = Release|x86
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Debug|Any CPU.Build.0 = Release|x86
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Debug|ARM.ActiveCfg = Debug|ARM
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Debug|ARM.Build.0 = Debug|ARM
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Debug|ARM.Deploy.0 = Debug|ARM
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Debug|x64.ActiveCfg = Debug|x64
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Debug|x64.Build.0 = Debug|x64
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Debug|x64.Deploy.0 = Debug|x64
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Debug|x86.ActiveCfg = Debug|x86
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Debug|x86.Build.0 = Debug|x86
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Debug|x86.Deploy.0 = Debug|x86
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Release|Any CPU.ActiveCfg = Release|x86
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Release|ARM.ActiveCfg = Release|ARM
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Release|ARM.Build.0 = Release|ARM
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Release|ARM.Deploy.0 = Release|ARM
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Release|x64.ActiveCfg = Release|x64
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Release|x64.Build.0 = Release|x64
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Release|x64.Deploy.0 = Release|x64
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Release|x86.ActiveCfg = Release|x86
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Release|x86.Build.0 = Release|x86
-		{19873EED-25C9-4663-A9A2-1075A940DFDA}.Release|x86.Deploy.0 = Release|x86
+		{1A3D79A3-8EA3-4FC4-B78B-3E73A2998782}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{1A3D79A3-8EA3-4FC4-B78B-3E73A2998782}.Debug|Any CPU.Build.0 = Debug|x86
+		{1A3D79A3-8EA3-4FC4-B78B-3E73A2998782}.Debug|ARM.ActiveCfg = Debug|x86
+		{1A3D79A3-8EA3-4FC4-B78B-3E73A2998782}.Debug|x64.ActiveCfg = Debug|x86
+		{1A3D79A3-8EA3-4FC4-B78B-3E73A2998782}.Debug|x86.ActiveCfg = Debug|x86
+		{1A3D79A3-8EA3-4FC4-B78B-3E73A2998782}.Debug|x86.Build.0 = Debug|x86
+		{1A3D79A3-8EA3-4FC4-B78B-3E73A2998782}.Release|Any CPU.ActiveCfg = Release|x86
+		{1A3D79A3-8EA3-4FC4-B78B-3E73A2998782}.Release|Any CPU.Build.0 = Release|x86
+		{1A3D79A3-8EA3-4FC4-B78B-3E73A2998782}.Release|ARM.ActiveCfg = Release|x86
+		{1A3D79A3-8EA3-4FC4-B78B-3E73A2998782}.Release|x64.ActiveCfg = Release|x86
+		{1A3D79A3-8EA3-4FC4-B78B-3E73A2998782}.Release|x86.ActiveCfg = Release|x86
+		{1A3D79A3-8EA3-4FC4-B78B-3E73A2998782}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

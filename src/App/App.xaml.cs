@@ -41,7 +41,7 @@
         IKeyboardMouseEvents hook;
         WindowDragOperation dragOperation;
         ICollection<ScreenLayout> screenLayouts;
-        private NotifyIcon trayIcon;
+        NotifyIcon trayIcon;
         IFolder localSettingsFolder, roamingSettingsFolder;
         SettingsSet<ScreenLayouts, ScreenLayouts> screenLayoutSettings;
         readonly Window winApiHandler = new Window {
@@ -59,15 +59,20 @@
         {
             base.OnStartup(e);
 
-            StopRunningInstances();
-
             if (e.Args.Contains("--jit-debugging"))
                 EnableJitDebugging();
 
             await EnableHockeyApp();
 
+            StopRunningInstances();
+
             this.MainWindow = this.winApiHandler;
             this.winApiHandler.Show();
+
+            var updateCheck = HockeyClient.Current.CheckForUpdatesAsync(autoShowUi: true, shutdownActions: () => {
+                this.BeginShutdown();
+                return true;
+            });
 
             this.localSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(AppData.FullName);
             this.roamingSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(RoamingAppData.FullName);
@@ -89,6 +94,8 @@
 
             this.winApiHandler.Closed += (sender, args) => this.BeginShutdown();
 
+            GC.KeepAlive(updateCheck);
+
             //this.MainWindow = new MyPos();
             //this.MainWindow.Show();
         }
@@ -97,9 +104,9 @@
         {
             var currentWindow = IntPtr.Zero;
             while (true) {
-                currentWindow = User32.FindWindowEx(IntPtr.Zero, currentWindow, null, nameof(winApiHandler));
+                currentWindow = FindWindowEx(IntPtr.Zero, currentWindow, null, nameof(winApiHandler));
                 if (currentWindow != IntPtr.Zero)
-                    User32.PostMessage(currentWindow, WindowMessage.WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+                    PostMessage(currentWindow, WindowMessage.WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
                 else
                     break;
             }
@@ -214,7 +221,7 @@
         async void Move(IntPtr window, Zone zone)
         {
             Rect targetBounds = zone.Target.GetPhysicalBounds();
-            if (!User32.MoveWindow(window, (int) targetBounds.Left, (int) targetBounds.Top, (int) targetBounds.Width,
+            if (!MoveWindow(window, (int) targetBounds.Left, (int) targetBounds.Top, (int) targetBounds.Width,
                 (int) targetBounds.Height, true)) {
                 this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
                 this.trayIcon.BalloonTipTitle = "Can't move";
@@ -223,9 +230,9 @@
             }
             else {
                 // TODO: option to not activate on move
-                User32.SetForegroundWindow(window);
+                SetForegroundWindow(window);
                 await Task.Yield();
-                User32.MoveWindow(window, (int)targetBounds.Left, (int)targetBounds.Top, (int)targetBounds.Width,
+                MoveWindow(window, (int)targetBounds.Left, (int)targetBounds.Top, (int)targetBounds.Width,
                     (int)targetBounds.Height, true);
             }
         }
@@ -254,29 +261,29 @@
             foreach (var screenLayout in this.screenLayouts) {
                 screenLayout.Hide();
             }
-            User32.SetForegroundWindow(this.dragOperation.OriginalActiveWindow);
+            SetForegroundWindow(this.dragOperation.OriginalActiveWindow);
             this.dragOperation = null;
         }
 
         void OnDragStart(object sender, DragHookEventArgs @event)
         {
-            this.dragOperation = this.DragStart();
+            this.dragOperation = DragStart();
             @event.Handled = this.dragOperation != null;
         }
 
         void OnDragStartPreview(object sender, DragHookEventArgs args)
         {
-            args.Handled = this.DragStart() != null;
+            args.Handled = DragStart() != null;
         }
 
-        WindowDragOperation DragStart()
+        static WindowDragOperation DragStart()
         {
             //var point = new POINT { x = (int)location.X, y = (int)location.Y };
             User32.GetCursorPos(out var point);
             var desktop = GetDesktopWindow();
             var child = ChildWindowFromPointEx(desktop, point, ChildWindowFromPointExFlags.CWP_SKIPINVISIBLE);
             try {
-                if (child == IntPtr.Zero || true.Equals(User32.GetWindowText(child)
+                if (child == IntPtr.Zero || true.Equals(GetWindowText(child)
                         ?.EndsWith("Remote Desktop Connection")))
                     return null;
             }
@@ -284,7 +291,7 @@
                 return null;
             }
             return new WindowDragOperation(child) {
-                OriginalActiveWindow = User32.GetForegroundWindow(),
+                OriginalActiveWindow = GetForegroundWindow(),
             };
         }
 
@@ -454,7 +461,7 @@
 
         private IntPtr OnWindowMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            //switch ((User32.WindowMessage)msg) {}
+            //switch ((WindowMessage)msg) {}
             return IntPtr.Zero;
         }
 
