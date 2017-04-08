@@ -11,7 +11,6 @@
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Forms;
-    using System.Windows.Input;
     using System.Windows.Interop;
     using System.Windows.Markup;
     using System.Xml;
@@ -32,6 +31,7 @@
     using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
     using Screen = LostTech.Windows.Screen;
     using static PInvoke.User32;
+    using MessageBox = System.Windows.MessageBox;
 
     /// <summary>
     /// Interaction logic for App.xaml
@@ -49,6 +49,8 @@
             AllowsTransparency = true,
             ShowInTaskbar = false,
             WindowStyle = WindowStyle.None,
+            Width=0,Height=0,
+            Title = nameof(winApiHandler),
         };
         DragHook dragHook;
         KeyboardArrowBehavior keyboardArrowBehavior;
@@ -57,12 +59,15 @@
         {
             base.OnStartup(e);
 
+            StopRunningInstances();
+
             if (e.Args.Contains("--jit-debugging"))
                 EnableJitDebugging();
 
             await EnableHockeyApp();
 
             this.MainWindow = this.winApiHandler;
+            this.winApiHandler.Show();
 
             this.localSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(AppData.FullName);
             this.roamingSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(RoamingAppData.FullName);
@@ -86,6 +91,33 @@
 
             //this.MainWindow = new MyPos();
             //this.MainWindow.Show();
+        }
+
+        static void StopRunningInstances()
+        {
+            var currentWindow = IntPtr.Zero;
+            while (true) {
+                currentWindow = User32.FindWindowEx(IntPtr.Zero, currentWindow, null, nameof(winApiHandler));
+                if (currentWindow != IntPtr.Zero)
+                    User32.PostMessage(currentWindow, WindowMessage.WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+                else
+                    break;
+            }
+
+            var selfID = Process.GetCurrentProcess().Id;
+            foreach(var instance in Process.GetProcessesByName("Stack")) {
+                if (instance.Id == selfID)
+                    continue;
+
+                if (!instance.WaitForExit(5000)) {
+                    MessageBox.Show($"Failed to stop Stack instance with process ID {instance.Id}. Will exit.",
+                        "Other instance is still running", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Environment.Exit(-1);
+                }
+                else {
+                    Debug.WriteLine($"Stopped [{instance.Id}] Stack.exe");
+                }
+            }
         }
 
         static Task EnableHockeyApp()
