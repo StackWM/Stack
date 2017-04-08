@@ -8,11 +8,18 @@
 
     <Property Id="ALLUSERS" Value="2" />
     <Property Id="MSIINSTALLPERUSER" Value="1" />
+    <Property Id="STACK_AUTO_START">1</Property>
 
     <Feature Id="ProductFeature" Title="App.Setup" Level="1">
       <ComponentGroupRef Id="ProductComponents" />
       <ComponentGroupRef Id="Shortcuts" />
     </Feature>
+
+    <InstallExecuteSequence>
+      <Custom Action="LaunchApp" After="InstallFinalize" />
+    </InstallExecuteSequence>
+
+    <CustomAction Id="LaunchApp" FileKey="Stack.exe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait" />
   </Product>
 
   <Fragment>
@@ -32,6 +39,13 @@
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
       <Component Id="Stack.exe" Guid="8721f00c-3a94-49cc-a4d2-6a434fef535e">
         <File Id="Stack.exe" Name="Stack.exe" Source="$(var.App.TargetDir)Stack.exe" />
+      </Component>
+      <Component Id="StackAutostart" Guid="a6cecb09-7db8-4d0a-8d18-6542830f3a2e">
+        <RegistryValue Id="Stack.Start" Root="HKCU" Action="write"
+                       Key="Software\Microsoft\Windows\CurrentVersion\Run"
+                       Name="Stack"
+                       Value="[INSTALLDIR]Stack.exe"
+                       Type="string"/>
       </Component>
       <Component Id="System.Console.dll" Guid="aa212e8d-c7eb-46c9-b34d-ca184e2a8219">
         <File Id="System.Console.dll" Name="System.Console.dll" Source="$(var.App_TargetDir)System.Console.dll" />
