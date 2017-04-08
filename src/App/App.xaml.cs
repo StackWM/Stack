@@ -13,6 +13,7 @@
     using System.Windows.Forms;
     using System.Windows.Interop;
     using System.Windows.Markup;
+    using System.Windows.Threading;
     using System.Xml;
     using Gma.System.MouseKeyHook;
     using LostTech.App;
@@ -54,6 +55,7 @@
         };
         DragHook dragHook;
         KeyboardArrowBehavior keyboardArrowBehavior;
+        DispatcherTimer updateTimer;
 
         protected override async void OnStartup(StartupEventArgs e)
         {
@@ -69,10 +71,9 @@
             this.MainWindow = this.winApiHandler;
             this.winApiHandler.Show();
 
-            var updateCheck = HockeyClient.Current.CheckForUpdatesAsync(autoShowUi: true, shutdownActions: () => {
-                this.BeginShutdown();
-                return true;
-            });
+            this.BeginCheckForUpdates();
+            this.updateTimer = new DispatcherTimer(DispatcherPriority.Background) {Interval = TimeSpan.FromDays(1), IsEnabled = true};
+            this.updateTimer.Tick += (_, __) => this.BeginCheckForUpdates();
 
             this.localSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(AppData.FullName);
             this.roamingSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(RoamingAppData.FullName);
@@ -84,6 +85,7 @@
                 var brokenFile = await this.localSettingsFolder.GetFileAsync("LayoutMap.xml");
                 await brokenFile.DeleteAsync();
                 this.screenLayoutSettings = await localSettings.LoadOrCreate<ScreenLayouts, ScreenLayouts>("LayoutMap.xml");
+                this.screenLayoutSettings.ScheduleSave();
             }
             screenLayoutSettings.Autosave = true;
             var settings = new StackSettings {LayoutMap = screenLayoutSettings.Value};
@@ -94,10 +96,16 @@
 
             this.winApiHandler.Closed += (sender, args) => this.BeginShutdown();
 
-            GC.KeepAlive(updateCheck);
-
             //this.MainWindow = new MyPos();
             //this.MainWindow.Show();
+        }
+
+        void BeginCheckForUpdates()
+        {
+            HockeyClient.Current.CheckForUpdatesAsync(autoShowUi: true, shutdownActions: () => {
+                this.BeginShutdown();
+                return true;
+            }).GetAwaiter();
         }
 
         static void StopRunningInstances()
@@ -310,6 +318,7 @@
                 this.screenLayoutSettings = null;
                 await settings.DisposeAsync();
 
+                Debug.WriteLine("settings written");
                 //await Task.Delay(5000);
                 //Debug.WriteLine("delayed message");
             }
