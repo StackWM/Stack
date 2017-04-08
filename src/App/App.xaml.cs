@@ -179,7 +179,7 @@
             this.Move(window, zone);
         }
 
-        void Move(IntPtr window, Zone zone)
+        async void Move(IntPtr window, Zone zone)
         {
             Rect targetBounds = zone.Target.GetPhysicalBounds();
             if (!User32.MoveWindow(window, (int) targetBounds.Left, (int) targetBounds.Top, (int) targetBounds.Width,
@@ -192,6 +192,9 @@
             else {
                 // TODO: option to not activate on move
                 User32.SetForegroundWindow(window);
+                await Task.Yield();
+                User32.MoveWindow(window, (int)targetBounds.Left, (int)targetBounds.Top, (int)targetBounds.Width,
+                    (int)targetBounds.Height, true);
             }
         }
 
