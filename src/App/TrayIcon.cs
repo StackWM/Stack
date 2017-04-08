@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using LostTech.Stack.Models;
     using PCLStorage;
@@ -69,8 +70,7 @@
                 this.stackSettings.LayoutMap.Map.Add(newMapping);
             else
                 this.stackSettings.LayoutMap.Map[entryIndex] = newMapping;
-            MessageBox.Show(caption: "Restart required", messageBoxText: "To apply changes, restart the app",
-                button: MessageBoxButton.OK, icon: MessageBoxImage.Warning);
+            Process.Start(Process.GetCurrentProcess().MainModule.FileName);
         }
     }
 }
