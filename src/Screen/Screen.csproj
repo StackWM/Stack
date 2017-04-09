@@ -64,8 +64,13 @@
     <Compile Include="..\App\Compat\RectangleCompat.cs">
       <Link>RectangleCompat.cs</Link>
     </Compile>
-    <Compile Include="Screen.cs" />
+    <Compile Include="CanNotFindDesktopException.cs" />
+    <Compile Include="IScreenProvider.cs" />
+    <Compile Include="Win32Screen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Win32ScreenProvider.cs" />
+    <Compile Include="Win32\DisplayDevice.cs" />
+    <Compile Include="Win32\DisplayDeviceStateFlags.cs" />
     <Compile Include="WtsApi.cs" />
   </ItemGroup>
   <ItemGroup>

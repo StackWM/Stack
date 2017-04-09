@@ -29,14 +29,14 @@ namespace LostTech.Stack.Models
             return result;
         }
 
-        public string GetPreferredLayout(Screen screen)
+        public string GetPreferredLayout(Win32Screen screen)
         {
             if (screen == null)
                 throw new ArgumentNullException(nameof(screen));
             return this.Map.FirstOrDefault(kv => kv.Key == screen.ID)?.Value;
         }
 
-        public int GetPreferredLayoutIndex(Screen screen)
+        public int GetPreferredLayoutIndex(Win32Screen screen)
         {
             if (screen == null)
                 throw new ArgumentNullException(nameof(screen));

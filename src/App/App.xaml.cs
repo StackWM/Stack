@@ -23,6 +23,7 @@
     using LostTech.Stack.Utils;
     using LostTech.Stack.Windows;
     using LostTech.Stack.Zones;
+    using LostTech.Windows;
     using Microsoft.HockeyApp;
     using PCLStorage;
     using PInvoke;
@@ -30,7 +31,6 @@
     using DragAction = System.Windows.DragAction;
     using FileAccess = PCLStorage.FileAccess;
     using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
-    using Screen = LostTech.Windows.Screen;
     using static PInvoke.User32;
     using MessageBox = System.Windows.MessageBox;
 
@@ -56,6 +56,7 @@
         DragHook dragHook;
         KeyboardArrowBehavior keyboardArrowBehavior;
         DispatcherTimer updateTimer;
+        readonly IScreenProvider screenProvider = new Win32ScreenProvider();
 
         protected override async void OnStartup(StartupEventArgs e)
         {
@@ -340,13 +341,12 @@
                 await this.InstallDefaultLayouts(layoutsDirectory);
 
             var defaultLayout = new Lazy<FrameworkElement>(() => this.LoadLayoutOrDefault(layoutsDirectory, "Default.xaml").Result);
-            var primary = Screen.Primary;
-            var screens = Screen.AllScreens.ToArray();
+            var screens = this.screenProvider.Screens;
             FrameworkElement[] layouts = await Task.WhenAll(screens
                 .Select(screen => GetLayoutForScreen(screen, stackSettings, layoutsDirectory))
                 .ToArray());
             var screenLayouts = new List<ScreenLayout>();
-            for (var screenIndex = 0; screenIndex < screens.Length; screenIndex++)
+            for (var screenIndex = 0; screenIndex < screens.Count; screenIndex++)
             {
                 var screen = screens[screenIndex];
                 var layout = new ScreenLayout();
@@ -368,7 +368,7 @@
 
             this.BindHandlers();
 
-            this.trayIcon = (await TrayIcon.StartTrayIcon(layoutsDirectory, stackSettings)).Icon;
+            this.trayIcon = (await TrayIcon.StartTrayIcon(layoutsDirectory, stackSettings, this.screenProvider)).Icon;
         }
 
         async Task InstallDefaultLayouts(IFolder destination)
@@ -388,7 +388,7 @@
             }
         }
 
-        async Task<FrameworkElement> GetLayoutForScreen(Screen screen, StackSettings settings, IFolder layoutsDirectory)
+        async Task<FrameworkElement> GetLayoutForScreen(Win32Screen screen, StackSettings settings, IFolder layoutsDirectory)
         {
             var layout = settings.LayoutMap.GetPreferredLayout(screen);
             if (layout == null)

@@ -37,16 +37,16 @@
             return IntPtr.Zero;
         }
 
-        public Screen Screen
-        { get { return (Screen) this.DataContext; } set { this.DataContext = value; } }
+        public Win32Screen Screen
+        { get { return (Win32Screen) this.DataContext; } set { this.DataContext = value; } }
 
-        public void AdjustToClientArea(Screen screen)
+        public void AdjustToClientArea(Win32Screen screen)
         {
             if (screen == null)
                 throw new ArgumentNullException(nameof(screen));
 
             Debug.WriteLine(screen.WorkingArea);
-            var transformFromDevice = screen.PresentationSource.CompositionTarget.TransformFromDevice;
+            var transformFromDevice = screen.TransformFromDevice;
             var topLeft = transformFromDevice.Transform(screen.WorkingArea.TopLeft);
             this.Left = topLeft.X;
             this.Top = topLeft.Y;
@@ -59,7 +59,7 @@
 
         public void AdjustToClientArea()
         {
-            if (this.DataContext is Screen screen)
+            if (this.DataContext is Win32Screen screen)
                 this.AdjustToClientArea(screen);
             else
                 throw new InvalidOperationException();
