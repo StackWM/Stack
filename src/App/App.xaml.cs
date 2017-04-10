@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -18,6 +19,7 @@
     using Gma.System.MouseKeyHook;
     using LostTech.App;
     using LostTech.Stack.Behavior;
+    using LostTech.Stack.DataBinding;
     using LostTech.Stack.InternalExtensions;
     using LostTech.Stack.Models;
     using LostTech.Stack.Utils;
@@ -173,7 +175,7 @@
             var location = GetCursorPos();
             var currentPosition = location;
 
-            var screen = this.screenLayouts.FirstOrDefault(layout => layout.GetPhysicalBounds().Contains(currentPosition));
+            var screen = this.screenLayouts.FirstOrDefault(layout => layout.Screen.IsActive && layout.GetPhysicalBounds().Contains(currentPosition));
             if (screen == null) {
                 if (this.dragOperation.CurrentZone != null) {
                     this.dragOperation.CurrentZone.IsDragMouseOver = false;
@@ -206,7 +208,8 @@
         void ShowLayoutGrid()
         {
             foreach (var screenLayout in this.screenLayouts) {
-                screenLayout.Show();
+                if (screenLayout.Screen.IsActive)
+                    screenLayout.Show();
             }
             this.dragOperation.Activated = true;
         }
@@ -221,7 +224,7 @@
             var window = this.dragOperation.Window;
             this.StopDrag(window);
 
-            var screen = this.screenLayouts.SingleOrDefault(layout => layout.GetPhysicalBounds().Contains(dropPoint));
+            var screen = this.screenLayouts.SingleOrDefault(layout => layout.Screen.IsActive && layout.GetPhysicalBounds().Contains(dropPoint));
             if (screen == null)
                 return;
             var relativeDropPoint = screen.PointFromScreen(dropPoint);
@@ -350,28 +353,44 @@
             FrameworkElement[] layouts = await Task.WhenAll(screens
                 .Select(screen => GetLayoutForScreen(screen, stackSettings, layoutsDirectory))
                 .ToArray());
-            var screenLayouts = new List<ScreenLayout>();
-            for (var screenIndex = 0; screenIndex < screens.Count; screenIndex++)
+            this.screenLayouts = new ObservableCollection<ScreenLayout>();
+
+            async Task AddLayoutForScreen(Win32Screen screen)
             {
-                var screen = screens[screenIndex];
-                var layout = new ScreenLayout{Opacity = 0};
-                layout.Closed += (sender, args) => this.BeginShutdown();
+                var layout = new ScreenLayout { Opacity = 0 };
+                layout.Closed += this.OnLayoutClosed;
                 layout.QueryContinueDrag += (sender, args) => args.Action = DragAction.Cancel;
                 // windows must be visible before calling AdjustToClientArea,
                 // otherwise final position is unpredictable
                 layout.Show();
                 layout.AdjustToClientArea(screen);
-                layout.Content = layouts[screenIndex];
-                layout.Title = $"{screenIndex}:{layout.Left}x{layout.Top}";
+                layout.Content = await GetLayoutForScreen(screen, stackSettings, layoutsDirectory);
+                layout.Title = $"{screen.ID}:{layout.Left}x{layout.Top}";
                 layout.DataContext = screen;
                 layout.Hide();
                 layout.Opacity = 0.7;
-                screenLayouts.Add(layout);
+                this.screenLayouts.Add(layout);
             }
-            this.screenLayouts = screenLayouts;
+
+            void RemoveLayoutForScreen(Win32Screen screen)
+            {
+                ScreenLayout layout = this.screenLayouts.FirstOrDefault(l => l.Screen == screen);
+                if (layout != null) {
+                    layout.Closed -= this.OnLayoutClosed;
+                    layout.Close();
+                    this.screenLayouts.Remove(layout);
+                }
+            }
+
+            foreach (Win32Screen screen in screens)
+                await AddLayoutForScreen(screen);
+
+            screens.OnChange<Win32Screen>(onAdd: s => AddLayoutForScreen(s), onRemove: RemoveLayoutForScreen);
 
             this.trayIcon = (await TrayIcon.StartTrayIcon(layoutsDirectory, this.layoutsDirectory, stackSettings, this.screenProvider)).Icon;
         }
+
+        void OnLayoutClosed(object sender, EventArgs args) { this.BeginShutdown(); }
 
         internal static readonly string OutOfBoxLayoutsResourcePrefix = typeof(App).Namespace + ".OOBLayouts.";
 
