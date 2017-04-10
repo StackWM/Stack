@@ -83,7 +83,7 @@
             this.roamingSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(RoamingAppData.FullName);
             var localSettings = XmlSettings.Create(this.localSettingsFolder);
             try {
-                screenLayoutSettings = await localSettings.LoadOrCreate<ScreenLayouts, ScreenLayouts>("LayoutMap.xml");
+                this.screenLayoutSettings = await localSettings.LoadOrCreate<ScreenLayouts, ScreenLayouts>("LayoutMap.xml");
             }
             catch (Exception) {
                 var brokenFile = await this.localSettingsFolder.GetFileAsync("LayoutMap.xml");
@@ -91,8 +91,8 @@
                 this.screenLayoutSettings = await localSettings.LoadOrCreate<ScreenLayouts, ScreenLayouts>("LayoutMap.xml");
                 this.screenLayoutSettings.ScheduleSave();
             }
-            screenLayoutSettings.Autosave = true;
-            var settings = new StackSettings {LayoutMap = screenLayoutSettings.Value};
+            this.screenLayoutSettings.Autosave = true;
+            var settings = new StackSettings {LayoutMap = this.screenLayoutSettings.Value};
 
             this.SetupScreenHooks();
 
@@ -264,7 +264,7 @@
         {
             if (@event.KeyData == Keys.Escape && this.dragOperation != null) {
                 @event.Handled = true;
-                StopDrag(this.dragOperation.Window);
+                this.StopDrag(this.dragOperation.Window);
                 return;
             }
         }
@@ -351,7 +351,7 @@
 
             var screens = this.screenProvider.Screens;
             FrameworkElement[] layouts = await Task.WhenAll(screens
-                .Select(screen => GetLayoutForScreen(screen, stackSettings, layoutsDirectory))
+                .Select(screen => this.GetLayoutForScreen(screen, stackSettings, layoutsDirectory))
                 .ToArray());
             this.screenLayouts = new ObservableCollection<ScreenLayout>();
 
@@ -364,7 +364,7 @@
                 // otherwise final position is unpredictable
                 layout.Show();
                 layout.AdjustToClientArea(screen);
-                layout.Content = await GetLayoutForScreen(screen, stackSettings, layoutsDirectory);
+                layout.Content = await this.GetLayoutForScreen(screen, stackSettings, layoutsDirectory);
                 layout.Title = $"{screen.ID}:{layout.Left}x{layout.Top}";
                 layout.DataContext = screen;
                 layout.Hide();
@@ -416,7 +416,7 @@
             var layout = settings.LayoutMap.GetPreferredLayout(screen);
             if (layout == null)
                 return this.MakeDefaultLayout();
-            return await LoadLayoutOrDefault(layoutsDirectory, layout);
+            return await this.LoadLayoutOrDefault(layoutsDirectory, layout);
         }
 
         private void BindHandlers()
@@ -500,5 +500,6 @@
         public static Version Version => Assembly.GetExecutingAssembly().GetName().Version;
 
         public int DragThreshold { get; private set; } = 40;
+        public static void Restart() { Process.Start(Process.GetCurrentProcess().MainModule.FileName); }
     }
 }

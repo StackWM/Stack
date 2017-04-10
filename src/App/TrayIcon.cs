@@ -61,6 +61,10 @@
                 onClick: (_, __) => ((App)Application.Current).BeginShutdown()) {
                 DisplayStyle = ToolStripItemDisplayStyle.Text
             });
+            contextMenu.Items.Add(new ToolStripMenuItem("Restart", image: null,
+                onClick: (_, __) => App.Restart()) {
+                DisplayStyle = ToolStripItemDisplayStyle.Text
+            });
 
             return trayIcon;
         }
@@ -225,7 +229,7 @@
                 this.stackSettings.LayoutMap.Map.Add(newMapping);
             else
                 this.stackSettings.LayoutMap.Map[entryIndex] = newMapping;
-            Process.Start(Process.GetCurrentProcess().MainModule.FileName);
+            App.Restart();
         }
 
         [DllImport("shell32.dll")]
