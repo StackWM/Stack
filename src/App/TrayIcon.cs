@@ -2,17 +2,17 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Diagnostics;
     using System.Drawing;
     using System.IO;
     using System.Linq;
-    using System.Linq.Expressions;
     using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Forms;
+    using LostTech.App;
+    using LostTech.Stack.DataBinding;
     using LostTech.Stack.Models;
     using LostTech.Windows;
     using Microsoft.VisualBasic;
@@ -20,6 +20,7 @@
     using PInvoke;
     using Application = System.Windows.Application;
     using FileAccess = PCLStorage.FileAccess;
+    using FileSystem = PCLStorage.FileSystem;
     using FontStyle = System.Drawing.FontStyle;
     using MessageBox = System.Windows.MessageBox;
 
@@ -36,7 +37,7 @@
             this.layoutsFolder = layoutsFolder ?? throw new ArgumentNullException(nameof(layoutsFolder));
         }
 
-        public static async Task<TrayIcon> StartTrayIcon(IFolder layoutsFolder, StackSettings stackSettings, IScreenProvider screenProvider)
+        public static async Task<TrayIcon> StartTrayIcon(IFolder layoutsFolder, ObservableDirectory layoutsDirectory, StackSettings stackSettings, IScreenProvider screenProvider)
         {
             var contextMenu = new ContextMenuStrip();
             var bitmap = new Bitmap(32, 32);
@@ -53,18 +54,20 @@
                 Visible = true,
             }, stackSettings, layoutsFolder);
 
-            trayIcon.CreateScreensMenu(layouts, stackSettings, screenProvider, contextMenu);
-            trayIcon.CreateLayoutsMenu(layoutsFolder, layouts, contextMenu);
+            trayIcon.CreateScreensMenu(layouts, layoutsDirectory, stackSettings, screenProvider, contextMenu);
+            trayIcon.CreateLayoutsMenu(layoutsFolder, layoutsDirectory, layouts, contextMenu);
 
             contextMenu.Items.Add(new ToolStripMenuItem("Exit", image: null,
-                onClick: (_, __) => ((App)Application.Current).BeginShutdown()));
+                onClick: (_, __) => ((App)Application.Current).BeginShutdown()) {
+                DisplayStyle = ToolStripItemDisplayStyle.Text
+            });
 
             return trayIcon;
         }
 
-        void CreateLayoutsMenu(IFolder layoutsFolder, IEnumerable<IFile> layouts, ToolStrip contextMenu)
+        void CreateLayoutsMenu(IFolder layoutsFolder, ObservableDirectory layoutsDirectory, IEnumerable<IFile> layouts, ToolStrip contextMenu)
         {
-            var layoutsMenu = new ToolStripMenuItem("Edit Layout");
+            var layoutsMenu = new ToolStripMenuItem("Edit Layout"){DisplayStyle = ToolStripItemDisplayStyle.Text};
 
             layoutsMenu.DropDownItems.Add(new ToolStripMenuItem("Use text editor") {Enabled = false});
 
@@ -73,6 +76,20 @@
                 var layoutMenu = new ToolStripMenuItem(name, null, EditLayoutClick) { Tag = layoutFile };
                 layoutsMenu.DropDownItems.Add(layoutMenu);
             }
+            layoutsDirectory.Files.OnChange<ObservableFile>(
+                onAdd: file => {
+                    if (!IsLayoutFileName(file.FullName))
+                        return;
+                    var name = Path.GetFileNameWithoutExtension(file.FullName);
+                    var layoutFile = FileSystem.Current.GetFileFromPathAsync(file.FullName).Result;
+                    var layoutMenu = new ToolStripMenuItem(name, null, EditLayoutClick) { Tag = layoutFile };
+                    layoutsMenu.DropDownItems.Insert(1, layoutMenu);
+                }, onRemove: file => {
+                    var layoutMenu = layoutsMenu.DropDownItems.OfType<ToolStripMenuItem>()
+                        .FirstOrDefault(item => ((IFile) item.Tag)?.Path == file.FullName);
+                    if (layoutMenu != null)
+                        layoutsMenu.DropDownItems.Remove(layoutMenu);
+                });
 
             layoutsMenu.DropDownItems.Add(new ToolStripSeparator());
             layoutsMenu.DropDownItems.Add(new ToolStripMenuItem("New...", null, this.CreateNewLayout));
@@ -83,6 +100,8 @@
             contextMenu.Items.Add(layoutsMenu);
             contextMenu.Items.Add(new ToolStripSeparator());
         }
+
+        static bool IsLayoutFileName(string fileName) => Path.GetExtension(fileName) == ".xaml";
 
         static void EditLayoutClick(object sender, EventArgs e) => EditLayout((IFile)((ToolStripItem) sender).Tag);
 
@@ -140,32 +159,56 @@
             }
         }
 
-        void CreateScreensMenu(ICollection<IFile> layouts, StackSettings stackSettings, IScreenProvider screenProvider,
+        void CreateScreensMenu(ICollection<IFile> layouts, ObservableDirectory layoutsDirectory, StackSettings stackSettings, IScreenProvider screenProvider,
             ToolStrip contextMenu)
         {
             var font = contextMenu.Font;
             var boldFont = new Font(font, FontStyle.Bold);
             foreach (var screen in screenProvider.Screens)
             {
-                var menu = new ToolStripMenuItem(screen.ToString());
+                var menu = new ToolStripMenuItem(screen.ToString()){DisplayStyle = ToolStripItemDisplayStyle.Text};
                 screen.OnChange(s => s.IsPrimary, val => menu.Font = val ? boldFont : font);
                 screen.OnChange(s => s.IsActive, val => menu.Visible = val);
 
-                foreach (var file in layouts)
-                {
-                    var name = Path.GetFileNameWithoutExtension(file.Name);
-                    var switchToThatLayout = new ToolStripMenuItem(name, null, this.SwitchLayoutClick)
-                    {
-                        Tag = new KeyValuePair<Win32Screen, string>(screen, name),
-                        CheckOnClick = true,
-                        Checked = stackSettings.LayoutMap.GetPreferredLayout(screen) == file.Name,
-                        Font = font,
-                    };
+                foreach (var file in layouts) {
+                    var switchToThatLayout = this.SwitchToLayoutMenuItem(stackSettings, file, screen, font);
                     menu.DropDownItems.Add(switchToThatLayout);
                 }
+
+                layoutsDirectory.Files.OnChange<ObservableFile>(
+                    onAdd: file => {
+                        if (!IsLayoutFileName(file.FullName))
+                            return;
+                        var layoutFile = FileSystem.Current.GetFileFromPathAsync(file.FullName).Result;
+                        var switchToThatLayout = this.SwitchToLayoutMenuItem(stackSettings, layoutFile, screen, font);
+                        menu.DropDownItems.Insert(0, switchToThatLayout);
+                    },
+                    onRemove: file => {
+                        if (!IsLayoutFileName(file.FullName))
+                            return;
+
+                        var name = Path.GetFileNameWithoutExtension(file.FullName);
+                        var layoutMenu = menu.DropDownItems.OfType<ToolStripMenuItem>()
+                            .FirstOrDefault(item => ((KeyValuePair<Win32Screen, string>)item.Tag).Value == name);
+                        if (layoutMenu != null)
+                            menu.DropDownItems.Remove(layoutMenu);
+                    });
+
                 contextMenu.Items.Add(menu);
             }
             contextMenu.Items.Add(new ToolStripSeparator());
+        }
+
+        ToolStripMenuItem SwitchToLayoutMenuItem(StackSettings stackSettings, IFile file, Win32Screen screen, Font font)
+        {
+            var name = Path.GetFileNameWithoutExtension(file.Name);
+            var switchToThatLayout = new ToolStripMenuItem(name, null, this.SwitchLayoutClick) {
+                Tag = new KeyValuePair<Win32Screen, string>(screen, name),
+                CheckOnClick = true,
+                Checked = stackSettings.LayoutMap.GetPreferredLayout(screen) == file.Name,
+                Font = font,
+            };
+            return switchToThatLayout;
         }
 
         void SwitchLayoutClick(object sender, EventArgs eventArgs)
@@ -200,30 +243,6 @@
         enum OpenAsFlags
         {
             Exec = 0x00000004,
-        }
-    }
-
-    static class Binder
-    {
-        public static void OnChange<TPropertyType, TSource>(this TSource dataSource, Expression<Func<TSource, TPropertyType>> property, Action<TPropertyType> action)
-            where TSource : INotifyPropertyChanged
-        {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-            if (dataSource == null)
-                throw new ArgumentNullException(nameof(dataSource));
-            if (property == null)
-                throw new ArgumentNullException(nameof(property));
-            if (!(property.Body is MemberExpression sourceMember))
-                throw new ArgumentException(message: "Lambda must be a property access expression", paramName: nameof(property));
-
-            var getter = property.Compile();
-            string propertyName = sourceMember.Member.Name;
-            dataSource.PropertyChanged += (_, args) => {
-                if (args.PropertyName == propertyName)
-                    action(getter(dataSource));
-            };
-            action(getter(dataSource));
         }
     }
 }

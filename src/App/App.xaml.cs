@@ -57,6 +57,7 @@
         KeyboardArrowBehavior keyboardArrowBehavior;
         DispatcherTimer updateTimer;
         readonly IScreenProvider screenProvider = new Win32ScreenProvider();
+        ObservableDirectory layoutsDirectory;
 
         protected override async void OnStartup(StartupEventArgs e)
         {
@@ -343,7 +344,8 @@
             if ((await layoutsDirectory.GetFilesAsync()).Count == 0)
                 await this.InstallDefaultLayouts(layoutsDirectory);
 
-            var defaultLayout = new Lazy<FrameworkElement>(() => this.LoadLayoutOrDefault(layoutsDirectory, "Default.xaml").Result);
+            this.layoutsDirectory = new ObservableDirectory(layoutsDirectory.Path);
+
             var screens = this.screenProvider.Screens;
             FrameworkElement[] layouts = await Task.WhenAll(screens
                 .Select(screen => GetLayoutForScreen(screen, stackSettings, layoutsDirectory))
@@ -352,12 +354,11 @@
             for (var screenIndex = 0; screenIndex < screens.Count; screenIndex++)
             {
                 var screen = screens[screenIndex];
-                var layout = new ScreenLayout();
+                var layout = new ScreenLayout{Opacity = 0};
                 layout.Closed += (sender, args) => this.BeginShutdown();
                 layout.QueryContinueDrag += (sender, args) => args.Action = DragAction.Cancel;
                 // windows must be visible before calling AdjustToClientArea,
                 // otherwise final position is unpredictable
-                layout.Opacity = 0;
                 layout.Show();
                 layout.AdjustToClientArea(screen);
                 layout.Content = layouts[screenIndex];
@@ -369,7 +370,7 @@
             }
             this.screenLayouts = screenLayouts;
 
-            this.trayIcon = (await TrayIcon.StartTrayIcon(layoutsDirectory, stackSettings, this.screenProvider)).Icon;
+            this.trayIcon = (await TrayIcon.StartTrayIcon(layoutsDirectory, this.layoutsDirectory, stackSettings, this.screenProvider)).Icon;
         }
 
         internal static readonly string OutOfBoxLayoutsResourcePrefix = typeof(App).Namespace + ".OOBLayouts.";
