@@ -41,11 +41,7 @@
         <File Id="Stack.exe" Name="Stack.exe" Source="$(var.App.TargetDir)Stack.exe" />
       </Component>
       <Component Id="StackAutostart" Guid="a6cecb09-7db8-4d0a-8d18-6542830f3a2e">
-        <RegistryValue Id="Stack.Start" Root="HKCU" Action="write"
-                       Key="Software\Microsoft\Windows\CurrentVersion\Run"
-                       Name="Stack"
-                       Value="[INSTALLDIR]Stack.exe"
-                       Type="string"/>
+        <RegistryValue Id="Stack.Start" Root="HKCU" Action="write" Key="Software\Microsoft\Windows\CurrentVersion\Run" Name="Stack" Value="[INSTALLDIR]Stack.exe" Type="string" />
       </Component>
       <Component Id="System.Console.dll" Guid="aa212e8d-c7eb-46c9-b34d-ca184e2a8219">
         <File Id="System.Console.dll" Name="System.Console.dll" Source="$(var.App_TargetDir)System.Console.dll" />
@@ -166,6 +162,12 @@
       </Component>
       <Component Id="RecursiveChangeNotifier.dll" Guid="3259ad82-6675-4fff-b8c2-808948eeed81">
         <File Id="RecursiveChangeNotifier.dll" Name="RecursiveChangeNotifier.dll" Source="$(var.App_TargetDir)RecursiveChangeNotifier.dll" />
+      </Component>
+      <Component Id="LostTech.App.ObservableFileSystem.dll" Guid="0eb027b6-3b45-4a87-9fa9-40578aed2307">
+        <File Id="LostTech.App.ObservableFileSystem.dll" Name="LostTech.App.ObservableFileSystem.dll" Source="$(var.App_TargetDir)LostTech.App.ObservableFileSystem.dll" />
+      </Component>
+      <Component Id="System.IO.FileSystem.Watcher.dll" Guid="01e12a06-e24b-4db1-ad36-c43d40cec1e0">
+        <File Id="System.IO.FileSystem.Watcher.dll" Name="System.IO.FileSystem.Watcher.dll" Source="$(var.App_TargetDir)System.IO.FileSystem.Watcher.dll" />
       </Component>
     </ComponentGroup>
     <ComponentGroup Id="Shortcuts" Directory="ApplicationProgramsFolder">
