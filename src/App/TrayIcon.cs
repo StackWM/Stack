@@ -54,7 +54,7 @@
             }, stackSettings, layoutsFolder);
 
             trayIcon.CreateScreensMenu(layouts, stackSettings, screenProvider, contextMenu);
-            trayIcon.CreateLayoutsMenu(layouts, contextMenu);
+            trayIcon.CreateLayoutsMenu(layoutsFolder, layouts, contextMenu);
 
             contextMenu.Items.Add(new ToolStripMenuItem("Exit", image: null,
                 onClick: (_, __) => ((App)Application.Current).BeginShutdown()));
@@ -62,7 +62,7 @@
             return trayIcon;
         }
 
-        void CreateLayoutsMenu(IEnumerable<IFile> layouts, ToolStrip contextMenu)
+        void CreateLayoutsMenu(IFolder layoutsFolder, IEnumerable<IFile> layouts, ToolStrip contextMenu)
         {
             var layoutsMenu = new ToolStripMenuItem("Edit Layout");
 
@@ -76,6 +76,9 @@
 
             layoutsMenu.DropDownItems.Add(new ToolStripSeparator());
             layoutsMenu.DropDownItems.Add(new ToolStripMenuItem("New...", null, this.CreateNewLayout));
+            layoutsMenu.DropDownItems.Add(new ToolStripMenuItem(
+                "Open Layouts Folder", null,
+                (_, __) => Process.Start(layoutsFolder.Path)));
 
             contextMenu.Items.Add(layoutsMenu);
             contextMenu.Items.Add(new ToolStripSeparator());
