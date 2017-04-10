@@ -91,11 +91,14 @@
             screenLayoutSettings.Autosave = true;
             var settings = new StackSettings {LayoutMap = screenLayoutSettings.Value};
 
-            await this.StartLayout(settings);
-
             this.SetupScreenHooks();
 
             this.winApiHandler.Closed += (sender, args) => this.BeginShutdown();
+
+            await this.StartLayout(settings);
+
+            // this must be the last, so that mouse won't lag while we are loading
+            this.BindHandlers();
 
             //this.MainWindow = new MyPos();
             //this.MainWindow.Show();
@@ -366,18 +369,17 @@
             }
             this.screenLayouts = screenLayouts;
 
-            this.BindHandlers();
-
             this.trayIcon = (await TrayIcon.StartTrayIcon(layoutsDirectory, stackSettings, this.screenProvider)).Icon;
         }
 
+        internal static readonly string OutOfBoxLayoutsResourcePrefix = typeof(App).Namespace + ".OOBLayouts.";
+
         async Task InstallDefaultLayouts(IFolder destination)
         {
-            var resourceContainer = Assembly.GetExecutingAssembly();
-            var prefix = this.GetType().Namespace + ".OOBLayouts.";
+            var resourceContainer = GetResourceContainer();
             foreach (var resource in resourceContainer.GetManifestResourceNames()
-                                                      .Where(name => name.StartsWith(prefix))) {
-                var name = resource.Substring(prefix.Length);
+                                                      .Where(name => name.StartsWith(OutOfBoxLayoutsResourcePrefix))) {
+                var name = resource.Substring(OutOfBoxLayoutsResourcePrefix.Length);
                 using (var stream = resourceContainer.GetManifestResourceStream(resource)) {
                     var file = await destination.CreateFileAsync(name, CreationCollisionOption.FailIfExists).ConfigureAwait(false);
                     using (var targetStream = await file.OpenAsync(FileAccess.ReadAndWrite).ConfigureAwait(false)) {
@@ -388,6 +390,7 @@
             }
         }
 
+        internal static Assembly GetResourceContainer() => Assembly.GetExecutingAssembly();
         async Task<FrameworkElement> GetLayoutForScreen(Win32Screen screen, StackSettings settings, IFolder layoutsDirectory)
         {
             var layout = settings.LayoutMap.GetPreferredLayout(screen);
