@@ -48,6 +48,15 @@
                 Visible = true,
             }, stackSettings, layoutsFolder);
 
+            var keyboardMovement = new ToolStripMenuItem("Override Win key + arrows") {
+//                Checked = stackSettings.EnableKeyboardMovement,
+            };
+            keyboardMovement.Click += delegate {
+                //keyboardMovement.Checked = stackSettings.EnableKeyboardMovement = !keyboardMovement.Checked;
+                App.Restart();
+            };
+            contextMenu.Items.Add(new ToolStripSeparator());
+
             trayIcon.CreateScreensMenu(layoutsDirectory, screenProvider, contextMenu);
             trayIcon.CreateLayoutsMenu(layoutsDirectory, contextMenu);
 

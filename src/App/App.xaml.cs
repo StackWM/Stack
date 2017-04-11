@@ -105,7 +105,7 @@
             await this.StartLayout(settings);
 
             // this must be the last, so that mouse won't lag while we are loading
-            this.BindHandlers();
+            this.BindHandlers(settings);
 
             //this.MainWindow = new MyPos();
             //this.MainWindow.Show();
@@ -320,7 +320,7 @@
             Debug.WriteLine("shutdown requested");
             this.hook.Dispose();
             this.dragHook.Dispose();
-            this.keyboardArrowBehavior.Dispose();
+            this.keyboardArrowBehavior?.Dispose();
             this.trayIcon?.Dispose();
 
             if (this.screenLayoutSettings != null)
@@ -423,10 +423,11 @@
             return await this.LoadLayoutOrDefault(layoutsDirectory, layout);
         }
 
-        private void BindHandlers()
+        private void BindHandlers(StackSettings settings)
         {
             // TODO: MIT license for MouseKeyboardActivityMonitor
             this.hook = Hook.GlobalEvents();
+            //if (settings.EnableKeyboardMovement)
             this.keyboardArrowBehavior = new KeyboardArrowBehavior(this.hook, this.screenLayouts, this.Move);
             this.dragHook = new DragHook(MouseButtons.Middle, this.hook);
             this.dragHook.DragStartPreview += this.OnDragStartPreview;
