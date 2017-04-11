@@ -85,9 +85,13 @@
             try {
                 this.screenLayoutSettings = await localSettings.LoadOrCreate<ScreenLayouts, ScreenLayouts>("LayoutMap.xml");
             }
-            catch (Exception) {
+            catch (Exception settingsError) {
+                var errorFile = await this.localSettingsFolder.CreateFileAsync("settings.err", CreationCollisionOption.ReplaceExisting);
+                await errorFile.WriteAllTextAsync(settingsError.ToString());
                 var brokenFile = await this.localSettingsFolder.GetFileAsync("LayoutMap.xml");
-                await brokenFile.DeleteAsync();
+                await brokenFile.MoveAsync(
+                    Path.Combine(this.localSettingsFolder.Path, "LayoutMap.Err.xml"),
+                    NameCollisionOption.ReplaceExisting);
                 this.screenLayoutSettings = await localSettings.LoadOrCreate<ScreenLayouts, ScreenLayouts>("LayoutMap.xml");
                 this.screenLayoutSettings.ScheduleSave();
             }

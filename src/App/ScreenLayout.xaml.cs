@@ -31,14 +31,16 @@
         {
             switch ((User32.WindowMessage) msg) {
             case User32.WindowMessage.WM_SETTINGCHANGE:
-                this.AdjustToScreen();
+                this.AdjustToScreenWhenIdle();
                 break;
             }
             return IntPtr.Zero;
         }
 
-        public Win32Screen Screen
-        { get { return (Win32Screen) this.DataContext; } set { this.DataContext = value; } }
+        public Win32Screen Screen {
+            get => (Win32Screen) this.DataContext;
+            set => this.DataContext = value;
+        }
 
         public void AdjustToClientArea(Win32Screen screen)
         {
@@ -69,8 +71,11 @@
         {
             base.OnDpiChanged(oldDpi, newDpi);
 
-            this.AdjustToScreen();
+            this.AdjustToScreenWhenIdle();
         }
+
+        void AdjustToScreenWhenIdle() =>
+            this.Dispatcher.Invoke(this.AdjustToScreen, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
         void AdjustToScreen()
         {
