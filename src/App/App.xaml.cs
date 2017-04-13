@@ -7,6 +7,7 @@
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
@@ -22,6 +23,7 @@
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.InternalExtensions;
     using LostTech.Stack.Models;
+    using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
     using LostTech.Stack.Windows;
     using LostTech.Stack.Zones;
@@ -46,7 +48,7 @@
         ICollection<ScreenLayout> screenLayouts;
         NotifyIcon trayIcon;
         IFolder localSettingsFolder, roamingSettingsFolder;
-        SettingsSet<ScreenLayouts, ScreenLayouts> screenLayoutSettings;
+
         readonly Window winApiHandler = new Window {
             Opacity = 0,
             AllowsTransparency = true,
@@ -60,6 +62,7 @@
         DispatcherTimer updateTimer;
         readonly IScreenProvider screenProvider = new Win32ScreenProvider();
         ObservableDirectory layoutsDirectory;
+        readonly StringBuilder layoutLoadProblems = new StringBuilder();
 
         protected override async void OnStartup(StartupEventArgs e)
         {
@@ -81,22 +84,11 @@
 
             this.localSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(AppData.FullName);
             this.roamingSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(RoamingAppData.FullName);
-            var localSettings = XmlSettings.Create(this.localSettingsFolder);
-            try {
-                this.screenLayoutSettings = await localSettings.LoadOrCreate<ScreenLayouts, ScreenLayouts>("LayoutMap.xml");
-            }
-            catch (Exception settingsError) {
-                var errorFile = await this.localSettingsFolder.CreateFileAsync("settings.err", CreationCollisionOption.ReplaceExisting);
-                await errorFile.WriteAllTextAsync(settingsError.ToString());
-                var brokenFile = await this.localSettingsFolder.GetFileAsync("LayoutMap.xml");
-                await brokenFile.MoveAsync(
-                    Path.Combine(this.localSettingsFolder.Path, "LayoutMap.Err.xml"),
-                    NameCollisionOption.ReplaceExisting);
-                this.screenLayoutSettings = await localSettings.LoadOrCreate<ScreenLayouts, ScreenLayouts>("LayoutMap.xml");
-                this.screenLayoutSettings.ScheduleSave();
-            }
-            this.screenLayoutSettings.Autosave = true;
-            var settings = new StackSettings {LayoutMap = this.screenLayoutSettings.Value};
+            this.localSettings = XmlSettings.Create(this.localSettingsFolder);
+            var settings = new StackSettings {
+                LayoutMap = await this.InitializeSettingsSet<ScreenLayouts>("LayoutMap.xml"),
+                Behaviors = await this.InitializeSettingsSet<Behaviors>("Behaviors.xml"),
+            };
 
             this.SetupScreenHooks();
 
@@ -109,6 +101,28 @@
 
             //this.MainWindow = new MyPos();
             //this.MainWindow.Show();
+        }
+
+        async Task<T> InitializeSettingsSet<T>(string fileName)
+            where T: class, new()
+        {
+            SettingsSet<T, T> settingsSet;
+            try {
+                settingsSet = await this.localSettings.LoadOrCreate<T, T>(fileName);
+            }
+            catch (Exception settingsError) {
+                var errorFile = await this.localSettingsFolder.CreateFileAsync(
+                    $"{fileName}.err", CreationCollisionOption.ReplaceExisting);
+                await errorFile.WriteAllTextAsync(settingsError.ToString());
+                var brokenFile = await this.localSettingsFolder.GetFileAsync(fileName);
+                await brokenFile.MoveAsync(
+                    Path.Combine(this.localSettingsFolder.Path, $"Err.{fileName}"),
+                    NameCollisionOption.ReplaceExisting);
+                settingsSet = await this.localSettings.LoadOrCreate<T, T>(fileName);
+                settingsSet.ScheduleSave();
+            }
+            settingsSet.Autosave = true;
+            return settingsSet.Value;
         }
 
         void BeginCheckForUpdates()
@@ -315,25 +329,29 @@
             };
         }
 
-        public async void BeginShutdown()
+        async Task DisposeAsync()
         {
-            Debug.WriteLine("shutdown requested");
             this.hook.Dispose();
             this.dragHook.Dispose();
             this.keyboardArrowBehavior?.Dispose();
             this.trayIcon?.Dispose();
 
-            if (this.screenLayoutSettings != null)
+            if (this.localSettings != null)
             {
-                this.screenLayoutSettings.ScheduleSave();
-                var settings = this.screenLayoutSettings;
-                this.screenLayoutSettings = null;
-                await settings.DisposeAsync();
+                this.localSettings.ScheduleSave();
+                await this.localSettings.DisposeAsync();
 
                 Debug.WriteLine("settings written");
                 //await Task.Delay(5000);
                 //Debug.WriteLine("delayed message");
             }
+        }
+
+        public async void BeginShutdown()
+        {
+            Debug.WriteLine("shutdown requested");
+
+            await this.DisposeAsync();
 
             this.Shutdown();
         }
@@ -392,11 +410,18 @@
             screens.OnChange<Win32Screen>(onAdd: s => AddLayoutForScreen(s), onRemove: RemoveLayoutForScreen);
 
             this.trayIcon = (await TrayIcon.StartTrayIcon(layoutsDirectory, this.layoutsDirectory, stackSettings, this.screenProvider)).Icon;
+            if (this.layoutLoadProblems.Length > 0) {
+                this.trayIcon.BalloonTipTitle = "Some layouts were not loaded";
+                this.trayIcon.BalloonTipText = this.layoutLoadProblems.ToString();
+                this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
+                this.trayIcon.ShowBalloonTip(30);
+            }
         }
 
         void OnLayoutClosed(object sender, EventArgs args) { this.BeginShutdown(); }
 
         internal static readonly string OutOfBoxLayoutsResourcePrefix = typeof(App).Namespace + ".OOBLayouts.";
+        LostTech.App.Settings localSettings;
 
         async Task InstallDefaultLayouts(IFolder destination)
         {
@@ -427,8 +452,8 @@
         {
             // TODO: MIT license for MouseKeyboardActivityMonitor
             this.hook = Hook.GlobalEvents();
-            //if (settings.EnableKeyboardMovement)
-            this.keyboardArrowBehavior = new KeyboardArrowBehavior(this.hook, this.screenLayouts, this.Move);
+            if (settings.Behaviors.KeyboardMove.Enabled)
+                this.keyboardArrowBehavior = new KeyboardArrowBehavior(this.hook, this.screenLayouts, this.Move);
             this.dragHook = new DragHook(MouseButtons.Middle, this.hook);
             this.dragHook.DragStartPreview += this.OnDragStartPreview;
             this.dragHook.DragStart += this.OnDragStart;
@@ -458,9 +483,15 @@
 
             using (var stream = await file.OpenAsync(FileAccess.Read))
             using (var xmlReader = XmlReader.Create(stream)) {
-                var layout = (FrameworkElement)XamlReader.Load(xmlReader);
-                Debug.WriteLine($"loaded layout {fileName}");
-                return layout;
+                try {
+                    var layout = (FrameworkElement) XamlReader.Load(xmlReader);
+                    Debug.WriteLine($"loaded layout {fileName}");
+                    return layout;
+                }
+                catch (XamlParseException e) {
+                    this.layoutLoadProblems.AppendLine($"{file.Name}: {e.Message}");
+                    return this.MakeDefaultLayout();
+                }
             }
         }
 

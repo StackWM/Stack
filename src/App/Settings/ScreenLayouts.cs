@@ -1,12 +1,12 @@
-namespace LostTech.Stack.Models
+namespace LostTech.Stack.Settings
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
     using System.Runtime.Serialization;
     using LostTech.App;
+    using LostTech.Stack.Models;
     using LostTech.Windows;
 
     [DataContract]

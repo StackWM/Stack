@@ -44,7 +44,7 @@
       <HintPath>..\..\packages\JetBrains.Annotations.10.4.0\lib\net\JetBrains.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="LostTech.App.Settings, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LostTech.App.Settings.0.1.0-b2017041001\lib\netstandard1.4\LostTech.App.Settings.dll</HintPath>
+      <HintPath>..\..\packages\LostTech.App.Settings.0.1.0-b2017041201\lib\netstandard1.4\LostTech.App.Settings.dll</HintPath>
     </Reference>
     <Reference Include="LostTech.App.XmlSettings, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LostTech.App.XmlSettings.0.1.0-b2017040803\lib\netstandard1.4\LostTech.App.XmlSettings.dll</HintPath>
@@ -182,13 +182,16 @@
     </ApplicationDefinition>
     <Compile Include="Behavior\KeyboardArrowBehavior.cs" />
     <Compile Include="DataBinding\Binder.cs" />
+    <Compile Include="DataBinding\NotifyPropertyChangedBase.cs" />
     <Compile Include="DebugHelper.cs" />
     <Compile Include="IOExtensions.cs" />
     <Compile Include="Models\MutableKeyValuePair.cs" />
-    <Compile Include="Models\ScreenLayouts.cs" />
     <Compile Include="Models\Serializer.cs" />
-    <Compile Include="Models\StackSettings.cs" />
     <Compile Include="PixelTools.cs" />
+    <Compile Include="Settings\Behaviors.cs" />
+    <Compile Include="Settings\KeyboardMoveBehaviorSettings.cs" />
+    <Compile Include="Settings\ScreenLayouts.cs" />
+    <Compile Include="Settings\StackSettings.cs" />
     <Compile Include="TrayIcon.cs" />
     <Compile Include="Utils\DragHookEventArgs.cs" />
     <Compile Include="Utils\EnumUtils.cs" />

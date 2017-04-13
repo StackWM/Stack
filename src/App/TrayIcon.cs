@@ -13,6 +13,7 @@
     using LostTech.App;
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.Models;
+    using LostTech.Stack.Settings;
     using LostTech.Windows;
     using Microsoft.VisualBasic;
     using PCLStorage;
@@ -49,12 +50,13 @@
             }, stackSettings, layoutsFolder);
 
             var keyboardMovement = new ToolStripMenuItem("Override Win key + arrows") {
-//                Checked = stackSettings.EnableKeyboardMovement,
+                Checked = stackSettings.Behaviors.KeyboardMove.Enabled,
             };
             keyboardMovement.Click += delegate {
-                //keyboardMovement.Checked = stackSettings.EnableKeyboardMovement = !keyboardMovement.Checked;
+                keyboardMovement.Checked = stackSettings.Behaviors.KeyboardMove.Enabled = !keyboardMovement.Checked;
                 App.Restart();
             };
+            contextMenu.Items.Add(keyboardMovement);
             contextMenu.Items.Add(new ToolStripSeparator());
 
             trayIcon.CreateScreensMenu(layoutsDirectory, screenProvider, contextMenu);
