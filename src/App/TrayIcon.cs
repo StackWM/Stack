@@ -49,6 +49,9 @@
                 Visible = true,
             }, stackSettings, layoutsFolder);
 
+            contextMenu.Items.Add("Feedback...", image: null,
+                onClick: (_, __) => Process.Start("http://bit.ly/2o7Rxvr"));
+
             var keyboardMovement = new ToolStripMenuItem("Override Win key + arrows") {
                 Checked = stackSettings.Behaviors.KeyboardMove.Enabled,
             };
