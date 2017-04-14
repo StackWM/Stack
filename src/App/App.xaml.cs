@@ -450,7 +450,6 @@
 
         private void BindHandlers(StackSettings settings)
         {
-            // TODO: MIT license for MouseKeyboardActivityMonitor
             this.hook = Hook.GlobalEvents();
             if (settings.Behaviors.KeyboardMove.Enabled)
                 this.keyboardArrowBehavior = new KeyboardArrowBehavior(this.hook, this.screenLayouts, this.Move);
@@ -503,7 +502,6 @@
 
         public static DirectoryInfo AppData {
             get {
-                // TODO: implement roaming
                 var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 var path = Path.Combine(appData, "Lost Tech LLC", nameof(LostTech.Stack));
                 return Directory.CreateDirectory(path);

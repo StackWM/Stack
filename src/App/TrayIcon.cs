@@ -28,6 +28,7 @@
         public NotifyIcon Icon { get; }
         readonly StackSettings stackSettings;
         readonly IFolder layoutsFolder;
+        readonly About aboutWindow = new About();
 
         TrayIcon(NotifyIcon trayIcon, StackSettings stackSettings, IFolder layoutsFolder)
         {
@@ -49,6 +50,7 @@
                 Visible = true,
             }, stackSettings, layoutsFolder);
 
+            contextMenu.Items.Add("About", image: null, onClick: (_, __) => trayIcon.aboutWindow.Show());
             contextMenu.Items.Add("Feedback...", image: null,
                 onClick: (_, __) => Process.Start("http://bit.ly/2o7Rxvr"));
 

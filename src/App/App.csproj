@@ -180,10 +180,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="About.xaml.cs">
+      <DependentUpon>About.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Behavior\KeyboardArrowBehavior.cs" />
     <Compile Include="DataBinding\Binder.cs" />
     <Compile Include="DataBinding\NotifyPropertyChangedBase.cs" />
     <Compile Include="DebugHelper.cs" />
+    <Compile Include="AppDependecy.cs" />
     <Compile Include="IOExtensions.cs" />
     <Compile Include="Models\MutableKeyValuePair.cs" />
     <Compile Include="Models\Serializer.cs" />
@@ -211,6 +215,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <Page Include="About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ScreenLayout.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
