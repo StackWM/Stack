@@ -41,7 +41,7 @@
         <File Id="Stack.exe" Name="Stack.exe" Source="$(var.App.TargetDir)Stack.exe" />
       </Component>
       <Component Id="StackAutostart" Guid="a6cecb09-7db8-4d0a-8d18-6542830f3a2e">
-        <RegistryValue Id="Stack.Start" Root="HKCU" Action="write" Key="Software\Microsoft\Windows\CurrentVersion\Run" Name="Stack" Value="[INSTALLDIR]Stack.exe" Type="string" />
+        <RegistryValue Id="Stack.Start" Root="HKCU" Action="write" Key="Software\Microsoft\Windows\CurrentVersion\Run" Name="Stack" Value="&quot;[INSTALLFOLDER]Stack.exe&quot;" Type="string" />
       </Component>
       <Component Id="System.Console.dll" Guid="aa212e8d-c7eb-46c9-b34d-ca184e2a8219">
         <File Id="System.Console.dll" Name="System.Console.dll" Source="$(var.App_TargetDir)System.Console.dll" />
