@@ -88,6 +88,7 @@
             var settings = new StackSettings {
                 LayoutMap = await this.InitializeSettingsSet<ScreenLayouts>("LayoutMap.xml"),
                 Behaviors = await this.InitializeSettingsSet<Behaviors>("Behaviors.xml"),
+                Notifications = await this.InitializeSettingsSet<NotificationSettings>("Notifications.xml"),
             };
 
             this.SetupScreenHooks();
@@ -363,7 +364,7 @@
             Thread.Sleep(1000);
         }
 
-        async Task StartLayout(StackSettings stackSettings)
+        async Task StartLayout(StackSettings settings)
         {
             var layoutsDirectory = await this.roamingSettingsFolder.CreateFolderAsync("Layouts", CreationCollisionOption.OpenIfExists);
             if ((await layoutsDirectory.GetFilesAsync()).Count == 0)
@@ -373,7 +374,7 @@
 
             var screens = this.screenProvider.Screens;
             FrameworkElement[] layouts = await Task.WhenAll(screens
-                .Select(screen => this.GetLayoutForScreen(screen, stackSettings, layoutsDirectory))
+                .Select(screen => this.GetLayoutForScreen(screen, settings, layoutsDirectory))
                 .ToArray());
             this.screenLayouts = new ObservableCollection<ScreenLayout>();
 
@@ -386,7 +387,7 @@
                 // otherwise final position is unpredictable
                 layout.Show();
                 layout.AdjustToClientArea(screen);
-                layout.Content = await this.GetLayoutForScreen(screen, stackSettings, layoutsDirectory);
+                layout.Content = await this.GetLayoutForScreen(screen, settings, layoutsDirectory);
                 layout.Title = $"{screen.ID}:{layout.Left}x{layout.Top}";
                 layout.DataContext = screen;
                 layout.Hide();
@@ -409,11 +410,18 @@
 
             screens.OnChange<Win32Screen>(onAdd: s => AddLayoutForScreen(s), onRemove: RemoveLayoutForScreen);
 
-            this.trayIcon = (await TrayIcon.StartTrayIcon(layoutsDirectory, this.layoutsDirectory, stackSettings, this.screenProvider)).Icon;
+            this.trayIcon = (await TrayIcon.StartTrayIcon(layoutsDirectory, this.layoutsDirectory, settings, this.screenProvider)).Icon;
             if (this.layoutLoadProblems.Length > 0) {
                 this.trayIcon.BalloonTipTitle = "Some layouts were not loaded";
                 this.trayIcon.BalloonTipText = this.layoutLoadProblems.ToString();
                 this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
+                this.trayIcon.ShowBalloonTip(30);
+            }
+            if (!settings.Notifications.IamInTrayDone) {
+                settings.Notifications.IamInTrayDone = true;
+                this.trayIcon.BalloonTipTitle = "Stack";
+                this.trayIcon.BalloonTipText = "Find me in the system tray!";
+                this.trayIcon.BalloonTipIcon = ToolTipIcon.Info;
                 this.trayIcon.ShowBalloonTip(30);
             }
         }
