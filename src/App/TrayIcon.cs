@@ -6,6 +6,7 @@
     using System.Drawing;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Threading.Tasks;
     using System.Windows;
@@ -40,12 +41,11 @@
         public static async Task<TrayIcon> StartTrayIcon(IFolder layoutsFolder, ObservableDirectory layoutsDirectory, StackSettings stackSettings, IScreenProvider screenProvider)
         {
             var contextMenu = new ContextMenuStrip();
-            var bitmap = new Bitmap(32, 32);
 
             var trayIcon = new TrayIcon(new NotifyIcon
             {
                 ContextMenuStrip = contextMenu,
-                Icon = System.Drawing.Icon.FromHandle(bitmap.GetHicon()),
+                Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/StackTrayIcon.ico")).Stream),
                 Text = nameof(Stack),
                 Visible = true,
             }, stackSettings, layoutsFolder);
