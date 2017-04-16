@@ -348,6 +348,7 @@
             {
                 this.localSettings.ScheduleSave();
                 await this.localSettings.DisposeAsync();
+                this.localSettings = null;
 
                 Debug.WriteLine("settings written");
                 //await Task.Delay(5000);
