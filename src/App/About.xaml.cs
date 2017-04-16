@@ -16,6 +16,8 @@ using System.Windows.Shapes;
 namespace LostTech.Stack
 {
     using System.Diagnostics;
+    using System.Windows.Interop;
+    using PInvoke;
 
     /// <summary>
     /// Interaction logic for About.xaml

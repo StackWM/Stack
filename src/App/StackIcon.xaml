@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="Art.Stack.StackIcon"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Art.Stack"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="400">
+    <UserControl.Resources>
+        <Style TargetType="Border">
+            <Setter Property="Background" Value="Silver"/>
+            <Setter Property="Margin" Value="6"/>
+        </Style>
+    </UserControl.Resources>
+    <Viewbox>
+    <Grid Width="400" Height="300">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1.5*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Grid.Row="0"/>
+        <Border Grid.Column="1" Grid.Row="0"/>
+        <Border Grid.ColumnSpan="2" Grid.Row="1"/>
+    </Grid>
+    </Viewbox>
+</UserControl>

@@ -4,27 +4,34 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LostTech.Stack"
+        xmlns:art="clr-namespace:Art.Stack"
         mc:Ignorable="d"
         Title="About Stack"
         WindowStartupLocation="CenterScreen"
         Width="500"
         Padding="40"
         ResizeMode="NoResize" SizeToContent="Height"
-        FontSize="20"
+        FontSize="16"
+        WindowStyle="ToolWindow"
+        Icon="pack://application:,,,/StackTrayIcon.ico"
         >
-    <StackPanel Margin="12,0">
+    <StackPanel Margin="12,12">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+            <art:StackIcon Width="72" Height="72"/>
+            <TextBlock Margin="8,0" FontSize="32" VerticalAlignment="Center">Stack</TextBlock>
+        </StackPanel>
+
         <TextBlock Margin="0,12">
-            <Span FontSize="42">Stack</Span>
+            <Span>Stack</Span>
             <Run Text="{Binding Source={x:Static local:App.Version}, Mode=OneTime}"/>
             <LineBreak/>
-            <Span FontSize="20">by Lost Tech LLC</Span>
+            <Span>by Lost Tech LLC</Span>
         </TextBlock>
 
         <TextBlock Margin="0,12">Running on Microsoft .NET Framework</TextBlock>
 
         <TextBlock Margin="0,12,0,0">Third-party software:</TextBlock>
         <ItemsControl
-            Margin="0,0,0,12"
             ItemsSource="{x:Static local:AppDependecy.Dependencies}"
             >
             <ItemsControl.ItemTemplate>

@@ -200,6 +200,9 @@
     <Compile Include="Settings\NotificationSettings.cs" />
     <Compile Include="Settings\ScreenLayouts.cs" />
     <Compile Include="Settings\StackSettings.cs" />
+    <Compile Include="StackIcon.xaml.cs">
+      <DependentUpon>StackIcon.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TrayIcon.cs" />
     <Compile Include="Utils\DragHookEventArgs.cs" />
     <Compile Include="Utils\EnumUtils.cs" />
@@ -239,6 +242,10 @@
     <Page Include="MyPos.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="StackIcon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
