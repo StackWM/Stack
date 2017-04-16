@@ -256,6 +256,13 @@
         async void Move(IntPtr window, Zone zone)
         {
             Rect targetBounds = zone.Target.GetPhysicalBounds();
+            try {
+                if (GetWindowPlacement(window).showCmd.HasFlag(WindowShowStyle.SW_MAXIMIZE)) {
+                    ShowWindow(window, WindowShowStyle.SW_RESTORE);
+                }
+            }
+            catch (PInvoke.Win32Exception) { }
+
             if (!MoveWindow(window, (int) targetBounds.Left, (int) targetBounds.Top, (int) targetBounds.Width,
                 (int) targetBounds.Height, true)) {
                 this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
