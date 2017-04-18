@@ -1,20 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-
-namespace LostTech.Stack
+﻿namespace LostTech.Stack
 {
+    using System;
+    using System.IO;
     using System.Reflection;
+    using System.Security.Cryptography;
+    using System.Windows;
 
     /// <summary>
     /// Interaction logic for LicenseTermsAcceptance.xaml
@@ -25,10 +15,32 @@ namespace LostTech.Stack
         {
             this.InitializeComponent();
 
-            var @namespace = typeof(LicenseTermsAcceptance).Namespace;
-            var resourceName = $"{@namespace}.Terms.html";
-            var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
+            Stream resource = GetTermsAndCondtions();
             this.LicenseContent.NavigateToStream(resource);
+        }
+
+        static Stream GetTermsAndCondtions()
+        {
+            string @namespace = typeof(LicenseTermsAcceptance).Namespace;
+            string resourceName = $"{@namespace}.Terms.html";
+            return Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
+        }
+
+        public static string GetTermsAndConditionsVersion()
+        {
+            var algorithm = new SHA256Managed();
+            byte[] hash = algorithm.ComputeHash(GetTermsAndCondtions());
+            return Convert.ToBase64String(hash);
+        }
+
+        void AcceptClick(object sender, RoutedEventArgs e) {
+            e.Handled = true;
+            this.DialogResult = true;
+        }
+
+        void DeclineClick(object sender, RoutedEventArgs e) {
+            e.Handled = true;
+            this.DialogResult = false;
         }
     }
 }

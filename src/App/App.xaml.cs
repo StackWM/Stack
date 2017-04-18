@@ -91,6 +91,15 @@
                 Notifications = await this.InitializeSettingsSet<NotificationSettings>("Notifications.xml"),
             };
 
+            if (settings.Notifications.AcceptedTerms != LicenseTermsAcceptance.GetTermsAndConditionsVersion()) {
+                var termsWindow = new LicenseTermsAcceptance();
+                if (!true.Equals(termsWindow.ShowDialog())) {
+                    this.Shutdown();
+                    return;
+                }
+                settings.Notifications.AcceptedTerms = LicenseTermsAcceptance.GetTermsAndConditionsVersion();
+            }
+
             this.SetupScreenHooks();
 
             this.winApiHandler.Closed += (sender, args) => this.BeginShutdown();

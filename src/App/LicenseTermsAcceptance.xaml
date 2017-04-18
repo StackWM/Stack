@@ -23,13 +23,13 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <WebBrowser Margin="12" x:Name="LicenseContent"/>
+        <WebBrowser Grid.Row="0" Margin="12" x:Name="LicenseContent"/>
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     >
-            <Button IsDefault="True" FontWeight="Bold">Accept</Button>
-            <Button IsCancel="True">Decline</Button>
+            <Button IsDefault="True" FontWeight="Bold" Click="AcceptClick">Accept</Button>
+            <Button IsCancel="True" Click="DeclineClick">Decline</Button>
         </StackPanel>
     </Grid>
 </Window>
