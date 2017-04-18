@@ -68,6 +68,8 @@
         {
             base.OnStartup(e);
 
+            this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
             if (e.Args.Contains("--jit-debugging"))
                 EnableJitDebugging();
 
@@ -97,6 +99,7 @@
                     this.Shutdown();
                     return;
                 }
+                termsWindow.Close();
                 settings.Notifications.AcceptedTerms = LicenseTermsAcceptance.GetTermsAndConditionsVersion();
             }
 
@@ -108,6 +111,8 @@
 
             // this must be the last, so that mouse won't lag while we are loading
             this.BindHandlers(settings);
+
+            GC.Collect();
 
             //this.MainWindow = new MyPos();
             //this.MainWindow.Show();
