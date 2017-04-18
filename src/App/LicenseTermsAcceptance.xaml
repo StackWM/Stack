@@ -1,0 +1,35 @@
+﻿<Window x:Class="LostTech.Stack.LicenseTermsAcceptance"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LostTech.Stack"
+        mc:Ignorable="d"
+        WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen"
+        Title="Stack Terms &amp; Conditions"
+        Height="720" Width="600"
+        >
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="18,6"/>
+            <Setter Property="MinWidth" Value="40"/>
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="Margin" Value="12"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <WebBrowser Margin="12" x:Name="LicenseContent"/>
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    >
+            <Button IsDefault="True" FontWeight="Bold">Accept</Button>
+            <Button IsCancel="True">Decline</Button>
+        </StackPanel>
+    </Grid>
+</Window>

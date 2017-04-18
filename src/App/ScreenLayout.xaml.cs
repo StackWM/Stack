@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Interop;
     using System.Windows.Media;
@@ -74,8 +75,15 @@
             this.AdjustToScreenWhenIdle();
         }
 
-        void AdjustToScreenWhenIdle() =>
-            this.Dispatcher.Invoke(this.AdjustToScreen, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        Task idleAdjustDelay;
+        async void AdjustToScreenWhenIdle()
+        {
+            var delay = Task.Delay(millisecondsDelay: 2000);
+            this.idleAdjustDelay = delay;
+            await delay;
+            if (delay == this.idleAdjustDelay)
+                this.AdjustToScreen();
+        }
 
         void AdjustToScreen()
         {
