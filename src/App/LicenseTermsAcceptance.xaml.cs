@@ -28,7 +28,7 @@
 
         public static string GetTermsAndConditionsVersion()
         {
-            var algorithm = new SHA256Managed();
+            var algorithm = new SHA256CryptoServiceProvider();
             byte[] hash = algorithm.ComputeHash(GetTermsAndCondtions());
             return Convert.ToBase64String(hash);
         }
