@@ -103,6 +103,9 @@
                 settings.Notifications.AcceptedTerms = LicenseTermsAcceptance.GetTermsAndConditionsVersion();
             }
 
+            if (!this.winApiHandler.IsLoaded)
+                return;
+
             this.SetupScreenHooks();
 
             this.winApiHandler.Closed += (sender, args) => this.BeginShutdown();
@@ -550,7 +553,7 @@
         private void SetupScreenHooks()
         {
             this.winApiHandler.Show();
-            var hwnd = (HwndSource)PresentationSource.FromVisual(this.winApiHandler);
+            var hwnd = (HwndSource) PresentationSource.FromVisual(this.winApiHandler);
             hwnd.AddHook(this.OnWindowMessage);
             this.winApiHandler.Hide();
         }
