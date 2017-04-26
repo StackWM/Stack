@@ -61,7 +61,16 @@
                 keyboardMovement.Checked = stackSettings.Behaviors.KeyboardMove.Enabled = !keyboardMovement.Checked;
                 App.Restart();
             };
+
+            var middleMouseMovement = new ToolStripMenuItem("Middle mouse drag") {
+                Checked = stackSettings.Behaviors.MouseMove.Enabled,
+            };
+            middleMouseMovement.Click += delegate {
+                middleMouseMovement.Checked = stackSettings.Behaviors.MouseMove.Enabled = !middleMouseMovement.Checked;
+                App.Restart();
+            };
             contextMenu.Items.Add(keyboardMovement);
+            contextMenu.Items.Add(middleMouseMovement);
             contextMenu.Items.Add(new ToolStripSeparator());
 
             trayIcon.CreateScreensMenu(layoutsDirectory, screenProvider, contextMenu);

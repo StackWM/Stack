@@ -23,7 +23,12 @@
 
         <TextBlock Margin="0,12">
             <Span>Stack</Span>
-            <Run Text="{Binding Source={x:Static local:App.Version}, Mode=OneTime}"/>
+            <InlineUIContainer BaselineAlignment="Bottom">
+                <TextBox Text="{Binding Source={x:Static local:App.Version}, Mode=OneTime}"
+                         Margin="0" Padding="0" BorderThickness="0"
+                         IsReadOnly="True"
+                         />
+            </InlineUIContainer>
             <LineBreak/>
             <Span>by Lost Tech LLC</Span>
         </TextBlock>

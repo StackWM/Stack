@@ -357,7 +357,8 @@
         async Task DisposeAsync()
         {
             this.hook.Dispose();
-            this.dragHook.Dispose();
+            this.dragHook?.Dispose();
+            this.dragHook = null;
             this.keyboardArrowBehavior?.Dispose();
             this.trayIcon?.Dispose();
 
@@ -486,12 +487,14 @@
             this.hook = Hook.GlobalEvents();
             if (settings.Behaviors.KeyboardMove.Enabled)
                 this.keyboardArrowBehavior = new KeyboardArrowBehavior(this.hook, this.screenLayouts, this.Move);
-            this.dragHook = new DragHook(MouseButtons.Middle, this.hook);
-            this.dragHook.DragStartPreview += this.OnDragStartPreview;
-            this.dragHook.DragStart += this.OnDragStart;
-            this.dragHook.DragEnd += this.OnDragEnd;
-            this.dragHook.DragMove += this.OnDragMove;
-            this.hook.KeyDown += this.GlobalKeyDown;
+            if (settings.Behaviors.MouseMove.Enabled) {
+                this.dragHook = new DragHook(MouseButtons.Middle, this.hook);
+                this.dragHook.DragStartPreview += this.OnDragStartPreview;
+                this.dragHook.DragStart += this.OnDragStart;
+                this.dragHook.DragEnd += this.OnDragEnd;
+                this.dragHook.DragMove += this.OnDragMove;
+                this.hook.KeyDown += this.GlobalKeyDown;
+            }
         }
 
         private async Task<FrameworkElement> LoadLayoutOrDefault(IFolder layoutDirectory, string fileName)
