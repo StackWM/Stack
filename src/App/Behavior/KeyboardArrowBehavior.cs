@@ -68,7 +68,7 @@
         private bool MoveCurrentWindow(Vector direction)
         {
             var window = User32.GetForegroundWindow();
-            if (!GetWindowInfo(window, out var info))
+            if (!GetWindowInfo(window, out var info) || User32.IsIconic(window))
                 return false;
 
             var windowBounds = new Rect(info.rcWindow.left, info.rcWindow.top,
@@ -85,7 +85,10 @@
                 Array.Reverse(sameCenter);
 
             var reducedWindowBounds = windowBounds;
-            reducedWindowBounds.Inflate(-1, -1);
+            // if inflating rectangle leads to negative size,
+            // rectangle is replaced with Rectangle.Empty, which is severely broken for our purposes
+            if (windowBounds.Width >= 1 && windowBounds.Height >= 1)
+                reducedWindowBounds.Inflate(-1, -1);
             var currentZone = sameCenter.FirstOrDefault(zone => windowBounds.Contains(zone.GetPhysicalBounds())
                                                              && zone.GetPhysicalBounds().Contains(reducedWindowBounds));
 
