@@ -55,6 +55,9 @@
     <Reference Include="LostTech.Checkpoint, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LostTech.Checkpoint.0.2.0-b2017040802\lib\netstandard1.0\LostTech.Checkpoint.dll</HintPath>
     </Reference>
+    <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MahApps.Metro.1.5.0\lib\net45\MahApps.Metro.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.HockeyApp.Core45, Version=4.1.6.1005, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\HockeySDK.WPF.4.1.6\lib\net45\Microsoft.HockeyApp.Core45.dll</HintPath>
     </Reference>
@@ -160,6 +163,10 @@
       <HintPath>..\..\packages\System.Security.Cryptography.X509Certificates.4.3.0\lib\net461\System.Security.Cryptography.X509Certificates.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MahApps.Metro.1.5.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -200,11 +207,14 @@
     <Compile Include="Models\Serializer.cs" />
     <Compile Include="PixelTools.cs" />
     <Compile Include="Settings\Behaviors.cs" />
-    <Compile Include="Settings\CommandKeyBinding.cs" />
+    <Compile Include="Settings\CopyableCommandKeyBinding.cs" />
     <Compile Include="Settings\KeyboardMoveBehaviorSettings.cs" />
     <Compile Include="Settings\NotificationSettings.cs" />
     <Compile Include="Settings\ScreenLayouts.cs" />
     <Compile Include="Settings\StackSettings.cs" />
+    <Compile Include="SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="StackIcon.xaml.cs">
       <DependentUpon>StackIcon.xaml</DependentUpon>
     </Compile>
@@ -253,6 +263,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="SettingsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="StackIcon.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -298,6 +312,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\App\KeySettings\src\WPF\WPF.csproj">
+      <Project>{f0f57d7c-f2aa-4046-9692-e30d896e8515}</Project>
+      <Name>WPF</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\App\ObservableFileSystem\src\ObservableFileSystem.csproj">
       <Project>{b8ad0753-625f-41e0-a90d-05d587cf0780}</Project>
       <Name>ObservableFileSystem</Name>

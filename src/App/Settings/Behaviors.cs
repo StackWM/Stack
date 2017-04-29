@@ -8,8 +8,8 @@
     {
         public KeyboardMoveBehaviorSettings KeyboardMove { get; set; } = new KeyboardMoveBehaviorSettings();
 
-        public ObservableCollection<CommandKeyBinding> KeyBindings { get; set; } =
-            new ObservableCollection<CommandKeyBinding>();
+        public ObservableCollection<CopyableCommandKeyBinding> KeyBindings { get; set; } =
+            new ObservableCollection<CopyableCommandKeyBinding>();
 
         public Behaviors Copy() => new Behaviors {
             KeyboardMove = this.KeyboardMove.Copy(),

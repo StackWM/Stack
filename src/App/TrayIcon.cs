@@ -38,7 +38,7 @@
             this.layoutsFolder = layoutsFolder ?? throw new ArgumentNullException(nameof(layoutsFolder));
         }
 
-        public static async Task<TrayIcon> StartTrayIcon(IFolder layoutsFolder, ObservableDirectory layoutsDirectory, StackSettings stackSettings, IScreenProvider screenProvider)
+        public static async Task<TrayIcon> StartTrayIcon(IFolder layoutsFolder, ObservableDirectory layoutsDirectory, StackSettings stackSettings, IScreenProvider screenProvider, SettingsWindow settingsWindow)
         {
             var contextMenu = new ContextMenuStrip();
 
@@ -49,6 +49,10 @@
                 Text = nameof(Stack),
                 Visible = true,
             }, stackSettings, layoutsFolder);
+
+            contextMenu.Items.Add("Settings", image: null, onClick: (_, __) => settingsWindow.Show())
+                .Font = new Font(contextMenu.Font, FontStyle.Bold);
+            trayIcon.Icon.DoubleClick += delegate { settingsWindow.Show(); };
 
             contextMenu.Items.Add("About", image: null, onClick: (_, __) => trayIcon.aboutWindow.Show());
             contextMenu.Items.Add("Feedback...", image: null,

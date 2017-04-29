@@ -57,6 +57,9 @@
             Width=0,Height=0,
             Title = nameof(winApiHandler),
         };
+
+        SettingsWindow SettingsWindow { get; } = new SettingsWindow();
+
         DragHook dragHook;
         KeyboardArrowBehavior keyboardArrowBehavior;
         DispatcherTimer updateTimer;
@@ -105,6 +108,8 @@
 
             if (!this.winApiHandler.IsLoaded)
                 return;
+
+            this.SettingsWindow.DataContext = settings;
 
             this.SetupScreenHooks();
 
@@ -435,7 +440,7 @@
 
             screens.OnChange<Win32Screen>(onAdd: s => AddLayoutForScreen(s), onRemove: RemoveLayoutForScreen);
 
-            this.trayIcon = (await TrayIcon.StartTrayIcon(layoutsDirectory, this.layoutsDirectory, settings, this.screenProvider)).Icon;
+            this.trayIcon = (await TrayIcon.StartTrayIcon(layoutsDirectory, this.layoutsDirectory, settings, this.screenProvider, this.SettingsWindow)).Icon;
             if (this.layoutLoadProblems.Length > 0) {
                 this.trayIcon.BalloonTipTitle = "Some layouts were not loaded";
                 this.trayIcon.BalloonTipText = this.layoutLoadProblems.ToString();

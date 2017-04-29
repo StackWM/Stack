@@ -169,6 +169,15 @@
       <Component Id="System.IO.FileSystem.Watcher.dll" Guid="01e12a06-e24b-4db1-ad36-c43d40cec1e0">
         <File Id="System.IO.FileSystem.Watcher.dll" Name="System.IO.FileSystem.Watcher.dll" Source="$(var.App_TargetDir)System.IO.FileSystem.Watcher.dll" />
       </Component>
+      <Component Id="System.Windows.Interactivity.dll" Guid="da6d8e70-0b59-4ca1-b0d1-6879f640724b">
+        <File Id="System.Windows.Interactivity.dll" Name="System.Windows.Interactivity.dll" Source="$(var.App_TargetDir)System.Windows.Interactivity.dll" />
+      </Component>
+      <Component Id="LostTech.App.KeySettings.WPF.dll" Guid="ad132cfc-1479-489c-b6f2-097729d08860">
+        <File Id="LostTech.App.KeySettings.WPF.dll" Name="LostTech.App.KeySettings.WPF.dll" Source="$(var.App_TargetDir)LostTech.App.KeySettings.WPF.dll" />
+      </Component>
+      <Component Id="MahApps.Metro.dll" Guid="1f132ff1-c2c9-4d72-b9e0-b3f733eba71e">
+        <File Id="MahApps.Metro.dll" Name="MahApps.Metro.dll" Source="$(var.App_TargetDir)MahApps.Metro.dll" />
+      </Component>
     </ComponentGroup>
     <ComponentGroup Id="Shortcuts" Directory="ApplicationProgramsFolder">
       <Component Id="Stack.exe.lnk.Component" Guid="c218d8d9-3dcf-4c6a-a6b1-6ea368f61bf6">
