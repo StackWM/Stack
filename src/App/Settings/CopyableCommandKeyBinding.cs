@@ -4,11 +4,11 @@
     using System.Linq;
     using LostTech.App;
 
-    public sealed class CopyableCommandKeyBinding : CommandKeyBinding, ICopyable<CopyableCommandKeyBinding>
+    public static class CopyableCommandKeyBinding
     {
-        public CopyableCommandKeyBinding Copy() => new CopyableCommandKeyBinding {
-            CommandName = this.CommandName,
-            Shortcut = this.Shortcut,
+        public static CommandKeyBinding Copy(this CommandKeyBinding binding) => new CommandKeyBinding {
+            CommandName = binding.CommandName,
+            Shortcut = binding.Shortcut,
         };
     }
 }

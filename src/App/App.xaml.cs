@@ -95,6 +95,7 @@
                 Behaviors = await this.InitializeSettingsSet<Behaviors>("Behaviors.xml"),
                 Notifications = await this.InitializeSettingsSet<NotificationSettings>("Notifications.xml"),
             };
+            settings.Behaviors.AddMissingBindings();
 
             if (settings.Notifications.AcceptedTerms != LicenseTermsAcceptance.GetTermsAndConditionsVersion()) {
                 var termsWindow = new LicenseTermsAcceptance();
@@ -136,6 +137,7 @@
             catch (Exception settingsError) {
                 var errorFile = await this.localSettingsFolder.CreateFileAsync(
                     $"{fileName}.err", CreationCollisionOption.ReplaceExisting);
+                Debug.WriteLine(settingsError.ToString());
                 await errorFile.WriteAllTextAsync(settingsError.ToString());
                 var brokenFile = await this.localSettingsFolder.GetFileAsync(fileName);
                 await brokenFile.MoveAsync(
