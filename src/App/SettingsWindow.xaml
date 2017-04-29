@@ -8,6 +8,7 @@
         xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:app="clr-namespace:LostTech.App;assembly=LostTech.App.KeySettings.WPF"
         xmlns:settings="clr-namespace:LostTech.Stack.Settings"
+        BorderThickness="1" BorderBrush="Black"
         mc:Ignorable="d"
         Title="Stack Settings: currently any changes here require application to be restarted!"
         Height="480" Width="800"
