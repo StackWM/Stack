@@ -14,18 +14,28 @@
     /// <summary>
     /// Interaction logic for ScreenLayout.xaml
     /// </summary>
-    public partial class ScreenLayout : Window
+    public partial class ScreenLayout
     {
+        HwndSource handle;
+
         public ScreenLayout()
         {
-            InitializeComponent();
-
-            this.Loaded += OnLoaded;
+            this.InitializeComponent();
         }
 
-        void OnLoaded(object sender, RoutedEventArgs routedEventArgs) {
-            var handle = (HwndSource)PresentationSource.FromVisual(this);
-            handle.AddHook(this.OnWindowMessage);
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            this.handle = (HwndSource)PresentationSource.FromVisual(this);
+            // ReSharper disable once PossibleNullReferenceException
+            this.handle.AddHook(this.OnWindowMessage);
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            this.handle?.RemoveHook(this.OnWindowMessage);
+            this.handle = null;
+            base.OnClosed(e);
         }
 
         private IntPtr OnWindowMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -81,7 +91,7 @@
             var delay = Task.Delay(millisecondsDelay: 2000);
             this.idleAdjustDelay = delay;
             await delay;
-            if (delay == this.idleAdjustDelay)
+            if (delay == this.idleAdjustDelay && this.IsLoaded)
                 this.AdjustToScreen();
         }
 

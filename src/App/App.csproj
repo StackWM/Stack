@@ -209,6 +209,7 @@
     <Compile Include="Settings\Behaviors.cs" />
     <Compile Include="Settings\CopyableCommandKeyBinding.cs" />
     <Compile Include="Settings\KeyboardMoveBehaviorSettings.cs" />
+    <Compile Include="Settings\MouseMoveBehaviorSettings.cs" />
     <Compile Include="Settings\NotificationSettings.cs" />
     <Compile Include="Settings\ScreenLayouts.cs" />
     <Compile Include="Settings\StackSettings.cs" />

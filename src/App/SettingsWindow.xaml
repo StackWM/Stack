@@ -9,7 +9,7 @@
         xmlns:app="clr-namespace:LostTech.App;assembly=LostTech.App.KeySettings.WPF"
         xmlns:settings="clr-namespace:LostTech.Stack.Settings"
         mc:Ignorable="d"
-        Title="Stack Settings"
+        Title="Stack Settings: currently any changes here require application to be restarted!"
         Height="480" Width="800"
         WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignInstance Type=settings:StackSettings, IsDesignTimeCreatable=True}"
@@ -41,7 +41,7 @@
                     <CheckBox Content="Use middle mouse button to move windows"
                               IsChecked="{Binding Behaviors.KeyboardMove.Enabled}"/>
                     <CheckBox Content="Use keyboard to move windows horizontally or vertically"
-                              IsChecked="{Binding Behaviors.KeyboardMove.Enabled}"/>
+                              IsChecked="{Binding Behaviors.MouseMove.Enabled}"/>
                 </StackPanel>
             </ScrollViewer>
         </TabItem>

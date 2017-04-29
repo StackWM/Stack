@@ -33,7 +33,7 @@
             this.hook.KeyDown += this.OnKeyDown;
         }
 
-        private void OnKeyDown(object sender, KeyEventArgs args)
+        void OnKeyDown(object sender, KeyEventArgs args)
         {
             if (GetKeyboardModifiers() == ModifierKeys.Windows
                 && Directions.TryGetValue(args.KeyData, out var direction)) {
