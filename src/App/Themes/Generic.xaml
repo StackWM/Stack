@@ -16,13 +16,12 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Background" Value="White"/>
-        <Setter Property="Opacity" Value="0.7"/>
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="BorderBrush" Value="Black"/>
         <Style.Triggers>
             <Trigger Property="IsDragMouseOver" Value="True">
-                <Setter Property="Opacity" Value="1"/>
+                <Setter Property="Background" Value="#A0000000"/>
             </Trigger>
         </Style.Triggers>
     </Style>
