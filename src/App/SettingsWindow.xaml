@@ -48,7 +48,21 @@
         <TabItem Header="Hotkeys">
             <app:KeySettingsEditor x:Name="KeySettingsEditor"
                                    DataContext="{Binding Behaviors.KeyBindings}"
-                                   />
+                                   ExtendedCapture="True"
+                                   >
+                <app:KeySettingsEditor.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="FontWeight" Value="Normal"/>
+                    </Style>
+                    <Style TargetType="app:KeyboardShortcutBox">
+                        <Style.Triggers>
+                            <Trigger Property="IsCapturingGesture" Value="True">
+                                <Setter Property="Background" Value="{x:Static SystemColors.InfoBrush}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </app:KeySettingsEditor.Resources>
+            </app:KeySettingsEditor>
         </TabItem>
     </metro:MetroAnimatedSingleRowTabControl>
 </metro:MetroWindow>
