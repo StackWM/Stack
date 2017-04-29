@@ -260,7 +260,7 @@
             var window = this.dragOperation.Window;
             this.StopDrag(window);
 
-            var screen = this.screenLayouts.SingleOrDefault(layout => layout.Screen.IsActive && layout.GetPhysicalBounds().Contains(dropPoint));
+            var screen = this.screenLayouts.FirstOrDefault(layout => layout.Screen.IsActive && layout.GetPhysicalBounds().Contains(dropPoint));
             if (screen == null)
                 return;
             var relativeDropPoint = screen.PointFromScreen(dropPoint);
