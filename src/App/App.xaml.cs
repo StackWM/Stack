@@ -493,7 +493,9 @@
         {
             this.hook = Hook.GlobalEvents();
             if (settings.Behaviors.KeyboardMove.Enabled)
-                this.keyboardArrowBehavior = new KeyboardArrowBehavior(this.hook, this.screenLayouts, this.Move);
+                this.keyboardArrowBehavior = new KeyboardArrowBehavior(
+                    this.hook, this.screenLayouts, settings.Behaviors.KeyBindings, this.Move);
+
             if (settings.Behaviors.MouseMove.Enabled) {
                 this.dragHook = new DragHook(MouseButtons.Middle, this.hook);
                 this.dragHook.DragStartPreview += this.OnDragStartPreview;

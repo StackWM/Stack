@@ -5,6 +5,7 @@
     using System.Windows.Input;
     using LostTech.App;
     using LostTech.App.Input;
+    using LostTech.Stack.Behavior;
     using LostTech.Stack.DataBinding;
     using M = System.Windows.Input.ModifierKeys;
 
@@ -33,10 +34,10 @@
         }
 
         static readonly CommandKeyBinding[] DefaultKeyBindings = {
-            new CommandKeyBinding("Move window up", new KeyStroke(Key.Up, M.Windows)),
-            new CommandKeyBinding("Move window down", new KeyStroke(Key.Down, M.Windows)),
-            new CommandKeyBinding("Move window left", new KeyStroke(Key.Left, M.Windows)),
-            new CommandKeyBinding("Move window right", new KeyStroke(Key.Right, M.Windows)),
+            new CommandKeyBinding(KeyboardArrowBehavior.Commands.MoveUp, new KeyStroke(Key.Up, M.Windows)),
+            new CommandKeyBinding(KeyboardArrowBehavior.Commands.MoveDown, new KeyStroke(Key.Down, M.Windows)),
+            new CommandKeyBinding(KeyboardArrowBehavior.Commands.MoveLeft, new KeyStroke(Key.Left, M.Windows)),
+            new CommandKeyBinding(KeyboardArrowBehavior.Commands.MoveRight, new KeyStroke(Key.Right, M.Windows)),
         };
     }
 }
