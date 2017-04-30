@@ -24,6 +24,7 @@
             new AppDependecy(nameof(Microsoft.HockeyApp)){Uri = new Uri("https://hockeyapp.net/"), License = "MIT"},
             new AppDependecy("JetBrains.Annotations", uri: "https://www.nuget.org/packages/JetBrains.Annotations", license: "MIT"),
             new AppDependecy(nameof(PInvoke), uri: "https://github.com/AArnott/pinvoke", license: "MIT"),
+            new AppDependecy(typeof(MahApps.Metro.AppTheme).Namespace, uri: "http://mahapps.com/", license: "MIT/MS-PL"),
         };
     }
 }
