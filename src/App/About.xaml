@@ -16,19 +16,6 @@
         FontSize="16"
         WindowStyle="ToolWindow"
         >
-    <metro:MetroWindow.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <!-- MahApps.Metro resource dictionaries. Make sure that all file names are Case Sensitive! -->
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-                <!-- Accent and AppTheme setting -->
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </metro:MetroWindow.Resources>
     <StackPanel Margin="12,12">
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
             <art:StackIcon Width="72" Height="72"/>

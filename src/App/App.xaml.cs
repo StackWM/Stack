@@ -58,7 +58,7 @@
             Title = nameof(winApiHandler),
         };
 
-        SettingsWindow SettingsWindow { get; } = new SettingsWindow();
+        SettingsWindow SettingsWindow { get; set; }
 
         DragHook dragHook;
         KeyboardArrowBehavior keyboardArrowBehavior;
@@ -110,7 +110,7 @@
             if (!this.winApiHandler.IsLoaded)
                 return;
 
-            this.SettingsWindow.DataContext = settings;
+            this.SettingsWindow = new SettingsWindow{ DataContext = settings };
 
             this.SetupScreenHooks();
 
