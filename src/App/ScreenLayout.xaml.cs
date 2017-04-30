@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Interop;
@@ -139,5 +140,11 @@
                 new PointHitTestParameters(dropPoint));
             return result;
         }
+    }
+
+    static class ScreenLayoutExtensions
+    {
+        public static IEnumerable<ScreenLayout> Active(this IEnumerable<ScreenLayout> layouts)
+            => layouts.Where(layout => layout.Screen.IsActive);
     }
 }

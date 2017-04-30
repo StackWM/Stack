@@ -45,7 +45,7 @@
                 info.rcWindow.right - info.rcWindow.left,
                 info.rcWindow.bottom - info.rcWindow.top);
             var windowCenter = windowBounds.Center();
-            var allZones = this.screenLayouts.SelectMany(screen => screen.Zones)
+            var allZones = this.screenLayouts.Active().SelectMany(screen => screen.Zones)
                 .Where(zone => zone.Target == null || zone.Equals(zone.Target))
                 .ToArray();
             var sameCenter = allZones.Where(zone => zone.GetPhysicalBounds().Center()
@@ -65,8 +65,8 @@
 
             var next = currentZone == null
                 ? sameCenter.FirstOrDefault()
-                : sameCenter.SkipWhile(zone => ReferenceEquals(zone, currentZone))
-                    .FirstOrDefault(zone => ReferenceEquals(zone, currentZone));
+                : sameCenter.SkipWhile(zone => !ReferenceEquals(zone, currentZone))
+                    .FirstOrDefault(zone => !ReferenceEquals(zone, currentZone));
 
             var strip = reducedWindowBounds;
             var directionalInfinity = direction * 1e120;

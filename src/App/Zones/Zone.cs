@@ -55,6 +55,9 @@
         public Zone()
         {
             this.AllowDrop = true;
+#if DEBUG
+            this.Tag = Guid.NewGuid();
+#endif
         }
 
         public bool IsDragMouseOver {

@@ -218,7 +218,8 @@
             var location = GetCursorPos();
             var currentPosition = location;
 
-            var screen = this.screenLayouts.FirstOrDefault(layout => layout.Screen.IsActive && layout.GetPhysicalBounds().Contains(currentPosition));
+            var screen = this.screenLayouts.Active()
+                .FirstOrDefault(layout => layout.GetPhysicalBounds().Contains(currentPosition));
             if (screen == null) {
                 if (this.dragOperation.CurrentZone != null) {
                     this.dragOperation.CurrentZone.IsDragMouseOver = false;
@@ -250,9 +251,8 @@
 
         void ShowLayoutGrid()
         {
-            foreach (var screenLayout in this.screenLayouts) {
-                if (screenLayout.Screen.IsActive)
-                    screenLayout.Show();
+            foreach (ScreenLayout screenLayout in this.screenLayouts.Active()) {
+                screenLayout.Show();
             }
             this.dragOperation.Activated = true;
         }
@@ -267,7 +267,8 @@
             var window = this.dragOperation.Window;
             this.StopDrag(window);
 
-            var screen = this.screenLayouts.FirstOrDefault(layout => layout.Screen.IsActive && layout.GetPhysicalBounds().Contains(dropPoint));
+            var screen = this.screenLayouts.Active()
+                .FirstOrDefault(layout => layout.GetPhysicalBounds().Contains(dropPoint));
             if (screen == null)
                 return;
             var relativeDropPoint = screen.PointFromScreen(dropPoint);

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Forms;
     using System.Windows.Input;
@@ -34,7 +35,7 @@
             this.hook.KeyDown += this.OnKeyDown;
         }
 
-        void OnKeyDown(object sender, KeyEventArgs args)
+        async void OnKeyDown(object sender, KeyEventArgs args)
         {
             ModifierKeys modifiers = GetKeyboardModifiers();
             Key key = KeyInterop.KeyFromVirtualKey((int)args.KeyData);
@@ -47,7 +48,11 @@
                 return;
 
             var moveCommand = new MoveCurrentWindowInDirectionCommand(this.move, this.screenLayouts);
-            args.Handled = moveCommand.Execute(direction);
+            args.Handled = moveCommand.CanExecute(direction);
+
+            // avoid freezing the system
+            await Task.Yield();
+            moveCommand.Execute(direction);
         }
 
         static readonly SortedList<string, Vector> Directions = new SortedList<string, Vector>
