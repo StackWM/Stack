@@ -22,7 +22,6 @@
     using LostTech.Stack.Behavior;
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.InternalExtensions;
-    using LostTech.Stack.Models;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
     using LostTech.Stack.Windows;
@@ -120,11 +119,6 @@
 
             // this must be the last, so that mouse won't lag while we are loading
             this.BindHandlers(settings);
-
-            GC.Collect();
-
-            //this.MainWindow = new MyPos();
-            //this.MainWindow.Show();
         }
 
         async Task<T> InitializeSettingsSet<T>(string fileName)
