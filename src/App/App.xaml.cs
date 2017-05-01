@@ -22,6 +22,7 @@
     using LostTech.Stack.Behavior;
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.InternalExtensions;
+    using LostTech.Stack.Models;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
     using LostTech.Stack.Windows;
@@ -93,7 +94,16 @@
                 LayoutMap = await this.InitializeSettingsSet<ScreenLayouts>("LayoutMap.xml"),
                 Behaviors = await this.InitializeSettingsSet<Behaviors>("Behaviors.xml"),
                 Notifications = await this.InitializeSettingsSet<NotificationSettings>("Notifications.xml"),
+                WindowGroups = await this.InitializeSettingsSet<CopyableObservableCollection<WindowGroup>>("WindowGroups.xml"),
             };
+            if (settings.WindowGroups.Count == 0) {
+                settings.WindowGroups.Add(new WindowGroup {
+                    Name = "42",
+                    Filters = {
+                        new Models.Filters.WindowFilter { ClassFilter = new Models.Filters.CommonStringMatchFilter{ Value = "42", Match = Models.Filters.CommonStringMatchFilter.MatchOption.Anywhere } },
+                    },
+                });
+            }
             settings.Behaviors.AddMissingBindings();
 
             if (settings.Notifications.AcceptedTerms != LicenseTermsAcceptance.GetTermsAndConditionsVersion()) {

@@ -196,6 +196,8 @@
     <Compile Include="Behavior\KeyboardArrowBehavior.cs" />
     <Compile Include="Commands\MoveCurrentWindowInDirectionCommand.cs" />
     <Compile Include="DataBinding\Binder.cs" />
+    <Compile Include="DataBinding\CopyableExtensions.cs" />
+    <Compile Include="DataBinding\CopyableObservableCollection.cs" />
     <Compile Include="DataBinding\NotifyPropertyChangedBase.cs" />
     <Compile Include="DebugHelper.cs" />
     <Compile Include="AppDependecy.cs" />
@@ -203,8 +205,13 @@
     <Compile Include="LicenseTermsAcceptance.xaml.cs">
       <DependentUpon>LicenseTermsAcceptance.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\Filters\CommonStringMatchFilter.cs" />
+    <Compile Include="Models\Filters\IFilter.cs" />
+    <Compile Include="Models\Filters\StringMatchFilter.cs" />
+    <Compile Include="Models\Filters\WindowFilter.cs" />
     <Compile Include="Models\MutableKeyValuePair.cs" />
     <Compile Include="Models\Serializer.cs" />
+    <Compile Include="Models\WindowGroup.cs" />
     <Compile Include="PixelTools.cs" />
     <Compile Include="Settings\Behaviors.cs" />
     <Compile Include="Settings\CopyableCommandKeyBinding.cs" />
@@ -339,6 +346,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Terms.html" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release'">
     <Exec Command="signtool sign /v /n &quot;Lost Tech LLC&quot; /t http://timestamp.verisign.com/scripts/timstamp.dll $(TargetPath)" />
