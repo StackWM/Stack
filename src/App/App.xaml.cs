@@ -358,21 +358,19 @@
 
         async Task DisposeAsync()
         {
-            this.hook.Dispose();
+            this.hook?.Dispose();
             this.dragHook?.Dispose();
             this.dragHook = null;
             this.keyboardArrowBehavior?.Dispose();
             this.trayIcon?.Dispose();
 
-            if (this.localSettings != null)
+            LostTech.App.Settings settings = this.localSettings;
+            if (settings != null)
             {
-                this.localSettings.ScheduleSave();
-                await this.localSettings.DisposeAsync();
+                settings.ScheduleSave();
+                await settings.DisposeAsync();
                 this.localSettings = null;
-
                 Debug.WriteLine("settings written");
-                //await Task.Delay(5000);
-                //Debug.WriteLine("delayed message");
             }
         }
 
