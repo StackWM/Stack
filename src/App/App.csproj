@@ -233,8 +233,8 @@
     <Compile Include="Views\StringFilterEditor.xaml.cs">
       <DependentUpon>StringFilterEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\WindowGroupEditor.xaml.cs">
-      <DependentUpon>WindowGroupEditor.xaml</DependentUpon>
+    <Compile Include="Views\WindowFilterEditor.xaml.cs">
+      <DependentUpon>WindowFilterEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Win32.cs" />
     <Compile Include="WindowDragOperation.cs" />
@@ -293,7 +293,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\WindowGroupEditor.xaml">
+    <Page Include="Views\WindowFilterEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

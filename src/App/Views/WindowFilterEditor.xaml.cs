@@ -1,30 +1,29 @@
 ﻿namespace LostTech.Stack.Views
 {
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
     using LostTech.Stack.Models.Filters;
 
     /// <summary>
-    /// Interaction logic for StringFilterEditor.xaml
+    /// Interaction logic for WindowFilterEditor.xaml
     /// </summary>
-    public partial class StringFilterEditor : UserControl
+    public partial class WindowFilterEditor : UserControl
     {
-        public StringFilterEditor()
+        public WindowFilterEditor()
         {
             this.InitializeComponent();
         }
 
-        public CommonStringMatchFilter Filter {
-            get => (CommonStringMatchFilter)this.GetValue(FilterProperty);
+
+        public WindowFilter Filter {
+            get => (WindowFilter)this.GetValue(FilterProperty);
             set => this.SetValue(FilterProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for Filter.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty FilterProperty =
-            DependencyProperty.Register(nameof(Filter), typeof(CommonStringMatchFilter),
-                typeof(StringFilterEditor), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(Filter), typeof(WindowFilter), typeof(WindowFilterEditor),
+                new PropertyMetadata(null));
 
 
     }
