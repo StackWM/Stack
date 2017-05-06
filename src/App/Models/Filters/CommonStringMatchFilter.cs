@@ -48,6 +48,9 @@
             }
         }
 
+        static readonly MatchOption[] MatchOptionsSingleton = (MatchOption[])Enum.GetValues(typeof(MatchOption));
+        public static MatchOption[] MatchOptions => MatchOptionsSingleton.ToArray();
+
         public enum MatchOption
         {
             Exact,

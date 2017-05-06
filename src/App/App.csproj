@@ -230,6 +230,12 @@
     <Compile Include="Utils\DragHookEventArgs.cs" />
     <Compile Include="Utils\EnumUtils.cs" />
     <Compile Include="Utils\RectExtensions.cs" />
+    <Compile Include="Views\StringFilterEditor.xaml.cs">
+      <DependentUpon>StringFilterEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WindowGroupEditor.xaml.cs">
+      <DependentUpon>WindowGroupEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Win32.cs" />
     <Compile Include="WindowDragOperation.cs" />
     <Compile Include="Windows\DragHook.cs" />
@@ -282,6 +288,14 @@
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\StringFilterEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowGroupEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
