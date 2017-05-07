@@ -11,7 +11,7 @@
         xmlns:views="clr-namespace:LostTech.Stack.Views"
         BorderThickness="1" BorderBrush="Black"
         mc:Ignorable="d"
-        Title="Stack Settings: currently any changes here require application to be restarted!"
+        Title="Stack Settings: currently any changes here might require application to be restarted!"
         Height="480" Width="800"
         WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignInstance Type=settings:StackSettings, IsDesignTimeCreatable=True}"
@@ -61,6 +61,9 @@
                     </Style>
                 </app:KeySettingsEditor.Resources>
             </app:KeySettingsEditor>
+        </TabItem>
+        <TabItem Header="Mouse Drag">
+            <views:WindowGroupListEditor AvailableGroups="{Binding WindowGroups}" />
         </TabItem>
         <TabItem Header="Window Groups">
             <views:WindowGroupsEditor ItemsSource="{Binding WindowGroups}"/>

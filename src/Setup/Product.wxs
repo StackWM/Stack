@@ -181,6 +181,9 @@
       <Component Id="ValueConverters.dll" Guid="1c1b3803-cfbb-433f-a9cb-eab752560661">
         <File Id="ValueConverters.dll" Name="ValueConverters.dll" Source="$(var.App_TargetDir)ValueConverters.dll" />
       </Component>
+      <Component Id="Prism.dll" Guid="bf1e8f78-f667-49f6-bfd6-98e3bb289b81">
+        <File Id="Prism.dll" Name="Prism.dll" Source="$(var.App_TargetDir)Prism.dll" />
+      </Component>
     </ComponentGroup>
     <ComponentGroup Id="Shortcuts" Directory="ApplicationProgramsFolder">
       <Component Id="Stack.exe.lnk.Component" Guid="c218d8d9-3dcf-4c6a-a6b1-6ea368f61bf6">
