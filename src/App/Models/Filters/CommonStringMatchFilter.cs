@@ -53,10 +53,10 @@
 
         public enum MatchOption
         {
+            Anywhere,
             Exact,
             Prefix,
             Suffix,
-            Anywhere,
             Regex,
         }
     }
