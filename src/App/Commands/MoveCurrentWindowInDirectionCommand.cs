@@ -2,21 +2,32 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Windows;
     using System.Windows.Input;
     using JetBrains.Annotations;
+    using LostTech.Stack.Models;
+    using LostTech.Stack.Models.Filters;
+    using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
     using LostTech.Stack.Zones;
     using PInvoke;
 
     class MoveCurrentWindowInDirectionCommand : ICommand
     {
-        readonly Action<IntPtr, Zone> move;
-        readonly ICollection<ScreenLayout> screenLayouts;
+        [NotNull] readonly KeyboardMoveBehaviorSettings settings;
+        [NotNull] readonly IEnumerable<WindowGroup> windowGroups;
+        [NotNull] readonly Action<IntPtr, Zone> move;
+        [NotNull] readonly ICollection<ScreenLayout> screenLayouts;
 
-        public MoveCurrentWindowInDirectionCommand([NotNull] Action<IntPtr, Zone> move, [NotNull] ICollection<ScreenLayout> screenLayouts)
+        public MoveCurrentWindowInDirectionCommand([NotNull] Action<IntPtr, Zone> move,
+            [NotNull] ICollection<ScreenLayout> screenLayouts,
+            [NotNull] KeyboardMoveBehaviorSettings settings,
+            [NotNull] IEnumerable<WindowGroup> windowGroups)
         {
+            this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            this.windowGroups = windowGroups ?? throw new ArgumentNullException(nameof(windowGroups));
             this.move = move ?? throw new ArgumentNullException(nameof(move));
             this.screenLayouts = screenLayouts ?? throw new ArgumentNullException(nameof(screenLayouts));
         }
@@ -24,7 +35,25 @@
         public bool CanExecute(object parameter)
         {
             IntPtr window = User32.GetForegroundWindow();
-            return Win32.GetWindowInfo(window, out var _);
+            return this.CanExecute(window);
+        }
+
+        public bool CanExecute(IntPtr window)
+        {
+            if (!Win32.GetWindowInfo(window, out var _)) {
+                Debug.WriteLine("can't move: window inaccessible");
+                return false;
+            }
+
+            if (User32.IsIconic(window))
+                return false;
+
+            if (this.settings.WindowGroupIgnoreList.Contains(this.windowGroups, window)) {
+                Debug.WriteLine("won't move: ignore list");
+                return false;
+            }
+
+            return true;
         }
 
         void ICommand.Execute(object parameter) => this.MoveCurrentWindow((Vector)parameter);
@@ -38,7 +67,7 @@
         bool MoveCurrentWindow(Vector direction)
         {
             var window = User32.GetForegroundWindow();
-            if (!Win32.GetWindowInfo(window, out var info) || User32.IsIconic(window))
+            if (!this.CanExecute(window) || !Win32.GetWindowInfo(window, out var info))
                 return false;
 
             var windowBounds = new Rect(info.rcWindow.left, info.rcWindow.top,

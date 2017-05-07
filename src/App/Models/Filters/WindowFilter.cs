@@ -5,13 +5,29 @@
     using System.Linq;
     using LostTech.App;
     using LostTech.Stack.DataBinding;
+    using PInvoke;
 
     public sealed class WindowFilter : NotifyPropertyChangedBase, IFilter<IntPtr>, ICopyable<WindowFilter>
     {
         CommonStringMatchFilter classFilter = new CommonStringMatchFilter();
         CommonStringMatchFilter titleFilter = new CommonStringMatchFilter();
 
-        public bool Matches(IntPtr windowHandle) { throw new NotImplementedException(); }
+        public bool Matches(IntPtr windowHandle)
+        {
+            if (!string.IsNullOrEmpty(this.ClassFilter?.Value)) {
+                string className = User32.GetClassName(windowHandle, maxLength: 4096);
+                if (!this.ClassFilter.Matches(className))
+                    return false;
+            }
+
+            if (!string.IsNullOrEmpty(this.TitleFilter?.Value)) {
+                string title = User32.GetWindowText(windowHandle);
+                if (!this.TitleFilter.Matches(title))
+                    return false;
+            }
+
+            return true;
+        }
 
         public CommonStringMatchFilter ClassFilter {
             get => this.classFilter;

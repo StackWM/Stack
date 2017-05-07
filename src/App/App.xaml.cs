@@ -23,6 +23,7 @@
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.InternalExtensions;
     using LostTech.Stack.Models;
+    using LostTech.Stack.Models.Filters;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
     using LostTech.Stack.Windows;
@@ -61,6 +62,7 @@
         SettingsWindow SettingsWindow { get; set; }
 
         DragHook dragHook;
+        StackSettings stackSettings;
         KeyboardArrowBehavior keyboardArrowBehavior;
         DispatcherTimer updateTimer;
         readonly IScreenProvider screenProvider = new Win32ScreenProvider();
@@ -96,13 +98,22 @@
                 Notifications = await this.InitializeSettingsSet<NotificationSettings>("Notifications.xml"),
                 WindowGroups = await this.InitializeSettingsSet<CopyableObservableCollection<WindowGroup>>("WindowGroups.xml"),
             };
-            if (settings.WindowGroups.Count == 0) {
+            this.stackSettings = settings;
+            if (settings.WindowGroups.Count == 0
+                && settings.Behaviors.MouseMove.WindowGroupIgnoreList.Count == 0
+                && settings.Behaviors.KeyboardMove.WindowGroupIgnoreList.Count == 0) {
+                const string remoteControlGroupName = "Remote Control Applications";
                 settings.WindowGroups.Add(new WindowGroup {
-                    Name = "42",
+                    Name = remoteControlGroupName,
                     Filters = {
-                        new Models.Filters.WindowFilter { ClassFilter = new Models.Filters.CommonStringMatchFilter{ Value = "42", Match = Models.Filters.CommonStringMatchFilter.MatchOption.Anywhere } },
+                        new WindowFilter { TitleFilter = new CommonStringMatchFilter {
+                            Value = "Remote Desktop Connection",
+                            Match = CommonStringMatchFilter.MatchOption.Suffix,
+                        }},
                     },
                 });
+                settings.Behaviors.MouseMove.WindowGroupIgnoreList.Add(remoteControlGroupName);
+                settings.Behaviors.KeyboardMove.WindowGroupIgnoreList.Add(remoteControlGroupName);
             }
             settings.Behaviors.AddMissingBindings();
 
@@ -290,7 +301,7 @@
                     ShowWindow(window, WindowShowStyle.SW_RESTORE);
                 }
             }
-            catch (PInvoke.Win32Exception) { }
+            catch (Win32Exception) { }
 
             if (!MoveWindow(window, (int) targetBounds.Left, (int) targetBounds.Top, (int) targetBounds.Width,
                 (int) targetBounds.Height, true)) {
@@ -338,24 +349,27 @@
 
         void OnDragStart(object sender, DragHookEventArgs @event)
         {
-            this.dragOperation = DragStart();
+            this.dragOperation = this.DragStart();
             @event.Handled = this.dragOperation != null;
         }
 
         void OnDragStartPreview(object sender, DragHookEventArgs args)
         {
-            args.Handled = DragStart() != null;
+            args.Handled = this.DragStart() != null;
         }
 
-        static WindowDragOperation DragStart()
+        WindowDragOperation DragStart()
         {
             //var point = new POINT { x = (int)location.X, y = (int)location.Y };
             User32.GetCursorPos(out var point);
             var desktop = GetDesktopWindow();
             var child = ChildWindowFromPointEx(desktop, point, ChildWindowFromPointExFlags.CWP_SKIPINVISIBLE);
             try {
-                if (child == IntPtr.Zero || true.Equals(GetWindowText(child)
-                        ?.EndsWith("Remote Desktop Connection")))
+                if (child == IntPtr.Zero)
+                    return null;
+
+                if (this.stackSettings.Behaviors.MouseMove.WindowGroupIgnoreList.Contains(
+                        this.stackSettings.WindowGroups, child))
                     return null;
             }
             catch (Win32Exception) {
@@ -499,7 +513,10 @@
             this.hook = Hook.GlobalEvents();
             if (settings.Behaviors.KeyboardMove.Enabled)
                 this.keyboardArrowBehavior = new KeyboardArrowBehavior(
-                    this.hook, this.screenLayouts, settings.Behaviors.KeyBindings, this.Move);
+                    this.hook, this.screenLayouts, settings.Behaviors.KeyBindings,
+                    settings.Behaviors.KeyboardMove,
+                    settings.WindowGroups,
+                    this.Move);
 
             if (settings.Behaviors.MouseMove.Enabled) {
                 this.dragHook = new DragHook(MouseButtons.Middle, this.hook);
@@ -553,7 +570,7 @@
         public static DirectoryInfo AppData {
             get {
                 var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                var path = Path.Combine(appData, "Lost Tech LLC", nameof(LostTech.Stack));
+                var path = Path.Combine(appData, "Lost Tech LLC", nameof(Stack));
                 return Directory.CreateDirectory(path);
             }
         }
@@ -562,7 +579,7 @@
         {
             get {
                 var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                var path = Path.Combine(appData, "Lost Tech LLC", nameof(LostTech.Stack));
+                var path = Path.Combine(appData, "Lost Tech LLC", nameof(Stack));
                 return Directory.CreateDirectory(path);
             }
         }
