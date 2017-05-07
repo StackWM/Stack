@@ -29,9 +29,15 @@
     </UserControl.Resources>
     <DockPanel>
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
-            <Button>Add Filter</Button>
+            <Button Click="AddButtonClick"
+                    Margin="0,0,6,0"
+                    >Add Filter</Button>
+            <Button IsEnabled="{Binding SelectedItem, ElementName=FiltersView, Converter={StaticResource NullIsFalseConverter}}"
+                    Click="RemoveButtonClick"
+                    >Remove Filter</Button>
         </StackPanel>
-        <ListView ItemContainerStyle="{StaticResource FilterContainerStyle}"
+        <ListView x:Name="FiltersView"
+                  ItemContainerStyle="{StaticResource FilterContainerStyle}"
                   ItemsSource="{Binding Filters, ElementName=LayoutRoot}"
                   />
     </DockPanel>

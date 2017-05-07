@@ -27,5 +27,18 @@
                 typeof(WindowFiltersEditor), new PropertyMetadata(null));
 
 
+        void RemoveButtonClick(object sender, RoutedEventArgs e)
+            => this.Filters.Remove((WindowFilter)this.FiltersView.SelectedItem);
+
+        void AddButtonClick(object sender, RoutedEventArgs e)
+        {
+            this.Filters.Add(new WindowFilter {
+                ClassFilter = {Value = "Class"},
+                TitleFilter = {Value = "Title"},
+            });
+            int index = this.Filters.Count - 1;
+            this.FiltersView.SelectedIndex = index;
+            this.FiltersView.Focus();
+        }
     }
 }

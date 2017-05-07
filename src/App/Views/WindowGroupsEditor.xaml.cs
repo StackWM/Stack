@@ -17,12 +17,12 @@
         }
 
         public ICollection<WindowGroup> ItemsSource {
-            get => (ICollection<WindowGroup>)this.GetValue(ItItemsSourceProperty);
-            set => this.SetValue(ItItemsSourceProperty, value);
+            get => (ICollection<WindowGroup>)this.GetValue(ItemsSourceProperty);
+            set => this.SetValue(ItemsSourceProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for ItItemsSource.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ItItemsSourceProperty =
+        public static readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register(nameof(ItemsSource), typeof(ICollection<WindowGroup>),
                 typeof(WindowGroupsEditor), new PropertyMetadata(null));
 

@@ -23,7 +23,7 @@
         <StackPanel Grid.Row="1" Grid.Column="0"
                     Orientation="Horizontal"
                     >
-            <Button Click="AddGroupClick">Add Group</Button>
+            <Button Click="AddGroupClick" Margin="0,0,6,0">Add Group</Button>
             <Button Click="RemoveGroupClick"
                     IsEnabled="{Binding SelectedItem, ElementName=GroupsView, Converter={StaticResource NullIsFalseConverter}}"
                     >
