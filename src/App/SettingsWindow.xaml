@@ -63,7 +63,7 @@
             </app:KeySettingsEditor>
         </TabItem>
         <TabItem Header="Window Groups">
-            <views:WindowGroupsEditor x:Name="WindowGroups"/>
+            <views:WindowGroupsEditor ItemsSource="{Binding WindowGroups}"/>
         </TabItem>
     </metro:MetroAnimatedSingleRowTabControl>
 </metro:MetroWindow>

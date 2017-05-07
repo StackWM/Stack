@@ -87,7 +87,7 @@
       <HintPath>..\..\packages\PInvoke.Windows.ShellScalingApi.0.5.64\lib\net40\PInvoke.Windows.ShellScalingApi.dll</HintPath>
     </Reference>
     <Reference Include="RecursiveChangeNotifier, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\RecursiveChangeNotifier.0.3.0-b2017032901\lib\netstandard1.0\RecursiveChangeNotifier.dll</HintPath>
+      <HintPath>..\..\packages\RecursiveChangeNotifier.0.3.0-b2017050701\lib\netstandard1.0\RecursiveChangeNotifier.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.AppContext, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">

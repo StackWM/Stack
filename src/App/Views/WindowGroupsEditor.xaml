@@ -42,7 +42,7 @@
 
             <DockPanel>
                 <TextBlock DockPanel.Dock="Left" Margin="6">Name:</TextBlock>
-                <TextBox x:Name="NameEditor" Text="{Binding Name}"/>
+                <TextBox x:Name="NameEditor" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
             </DockPanel>
 
             <local:WindowFiltersEditor Filters="{Binding Filters}"
