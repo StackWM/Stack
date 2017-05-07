@@ -30,8 +30,7 @@
         {
             this.ItemsSource.Add(new WindowGroup {Name = "New Group"});
             this.GroupsView.SelectedIndex = this.ItemsSource.Count - 1;
-            this.NameEditor.Focus();
-            this.NameEditor.SelectAll();
+            this.GroupEditor.StartEdititng();
         }
 
         void RemoveGroupClick(object sender, RoutedEventArgs e)

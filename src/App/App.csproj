@@ -239,6 +239,9 @@
     <Compile Include="Views\WindowFiltersEditor.xaml.cs">
       <DependentUpon>WindowFiltersEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\WindowGroupEditor.xaml.cs">
+      <DependentUpon>WindowGroupEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\WindowGroupsEditor.xaml.cs">
       <DependentUpon>WindowGroupsEditor.xaml</DependentUpon>
     </Compile>
@@ -304,6 +307,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\WindowFiltersEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowGroupEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
