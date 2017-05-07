@@ -178,6 +178,9 @@
       <Component Id="MahApps.Metro.dll" Guid="1f132ff1-c2c9-4d72-b9e0-b3f733eba71e">
         <File Id="MahApps.Metro.dll" Name="MahApps.Metro.dll" Source="$(var.App_TargetDir)MahApps.Metro.dll" />
       </Component>
+      <Component Id="ValueConverters.dll" Guid="1c1b3803-cfbb-433f-a9cb-eab752560661">
+        <File Id="ValueConverters.dll" Name="ValueConverters.dll" Source="$(var.App_TargetDir)ValueConverters.dll" />
+      </Component>
     </ComponentGroup>
     <ComponentGroup Id="Shortcuts" Directory="ApplicationProgramsFolder">
       <Component Id="Stack.exe.lnk.Component" Guid="c218d8d9-3dcf-4c6a-a6b1-6ea368f61bf6">

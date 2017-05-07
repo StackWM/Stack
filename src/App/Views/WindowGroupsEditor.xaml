@@ -23,11 +23,17 @@
         <StackPanel Grid.Row="1" Grid.Column="0"
                     Orientation="Horizontal"
                     >
-            <Button>+</Button>
+            <Button Click="AddGroupClick">Add Group</Button>
+            <Button Click="RemoveGroupClick"
+                    IsEnabled="{Binding SelectedItem, ElementName=GroupsView, Converter={StaticResource NullIsFalseConverter}}"
+                    >
+                Remove Group</Button>
         </StackPanel>
 
         <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
+              Margin="6,0,0,0"
               DataContext="{Binding SelectedItem, ElementName=GroupsView}"
+              IsEnabled="{Binding SelectedItem, ElementName=GroupsView, Converter={StaticResource NullIsFalseConverter}}"
               >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -35,11 +41,14 @@
             </Grid.RowDefinitions>
 
             <DockPanel>
-                <TextBlock DockPanel.Dock="Left">Name:</TextBlock>
-                <TextBox Text="{Binding Name}"/>
+                <TextBlock DockPanel.Dock="Left" Margin="6">Name:</TextBlock>
+                <TextBox x:Name="NameEditor" Text="{Binding Name}"/>
             </DockPanel>
 
-            <local:WindowFiltersEditor Filters="{Binding Filters}"/>
+            <local:WindowFiltersEditor Filters="{Binding Filters}"
+                                       Grid.Row="1"
+                                       Margin="0,6,0,0"
+                                       />
         </Grid>
     </Grid>
 </UserControl>

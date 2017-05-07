@@ -27,7 +27,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObservableFileSystem", "..\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF", "..\..\App\KeySettings\src\WPF\WPF.csproj", "{F0F57D7C-F2AA-4046-9692-E30D896E8515}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValueConverters.NetFx", "..\..\OSS\ValueConverters.NET\ValueConverters.NetFx\ValueConverters.NetFx.csproj", "{EFC0655A-C5B8-4B71-B130-3BA06F43287D}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ValueConverters.Shared", "..\..\OSS\ValueConverters.NET\ValueConverters.Shared\ValueConverters.Shared.shproj", "{4D17E49B-5E42-487E-B057-DA0D8D364662}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\..\OSS\ValueConverters.NET\ValueConverters.Shared\ValueConverters.Shared.projitems*{4d17e49b-5e42-487e-b057-da0d8d364662}*SharedItemsImports = 13
+		..\..\OSS\ValueConverters.NET\ValueConverters.Shared\ValueConverters.Shared.projitems*{efc0655a-c5b8-4b71-b130-3ba06f43287d}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|ARM = Debug|ARM
@@ -131,6 +139,22 @@ Global
 		{F0F57D7C-F2AA-4046-9692-E30D896E8515}.Release|x64.Build.0 = Release|Any CPU
 		{F0F57D7C-F2AA-4046-9692-E30D896E8515}.Release|x86.ActiveCfg = Release|Any CPU
 		{F0F57D7C-F2AA-4046-9692-E30D896E8515}.Release|x86.Build.0 = Release|Any CPU
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D}.Debug|ARM.Build.0 = Debug|Any CPU
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D}.Debug|x64.Build.0 = Debug|Any CPU
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D}.Debug|x86.Build.0 = Debug|Any CPU
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D}.Release|ARM.ActiveCfg = Release|Any CPU
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D}.Release|ARM.Build.0 = Release|Any CPU
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D}.Release|x64.ActiveCfg = Release|Any CPU
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D}.Release|x64.Build.0 = Release|Any CPU
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D}.Release|x86.ActiveCfg = Release|Any CPU
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -138,5 +162,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{B8AD0753-625F-41E0-A90D-05D587CF0780} = {30516558-7C3B-4FE9-BDA4-8343329FA665}
 		{F0F57D7C-F2AA-4046-9692-E30D896E8515} = {30516558-7C3B-4FE9-BDA4-8343329FA665}
+		{EFC0655A-C5B8-4B71-B130-3BA06F43287D} = {30516558-7C3B-4FE9-BDA4-8343329FA665}
+		{4D17E49B-5E42-487E-B057-DA0D8D364662} = {30516558-7C3B-4FE9-BDA4-8343329FA665}
 	EndGlobalSection
 EndGlobal

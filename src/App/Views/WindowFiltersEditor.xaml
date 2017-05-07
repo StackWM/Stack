@@ -27,9 +27,12 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    <Grid>
+    <DockPanel>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
+            <Button>Add Filter</Button>
+        </StackPanel>
         <ListView ItemContainerStyle="{StaticResource FilterContainerStyle}"
                   ItemsSource="{Binding Filters, ElementName=LayoutRoot}"
                   />
-    </Grid>
+    </DockPanel>
 </UserControl>
