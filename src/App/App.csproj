@@ -236,6 +236,12 @@
     <Compile Include="Views\WindowFilterEditor.xaml.cs">
       <DependentUpon>WindowFilterEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\WindowFiltersEditor.xaml.cs">
+      <DependentUpon>WindowFiltersEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WindowGroupsEditor.xaml.cs">
+      <DependentUpon>WindowGroupsEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Win32.cs" />
     <Compile Include="WindowDragOperation.cs" />
     <Compile Include="Windows\DragHook.cs" />
@@ -294,6 +300,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\WindowFilterEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowFiltersEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowGroupsEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

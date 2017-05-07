@@ -8,10 +8,10 @@
 
     public sealed class WindowFilter : NotifyPropertyChangedBase, IFilter<IntPtr>, ICopyable<WindowFilter>
     {
-        CommonStringMatchFilter classFilter;
-        CommonStringMatchFilter titleFilter;
+        CommonStringMatchFilter classFilter = new CommonStringMatchFilter();
+        CommonStringMatchFilter titleFilter = new CommonStringMatchFilter();
 
-        public bool Matches(IntPtr value) { throw new NotImplementedException(); }
+        public bool Matches(IntPtr windowHandle) { throw new NotImplementedException(); }
 
         public CommonStringMatchFilter ClassFilter {
             get => this.classFilter;

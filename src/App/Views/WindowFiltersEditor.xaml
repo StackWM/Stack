@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="LostTech.Stack.Views.WindowFiltersEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:LostTech.Stack.Views"
+             mc:Ignorable="d"
+             x:Name="LayoutRoot"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <DataTemplate x:Key="FilterTemplate">
+            <local:WindowFilterEditor Filter="{Binding}"/>
+        </DataTemplate>
+        <DataTemplate x:Key="FilterDisplayTemplate">
+            <TextBlock>
+                Class: <Run Text="{Binding ClassFilter.Value}"/>
+                Title: <Run Text="{Binding TitleFilter.Value}"/>
+            </TextBlock>
+        </DataTemplate>
+        <Style TargetType="ListViewItem" x:Key="FilterContainerStyle">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="ContentTemplate" Value="{StaticResource FilterDisplayTemplate}"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="ContentTemplate" Value="{StaticResource FilterTemplate}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <ListView ItemContainerStyle="{StaticResource FilterContainerStyle}"
+                  ItemsSource="{Binding Filters, ElementName=LayoutRoot}"
+                  />
+    </Grid>
+</UserControl>
