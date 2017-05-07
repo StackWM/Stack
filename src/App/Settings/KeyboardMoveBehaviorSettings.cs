@@ -1,6 +1,7 @@
 ﻿namespace LostTech.Stack.Settings
 {
     using System;
+    using System.Collections.ObjectModel;
     using LostTech.App;
     using LostTech.Stack.DataBinding;
 
@@ -17,8 +18,18 @@
             }
         }
 
-        public KeyboardMoveBehaviorSettings Copy() => new KeyboardMoveBehaviorSettings {
-            Enabled = this.Enabled,
-        };
+        public ObservableCollection<string> WindowGroupIgnoreList { get; } =
+            new ObservableCollection<string>();
+
+        public KeyboardMoveBehaviorSettings Copy()
+        {
+            var copy = new KeyboardMoveBehaviorSettings
+            {
+                Enabled = this.Enabled,
+            };
+            foreach (string groupName in this.WindowGroupIgnoreList)
+                copy.WindowGroupIgnoreList.Add(groupName);
+            return copy;
+        }
     }
 }

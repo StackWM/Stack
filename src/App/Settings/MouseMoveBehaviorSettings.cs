@@ -1,6 +1,7 @@
 ﻿namespace LostTech.Stack.Settings
 {
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using LostTech.App;
     using LostTech.Stack.DataBinding;
@@ -17,8 +18,17 @@
             }
         }
 
-        public MouseMoveBehaviorSettings Copy() => new MouseMoveBehaviorSettings {
-            Enabled = this.Enabled,
-        };
+        public ObservableCollection<string> WindowGroupIgnoreList { get; } =
+            new ObservableCollection<string>();
+
+        public MouseMoveBehaviorSettings Copy()
+        {
+            var copy = new MouseMoveBehaviorSettings {
+                Enabled = this.Enabled,
+            };
+            foreach (string groupName in this.WindowGroupIgnoreList)
+                copy.WindowGroupIgnoreList.Add(groupName);
+            return copy;
+        }
     }
 }

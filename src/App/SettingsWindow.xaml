@@ -30,23 +30,32 @@
         </ResourceDictionary>
     </metro:MetroWindow.Resources>
     <metro:MetroAnimatedSingleRowTabControl Margin="8">
-        <TabItem Header="Behaviors">
-            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
-                          Padding="8"
-                          >
-                <StackPanel Orientation="Vertical">
-                    <metro:ToggleSwitch Content="Use middle mouse button to move windows"
-                              IsChecked="{Binding Behaviors.KeyboardMove.Enabled}"/>
-                    <metro:ToggleSwitch Content="Use keyboard to move windows horizontally or vertically"
-                              IsChecked="{Binding Behaviors.MouseMove.Enabled}"/>
-                </StackPanel>
-            </ScrollViewer>
+        <TabItem Header="Mouse Drag">
+            <DockPanel Margin="8">
+                <metro:ToggleSwitch Content="Use middle mouse button to move windows"
+                                    DockPanel.Dock="Top"
+                                    IsChecked="{Binding Behaviors.KeyboardMove.Enabled}"/>
+                <TextBlock DockPanel.Dock="Top">Disable for these windows:</TextBlock>
+                <views:WindowGroupListEditor AvailableGroups="{Binding WindowGroups}"
+                                             Groups="{Binding Behaviors.MouseMove.WindowGroupIgnoreList}"/>
+            </DockPanel>
+        </TabItem>
+        <TabItem Header="Keyboard Move">
+            <DockPanel Margin="8">
+                <metro:ToggleSwitch Content="Use keyboard to move windows horizontally or vertically"
+                                    DockPanel.Dock="Top"
+                                    IsChecked="{Binding Behaviors.MouseMove.Enabled}"/>
+                <TextBlock DockPanel.Dock="Top">Disable for these windows:</TextBlock>
+                <views:WindowGroupListEditor AvailableGroups="{Binding WindowGroups}"
+                                             Groups="{Binding Behaviors.KeyboardMove.WindowGroupIgnoreList}" />
+            </DockPanel>
         </TabItem>
         <TabItem Header="Hotkeys">
             <app:KeySettingsEditor x:Name="KeySettingsEditor"
                                    DataContext="{Binding Behaviors.KeyBindings}"
                                    ExtendedCapture="True"
                                    Background="{StaticResource ControlBackgroundBrush}"
+                                   Margin="8"
                                    >
                 <app:KeySettingsEditor.Resources>
                     <Style TargetType="Button">
@@ -62,11 +71,8 @@
                 </app:KeySettingsEditor.Resources>
             </app:KeySettingsEditor>
         </TabItem>
-        <TabItem Header="Mouse Drag">
-            <views:WindowGroupListEditor AvailableGroups="{Binding WindowGroups}" />
-        </TabItem>
         <TabItem Header="Window Groups">
-            <views:WindowGroupsEditor ItemsSource="{Binding WindowGroups}"/>
+            <views:WindowGroupsEditor Margin="8" ItemsSource="{Binding WindowGroups}"/>
         </TabItem>
     </metro:MetroAnimatedSingleRowTabControl>
 </metro:MetroWindow>
