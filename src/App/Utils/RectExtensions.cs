@@ -16,5 +16,15 @@
         }
 
         public static double DotProduct(this Vector value, Vector other) => value.X * other.X + value.Y * other.Y;
+
+        public static Rect Inflated(this Rect rect, double x, double y)
+        {
+            if (x < 0 && rect.Width < x)
+                return rect;
+            if (y < 0 && rect.Height < y)
+                return rect;
+            rect.Inflate(x, y);
+            return rect;
+        }
     }
 }

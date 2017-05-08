@@ -48,20 +48,19 @@
             var allZones = this.screenLayouts.Active().SelectMany(screen => screen.Zones)
                 .Where(zone => zone.Target == null || zone.Equals(zone.Target))
                 .ToArray();
-            var sameCenter = allZones.Where(zone => zone.GetPhysicalBounds().Center()
-                .Equals(windowCenter, epsilon: Epsilon)).ToArray();
-            // it only affects cases when centers match
+
+            // when moving in the opposite direction enumeration order must be reversed
             bool inverse = direction.X + direction.Y < 0;
             if (inverse)
-                Array.Reverse(sameCenter);
+                Array.Reverse(allZones);
 
-            var reducedWindowBounds = windowBounds;
-            // if inflating rectangle leads to negative size,
-            // rectangle is replaced with Rectangle.Empty, which is severely broken for our purposes
-            if (windowBounds.Width >= 1 && windowBounds.Height >= 1)
-                reducedWindowBounds.Inflate(-1, -1);
-            var currentZone = sameCenter.FirstOrDefault(zone => windowBounds.Contains(zone.GetPhysicalBounds())
-                                                                && zone.GetPhysicalBounds().Contains(reducedWindowBounds));
+            var sameCenter = allZones.Where(zone => zone.GetPhysicalBounds().Center()
+                .Equals(windowCenter, epsilon: Epsilon)).ToArray();
+
+            var reducedWindowBounds = windowBounds.Inflated(-1,-1);
+            var currentZone = sameCenter.FirstOrDefault(zone =>
+                windowBounds.Contains(zone.GetPhysicalBounds().Inflated(-1, -1))
+                && zone.GetPhysicalBounds().Contains(reducedWindowBounds));
 
             var next = currentZone == null
                 ? sameCenter.FirstOrDefault()
@@ -72,10 +71,16 @@
             var directionalInfinity = direction * 1e120;
             strip.Inflate(Math.Abs(directionalInfinity.X), Math.Abs(directionalInfinity.Y));
 
+            var targets = allZones.Where(zone =>
+                    zone.GetPhysicalBounds().IntersectsWith(strip)
+                    && !sameCenter.Contains(zone)
+                    && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction) > 0)
+                .ToArray();
             next = next
                    // there are no zones with the same center
                    ?? allZones.Where(zone =>
                            zone.GetPhysicalBounds().IntersectsWith(strip)
+                           && !sameCenter.Contains(zone)
                            && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction) > 0)
                        .OrderBy(zone => DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction))
                        .FirstOrDefault();
