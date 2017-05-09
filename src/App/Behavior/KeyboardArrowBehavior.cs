@@ -8,14 +8,19 @@
     using System.Windows.Forms;
     using System.Windows.Input;
     using Gma.System.MouseKeyHook;
+    using JetBrains.Annotations;
     using LostTech.App;
     using LostTech.App.Input;
     using LostTech.Stack.Commands;
+    using LostTech.Stack.Models;
+    using LostTech.Stack.Settings;
     using LostTech.Stack.Zones;
     using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 
     class KeyboardArrowBehavior : IDisposable
     {
+        readonly KeyboardMoveBehaviorSettings settings;
+        readonly IEnumerable<WindowGroup> windowGroups;
         readonly IKeyboardEvents hook;
         readonly ICollection<ScreenLayout> screenLayouts;
         readonly Action<IntPtr, Zone> move;
@@ -23,8 +28,12 @@
 
         public KeyboardArrowBehavior(IKeyboardEvents keyboardHook, ICollection<ScreenLayout> screenLayouts,
             IEnumerable<CommandKeyBinding> keyBindings,
+            [NotNull] KeyboardMoveBehaviorSettings settings,
+            [NotNull] IEnumerable<WindowGroup> windowGroups,
             Action<IntPtr, Zone> move)
         {
+            this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            this.windowGroups = windowGroups ?? throw new ArgumentNullException(nameof(windowGroups));
             this.hook = keyboardHook ?? throw new ArgumentNullException(nameof(keyboardHook));
             this.screenLayouts = screenLayouts ?? throw new ArgumentNullException(nameof(screenLayouts));
             this.move = move ?? throw new ArgumentNullException(nameof(move));
@@ -47,7 +56,8 @@
             if (!Directions.TryGetValue(binding.CommandName, out var direction))
                 return;
 
-            var moveCommand = new MoveCurrentWindowInDirectionCommand(this.move, this.screenLayouts);
+            var moveCommand = new MoveCurrentWindowInDirectionCommand(this.move, this.screenLayouts,
+                this.settings, this.windowGroups);
             args.Handled = moveCommand.CanExecute(direction);
 
             // avoid freezing the system

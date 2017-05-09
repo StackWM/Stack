@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:LostTech.Stack"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+             xmlns:valueConverters="clr-namespace:ValueConverters"
              mc:Ignorable="options"
              >
     <Application.Resources>
@@ -18,6 +19,10 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
                 <ResourceDictionary>
                     <SolidColorBrush x:Key="AlternateControlBackgroundBrush" Color="{StaticResource Gray10}" options:Freeze="True"/>
+                    <valueConverters:ValueToBoolConverter x:Key="NullIsFalseConverter"
+                                                          IsInverted="True"
+                                                          TrueValue="{x:Null}"
+                                                          />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

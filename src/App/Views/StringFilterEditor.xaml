@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="LostTech.Stack.Views.StringFilterEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:LostTech.Stack.Views"
+             xmlns:filters="clr-namespace:LostTech.Stack.Models.Filters"
+             mc:Ignorable="d"
+             x:Name="LayoutRoot"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <TextBox VerticalContentAlignment="Center" Text="{Binding Filter.Value, ElementName=LayoutRoot}" />
+        <ComboBox Grid.Column="1" MinWidth="110"
+            ItemsSource="{x:Static filters:CommonStringMatchFilter.MatchOptions}"
+            SelectedValue="{Binding Filter.Match, ElementName=LayoutRoot}"
+            />
+    </Grid>
+</UserControl>

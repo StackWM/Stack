@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="LostTech.Stack.Views.WindowGroupListEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:LostTech.Stack.Views"
+             mc:Ignorable="d"
+             x:Name="LayoutRoot"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.ContextMenu.xaml" />
+    </UserControl.Resources>
+    <DockPanel>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
+            <Button Content="Add" Click="AddGroupClick" Margin="0,0,6,0">
+                <Button.ContextMenu>
+                    <ContextMenu x:Name="AvaiableGroupsMenu"
+                                 ItemsSource="{Binding AvailableGroups, ElementName=LayoutRoot}"
+                                 DisplayMemberPath="Name"
+                                 >
+                        <ContextMenu.ItemContainerStyle>
+                            <Style TargetType="MenuItem" BasedOn="{StaticResource MetroMenuItem}">
+                                <Setter Property="Command" Value="{Binding AddGroupCommand, ElementName=LayoutRoot}"/>
+                                <Setter Property="CommandParameter" Value="{Binding}"/>
+                            </Style>
+                        </ContextMenu.ItemContainerStyle>
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
+            <Button Click="RemoveGroupClick"
+                    IsEnabled="{Binding SelectedItem, ElementName=GroupList, Converter={StaticResource NullIsFalseConverter}}"
+                    >Remove
+            </Button>
+        </StackPanel>
+        <ListView x:Name="GroupList" ItemsSource="{Binding Groups, ElementName=LayoutRoot}"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  >
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+        </ListView>
+    </DockPanel>
+</UserControl>
