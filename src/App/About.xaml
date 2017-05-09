@@ -43,7 +43,9 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Margin="0,2">
-                        <Hyperlink NavigateUri="{Binding Uri}" RequestNavigate="Hyperlink_RequestNavigate"><Run Text="{Binding Name}"/></Hyperlink>
+                        <Hyperlink NavigateUri="{Binding Uri}"
+                                   ToolTip="{Binding Uri}"
+                                   RequestNavigate="Hyperlink_RequestNavigate"><Run Text="{Binding Name}"/></Hyperlink>
                         (<Run Text="{Binding License}"/>)
                     </TextBlock>
                 </DataTemplate>
