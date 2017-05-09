@@ -25,7 +25,8 @@
             new AppDependecy("JetBrains.Annotations", uri: "https://www.nuget.org/packages/JetBrains.Annotations", license: "MIT"),
             new AppDependecy(nameof(PInvoke), uri: "https://github.com/AArnott/pinvoke", license: "MIT"),
             new AppDependecy(typeof(MahApps.Metro.AppTheme).Namespace, uri: "http://mahapps.com/", license: "MIT/MS-PL"),
-            new AppDependecy(nameof(ValueConverters), uri: "https://github.com/thomasgalliker/ValueConverters.NET", license: Apache 2.0, but),
+            new AppDependecy(nameof(Prism), uri: "https://github.com/PrismLibrary/Prism", license: "Apache 2.0"),
+            new AppDependecy(nameof(ValueConverters), uri: "https://github.com/thomasgalliker/ValueConverters.NET", license: "Apache 2.0"),
         };
     }
 }

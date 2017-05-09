@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETFX</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>true</Prefer32Bit>
@@ -31,7 +31,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NETFX</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>true</Prefer32Bit>
@@ -97,6 +97,7 @@
       <HintPath>..\..\packages\System.AppContext.4.3.0\lib\net46\System.AppContext.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Console, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Console.4.3.0\lib\net46\System.Console.dll</HintPath>
     </Reference>
@@ -184,6 +185,9 @@
     <Reference Include="Validation, Version=2.4.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Validation.2.4.15\lib\net45\Validation.dll</HintPath>
     </Reference>
+    <Reference Include="ValueConverters, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ValueConverters.1.0.5\lib\net45\ValueConverters.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -202,6 +206,9 @@
     <Compile Include="DataBinding\CopyableExtensions.cs" />
     <Compile Include="DataBinding\CopyableObservableCollection.cs" />
     <Compile Include="DataBinding\NotifyPropertyChangedBase.cs" />
+    <Compile Include="DataBinding\PropertyHelper.cs" />
+    <Compile Include="DataBinding\ValueToBoolConverter.cs" />
+    <Compile Include="DataBinding\ValueToBoolConverterBase.cs" />
     <Compile Include="DebugHelper.cs" />
     <Compile Include="AppDependecy.cs" />
     <Compile Include="IOExtensions.cs" />
@@ -377,10 +384,6 @@
     <ProjectReference Include="..\..\..\..\OSS\MouseKeyHook\MouseKeyHook\MouseKeyHook.csproj">
       <Project>{f52aa97e-180a-40ed-8f2b-09080171d6c7}</Project>
       <Name>MouseKeyHook</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\OSS\ValueConverters.NET\ValueConverters.NetFx\ValueConverters.NetFx.csproj">
-      <Project>{efc0655a-c5b8-4b71-b130-3ba06f43287d}</Project>
-      <Name>ValueConverters.NetFx</Name>
     </ProjectReference>
     <ProjectReference Include="..\Screen\Screen.csproj">
       <Project>{adea0e3b-e6af-403b-b293-f3bc88f426ba}</Project>
