@@ -1,8 +1,7 @@
 ﻿namespace LostTech.Stack.Models.Filters
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
+    using System.Diagnostics;
     using LostTech.App;
     using LostTech.Stack.DataBinding;
     using PInvoke;
@@ -14,16 +13,26 @@
 
         public bool Matches(IntPtr windowHandle)
         {
-            if (!string.IsNullOrEmpty(this.ClassFilter?.Value)) {
-                string className = User32.GetClassName(windowHandle, maxLength: 4096);
-                if (!this.ClassFilter.Matches(className))
-                    return false;
-            }
+            try
+            {
+                if (!string.IsNullOrEmpty(this.ClassFilter?.Value))
+                {
+                    string className = User32.GetClassName(windowHandle, maxLength: 4096);
+                    if (!this.ClassFilter.Matches(className))
+                        return false;
+                }
 
-            if (!string.IsNullOrEmpty(this.TitleFilter?.Value)) {
-                string title = User32.GetWindowText(windowHandle);
-                if (!this.TitleFilter.Matches(title))
-                    return false;
+                if (!string.IsNullOrEmpty(this.TitleFilter?.Value))
+                {
+                    string title = User32.GetWindowText(windowHandle);
+                    if (!this.TitleFilter.Matches(title))
+                        return false;
+                }
+            }
+            catch (Win32Exception e)
+            {
+                Debug.WriteLine($"Can't obtain window class or title: {e}");
+                return false;
             }
 
             return true;
