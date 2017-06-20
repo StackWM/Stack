@@ -28,6 +28,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF", "..\..\App\KeySettings\src\WPF\WPF.csproj", "{F0F57D7C-F2AA-4046-9692-E30D896E8515}"
 EndProject
 Project("{262852C6-CD72-467D-83FE-5EEB1973A190}") = "Store", "src\Store\Store.jsproj", "{90D49852-4577-46C6-B97B-7E044B39D5FD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C9C161DE-31A7-4426-B523-7302DFF6B66A} = {C9C161DE-31A7-4426-B523-7302DFF6B66A}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
