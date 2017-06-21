@@ -189,7 +189,7 @@
                 if (instance.Id == selfID)
                     continue;
 
-                if (!instance.WaitForExit(5000)) {
+                if (!instance.WaitForExit(13000)) {
                     MessageBox.Show($"Failed to stop Stack instance with process ID {instance.Id}. Will exit.",
                         "Other instance is still running", MessageBoxButton.OK, MessageBoxImage.Error);
                     Environment.Exit(-1);
@@ -200,7 +200,7 @@
             }
         }
 
-        static Task EnableHockeyApp()
+        static async Task EnableHockeyApp()
         {
 #if DEBUG
             HockeyClient.Current.Configure("be80a4a0381c4c37bc187d593ac460f9 ");
@@ -211,7 +211,11 @@
 #else
             HockeyClient.Current.Configure("6037e69fa4944acc9d83ef7682e60732");
 #endif
-            return HockeyClient.Current.SendCrashesAsync();
+            try
+            {
+                await HockeyClient.Current.SendCrashesAsync().ConfigureAwait(false);
+            }
+            catch (IOException e) when ((e.HResult ^ unchecked((int)0x8007_0000)) == (int) Win32ErrorCode.ERROR_NO_MORE_FILES) {}
         }
 
         static void EnableJitDebugging()
