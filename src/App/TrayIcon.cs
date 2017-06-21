@@ -92,6 +92,12 @@
                     DisplayStyle = ToolStripItemDisplayStyle.Text,
                 });
             }
+#if DEBUG
+            contextMenu.Items.Add(new ToolStripMenuItem("D: THROW", image: null,
+                onClick: (_, __) => throw new Exception("Requested from context menu")) {
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+            });
+#endif
 
             contextMenu.Items.Add(new ToolStripMenuItem("Exit", image: null,
                 onClick: (_, __) => ((App)Application.Current).BeginShutdown()) {
