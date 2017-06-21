@@ -600,5 +600,11 @@
 
         public int DragThreshold { get; private set; } = 40;
         public static void Restart() { Process.Start(Process.GetCurrentProcess().MainModule.FileName); }
+
+        public static void RestartAsAdmin()
+        {
+            var startInfo = new ProcessStartInfo(Process.GetCurrentProcess().MainModule.FileName) { Verb = "runas" };
+            Process.Start(startInfo);
+        }
     }
 }

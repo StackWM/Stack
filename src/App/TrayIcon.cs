@@ -6,7 +6,6 @@
     using System.Drawing;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Threading.Tasks;
     using System.Windows;
@@ -84,6 +83,16 @@
                 onClick: (_, __) => App.Restart()) {
                 DisplayStyle = ToolStripItemDisplayStyle.Text
             });
+            if (!Win32.IsWindows8OrBetter()
+                ||  Win32.GetPackageFamilyName(Process.GetCurrentProcess().Handle, out var _, IntPtr.Zero)
+                          == Win32.APPMODEL_ERROR_NO_PACKAGE)
+            {
+                contextMenu.Items.Add(new ToolStripMenuItem("Restart as Admin", image: null,
+                    onClick: (_, __) => App.RestartAsAdmin()) {
+                    DisplayStyle = ToolStripItemDisplayStyle.Text,
+                });
+            }
+
             contextMenu.Items.Add(new ToolStripMenuItem("Exit", image: null,
                 onClick: (_, __) => ((App)Application.Current).BeginShutdown()) {
                 DisplayStyle = ToolStripItemDisplayStyle.Text
