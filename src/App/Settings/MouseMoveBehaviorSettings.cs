@@ -3,8 +3,7 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using LostTech.App;
-    using LostTech.Stack.DataBinding;
+    using LostTech.App.DataBinding;
 
     public sealed class MouseMoveBehaviorSettings : NotifyPropertyChangedBase, ICopyable<MouseMoveBehaviorSettings>
     {

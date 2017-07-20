@@ -2,8 +2,7 @@
 {
     using System;
     using System.Collections.ObjectModel;
-    using LostTech.App;
-    using LostTech.Stack.DataBinding;
+    using LostTech.App.DataBinding;
 
     public sealed class KeyboardMoveBehaviorSettings: NotifyPropertyChangedBase, ICopyable<KeyboardMoveBehaviorSettings>
     {

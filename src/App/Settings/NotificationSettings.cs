@@ -1,7 +1,6 @@
 ﻿namespace LostTech.Stack.Settings
 {
-    using LostTech.App;
-    using LostTech.Stack.DataBinding;
+    using LostTech.App.DataBinding;
 
     public sealed class NotificationSettings : NotifyPropertyChangedBase, ICopyable<NotificationSettings>
     {

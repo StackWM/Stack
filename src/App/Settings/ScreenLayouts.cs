@@ -5,7 +5,7 @@ namespace LostTech.Stack.Settings
     using System.ComponentModel;
     using System.Linq;
     using System.Runtime.Serialization;
-    using LostTech.App;
+    using LostTech.App.DataBinding;
     using LostTech.Stack.Models;
     using LostTech.Windows;
 

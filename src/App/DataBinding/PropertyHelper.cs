@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Globalization;
-
 #if XAMARIN
 using Xamarin.Forms;
 using Property = Xamarin.Forms.BindableProperty;

@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using LostTech.App;
+    using LostTech.App.DataBinding;
 
     public sealed class CopyableObservableCollection<T> : ObservableCollection<T>, ICopyable<CopyableObservableCollection<T>>
         where T:ICopyable<T>

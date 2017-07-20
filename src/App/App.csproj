@@ -51,11 +51,11 @@
     <Reference Include="LostTech.App.DataBinding, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LostTech.App.DataBinding.0.1.0\lib\netstandard1.0\LostTech.App.DataBinding.dll</HintPath>
     </Reference>
-    <Reference Include="LostTech.App.Settings, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LostTech.App.Settings.0.1.0-b2017062002\lib\netstandard1.4\LostTech.App.Settings.dll</HintPath>
+    <Reference Include="LostTech.App.Settings, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LostTech.App.Settings.0.2.0-b2017071816\lib\netstandard1.4\LostTech.App.Settings.dll</HintPath>
     </Reference>
     <Reference Include="LostTech.App.XmlSettings, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LostTech.App.XmlSettings.0.1.0-b2017040803\lib\netstandard1.4\LostTech.App.XmlSettings.dll</HintPath>
+      <HintPath>..\..\packages\LostTech.App.XmlSettings.0.1.0-b2017071801\lib\netstandard1.4\LostTech.App.XmlSettings.dll</HintPath>
     </Reference>
     <Reference Include="LostTech.Checkpoint, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LostTech.Checkpoint.0.2.0-b2017040802\lib\netstandard1.0\LostTech.Checkpoint.dll</HintPath>
@@ -214,9 +214,7 @@
     <Compile Include="Behavior\KeyboardArrowBehavior.cs" />
     <Compile Include="Commands\MoveCurrentWindowInDirectionCommand.cs" />
     <Compile Include="DataBinding\Binder.cs" />
-    <Compile Include="DataBinding\CopyableExtensions.cs" />
     <Compile Include="DataBinding\CopyableObservableCollection.cs" />
-    <Compile Include="DataBinding\NotifyPropertyChangedBase.cs" />
     <Compile Include="DataBinding\PropertyHelper.cs" />
     <Compile Include="DataBinding\ValueToBoolConverter.cs" />
     <Compile Include="DebugHelper.cs" />

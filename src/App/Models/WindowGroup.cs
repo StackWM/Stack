@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using LostTech.App;
+    using LostTech.App.DataBinding;
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.Models.Filters;
 

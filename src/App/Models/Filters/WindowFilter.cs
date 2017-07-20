@@ -2,9 +2,10 @@
 {
     using System;
     using System.Diagnostics;
-    using LostTech.App;
-    using LostTech.Stack.DataBinding;
+    using LostTech.App.DataBinding;
     using PInvoke;
+    using CopyableExtensions = LostTech.App.DataBinding.CopyableExtensions;
+    using NotifyPropertyChangedBase = LostTech.App.DataBinding.NotifyPropertyChangedBase;
 
     public sealed class WindowFilter : NotifyPropertyChangedBase, IFilter<IntPtr>, ICopyable<WindowFilter>
     {

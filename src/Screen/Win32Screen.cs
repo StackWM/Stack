@@ -11,7 +11,6 @@
     using LostTech.Windows.Win32;
     using PInvoke;
     using static System.FormattableString;
-    using static LostTech.Windows.Win32.DisplayDevice;
     using FormsScreen = System.Windows.Forms.Screen;
 
     public sealed class Win32Screen: INotifyPropertyChanged

@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using LostTech.Stack.DataBinding;
+    using LostTech.App.DataBinding;
 
     public abstract class StringMatchFilter<T> : NotifyPropertyChangedBase, IFilter<T>
     {

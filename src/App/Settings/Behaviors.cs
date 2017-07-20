@@ -4,10 +4,11 @@
     using System.Linq;
     using System.Windows.Input;
     using LostTech.App;
+    using LostTech.App.DataBinding;
     using LostTech.App.Input;
     using LostTech.Stack.Behavior;
-    using LostTech.Stack.DataBinding;
     using M = System.Windows.Input.ModifierKeys;
+    using NotifyPropertyChangedBase = LostTech.App.DataBinding.NotifyPropertyChangedBase;
 
     public sealed class Behaviors: NotifyPropertyChangedBase, ICopyable<Behaviors>
     {
