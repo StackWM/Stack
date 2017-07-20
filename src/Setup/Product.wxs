@@ -184,6 +184,15 @@
       <Component Id="Prism.dll" Guid="bf1e8f78-f667-49f6-bfd6-98e3bb289b81">
         <File Id="Prism.dll" Name="Prism.dll" Source="$(var.App_TargetDir)Prism.dll" />
       </Component>
+      <Component Id="LostTech.Stack.Extensibility.dll" Guid="d2550fa6-9676-46f7-9e8a-f1fe8c907b45">
+        <File Id="LostTech.Stack.Extensibility.dll" Name="LostTech.Stack.Extensibility.dll" Source="$(var.App_TargetDir)LostTech.Stack.Extensibility.dll" />
+      </Component>
+      <Component Id="LostTech.App.DataBinding.dll" Guid="7d36992c-41a0-43c2-9929-4998fbaf6d7d">
+        <File Id="LostTech.App.DataBinding.dll" Name="LostTech.App.DataBinding.dll" Source="$(var.App_TargetDir)LostTech.App.DataBinding.dll" />
+      </Component>
+      <Component Id="System.Runtime.Serialization.Primitives.dll" Guid="02233042-0605-4347-8788-35eb47b53445">
+        <File Id="System.Runtime.Serialization.Primitives.dll" Name="System.Runtime.Serialization.Primitives.dll" Source="$(var.App_TargetDir)System.Runtime.Serialization.Primitives.dll" />
+      </Component>
     </ComponentGroup>
     <ComponentGroup Id="Shortcuts" Directory="ApplicationProgramsFolder">
       <Component Id="Stack.exe.lnk.Component" Guid="c218d8d9-3dcf-4c6a-a6b1-6ea368f61bf6">
