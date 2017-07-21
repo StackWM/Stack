@@ -1,12 +1,16 @@
 ﻿namespace LostTech.Stack.Behavior
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using EventHook;
+    using JetBrains.Annotations;
 
     class NewWindowBehavior: IDisposable
     {
-        public NewWindowBehavior() {
+        readonly ICollection<ScreenLayout> screenLayouts;
+        public NewWindowBehavior([NotNull] ICollection<ScreenLayout> screenLayouts) {
+            this.screenLayouts = screenLayouts ?? throw new ArgumentNullException(nameof(screenLayouts));
             ApplicationWatcher.OnApplicationWindowChange += this.OnApplicationWindowChange;
         }
 

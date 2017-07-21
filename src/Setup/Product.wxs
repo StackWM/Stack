@@ -193,6 +193,18 @@
       <Component Id="System.Runtime.Serialization.Primitives.dll" Guid="02233042-0605-4347-8788-35eb47b53445">
         <File Id="System.Runtime.Serialization.Primitives.dll" Name="System.Runtime.Serialization.Primitives.dll" Source="$(var.App_TargetDir)System.Runtime.Serialization.Primitives.dll" />
       </Component>
+      <Component Id="EventHook.dll" Guid="674a75a5-c1d2-4038-81e3-c1aa3945d06f">
+        <File Id="EventHook.dll" Name="EventHook.dll" Source="$(var.App_TargetDir)EventHook.dll" />
+      </Component>
+      <Component Id="Nito.AsyncEx.Enlightenment.dll" Guid="40a9552a-c2f1-4dc9-a049-59177dce83ba">
+        <File Id="Nito.AsyncEx.Enlightenment.dll" Name="Nito.AsyncEx.Enlightenment.dll" Source="$(var.App_TargetDir)Nito.AsyncEx.Enlightenment.dll" />
+      </Component>
+      <Component Id="Nito.AsyncEx.Concurrent.dll" Guid="0324952c-538e-4e89-8416-20f8dde43745">
+        <File Id="Nito.AsyncEx.Concurrent.dll" Name="Nito.AsyncEx.Concurrent.dll" Source="$(var.App_TargetDir)Nito.AsyncEx.Concurrent.dll" />
+      </Component>
+      <Component Id="Nito.AsyncEx.dll" Guid="fba74a2e-fc71-4332-a5a0-7a1b795b2da5">
+        <File Id="Nito.AsyncEx.dll" Name="Nito.AsyncEx.dll" Source="$(var.App_TargetDir)Nito.AsyncEx.dll" />
+      </Component>
     </ComponentGroup>
     <ComponentGroup Id="Shortcuts" Directory="ApplicationProgramsFolder">
       <Component Id="Stack.exe.lnk.Component" Guid="c218d8d9-3dcf-4c6a-a6b1-6ea368f61bf6">

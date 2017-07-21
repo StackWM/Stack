@@ -63,10 +63,10 @@
         SettingsWindow SettingsWindow { get; set; }
 
         DragHook dragHook;
-        bool applicationWatcherStarted = false;
+        bool applicationWatcherStarted;
         StackSettings stackSettings;
         KeyboardArrowBehavior keyboardArrowBehavior;
-        NewWindowBehavior newWindowBehavior = new NewWindowBehavior();
+        NewWindowBehavior newWindowBehavior;
         DispatcherTimer updateTimer;
         readonly IScreenProvider screenProvider = new Win32ScreenProvider();
         ObservableDirectory layoutsDirectory;
@@ -533,6 +533,8 @@
                     settings.Behaviors.KeyboardMove,
                     settings.WindowGroups,
                     this.Move);
+
+            this.newWindowBehavior = new NewWindowBehavior(this.screenLayouts);
 
             if (settings.Behaviors.MouseMove.Enabled) {
                 this.dragHook = new DragHook(MouseButtons.Middle, this.hook);

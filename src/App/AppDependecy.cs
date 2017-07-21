@@ -27,6 +27,8 @@
             new AppDependecy(typeof(MahApps.Metro.AppTheme).Namespace, uri: "http://mahapps.com/", license: "MIT/MS-PL"),
             new AppDependecy(nameof(Prism), uri: "https://github.com/PrismLibrary/Prism", license: "Apache 2.0"),
             new AppDependecy(nameof(ValueConverters), uri: "https://github.com/thomasgalliker/ValueConverters.NET", license: "Apache 2.0"),
+            new AppDependecy(nameof(EventHook), uri: "https://github.com/justcoding121/Windows-User-Action-Hook", license: "MIT"),
+            new AppDependecy("Nito.AsyncEx", uri: "https://github.com/StephenCleary/AsyncEx", license: "MIT"),
         };
     }
 }
