@@ -13,7 +13,7 @@
 
     class SettingsMigration
     {
-        public static async Task Migrate([NotNull] IFolder localSettingsFolder) {
+        public static async Task<bool> Migrate([NotNull] IFolder localSettingsFolder) {
             if (localSettingsFolder == null)
                 throw new ArgumentNullException(nameof(localSettingsFolder));
 
@@ -25,14 +25,14 @@
                 windowGroups = await localSettings
                     .Load<CopyableObservableCollection<WindowGroup>>("WindowGroups.xml").ConfigureAwait(false);
             } catch (Exception) {
-                return;
+                return false;
             }
 
             if (windowGroups == null)
-                return;
+                return false;
 
             if (windowGroups.Value.All(group => group.VersionSetExplicitly && group.Version == WindowGroup.LatestVersion))
-                return;
+                return false;
 
             var legacySettings = XmlSettings.Create(localSettingsFolder);
             var legacyGroups = await legacySettings
@@ -47,6 +47,7 @@
 
             localSettings.ScheduleSave();
             await Task.WhenAll(legacySettings.DisposeAsync(), localSettings.DisposeAsync()).ConfigureAwait(false);
+            return false;
         }
 
         static WindowGroup Migrate(LegacyWindowGroup legacyGroup) {

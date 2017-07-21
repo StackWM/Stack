@@ -92,7 +92,7 @@
             this.localSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(AppData.FullName);
             this.roamingSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(RoamingAppData.FullName);
 
-            await SettingsMigration.Migrate(this.localSettingsFolder);
+            bool migrating = await SettingsMigration.Migrate(this.localSettingsFolder);
 
             this.localSettings = XmlSettings.Create(this.localSettingsFolder);
             var settings = new StackSettings {
