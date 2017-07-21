@@ -52,7 +52,7 @@
       <HintPath>..\..\packages\LostTech.App.DataBinding.0.1.0\lib\netstandard1.0\LostTech.App.DataBinding.dll</HintPath>
     </Reference>
     <Reference Include="LostTech.App.Settings, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LostTech.App.Settings.0.2.0-b2017071816\lib\netstandard1.4\LostTech.App.Settings.dll</HintPath>
+      <HintPath>..\..\packages\LostTech.App.Settings.0.2.0-b2017072001\lib\netstandard1.4\LostTech.App.Settings.dll</HintPath>
     </Reference>
     <Reference Include="LostTech.App.XmlSettings, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LostTech.App.XmlSettings.0.1.0-b2017071801\lib\netstandard1.4\LostTech.App.XmlSettings.dll</HintPath>
@@ -223,11 +223,12 @@
     <Compile Include="LicenseTermsAcceptance.xaml.cs">
       <DependentUpon>LicenseTermsAcceptance.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\Filters\CommonStringMatchFilter.cs" />
-    <Compile Include="Models\Filters\IFilter.cs" />
-    <Compile Include="Models\Filters\GroupListHelper.cs" />
-    <Compile Include="Models\Filters\StringMatchFilter.cs" />
-    <Compile Include="Models\Filters\WindowFilter.cs" />
+    <Compile Include="Models\Legacy\Filters\CommonStringMatchFilter.cs" />
+    <Compile Include="Models\Legacy\Filters\IFilter.cs" />
+    <Compile Include="Models\GroupListHelper.cs" />
+    <Compile Include="Models\Legacy\Filters\StringMatchFilter.cs" />
+    <Compile Include="Models\Legacy\Filters\WindowFilter.cs" />
+    <Compile Include="Models\Legacy\WindowGroup.cs" />
     <Compile Include="Models\MutableKeyValuePair.cs" />
     <Compile Include="Models\Serializer.cs" />
     <Compile Include="Models\WindowGroup.cs" />
@@ -238,6 +239,7 @@
     <Compile Include="Settings\MouseMoveBehaviorSettings.cs" />
     <Compile Include="Settings\NotificationSettings.cs" />
     <Compile Include="Settings\ScreenLayouts.cs" />
+    <Compile Include="Settings\SettingsMigration.cs" />
     <Compile Include="Settings\StackSettings.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>

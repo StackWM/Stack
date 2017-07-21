@@ -4,7 +4,7 @@
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
-    using LostTech.Stack.Models.Filters;
+    using LostTech.Stack.Extensibility.Filters;
 
     /// <summary>
     /// Interaction logic for WindowFiltersEditor.xaml
@@ -33,8 +33,8 @@
         void AddButtonClick(object sender, RoutedEventArgs e)
         {
             this.Filters.Add(new WindowFilter {
-                ClassFilter = {Value = "Class"},
-                TitleFilter = {Value = "Title"},
+                ClassFilter = new CommonStringMatchFilter {Value = "Class"},
+                TitleFilter = new CommonStringMatchFilter {Value = "Title"},
             });
             int index = this.Filters.Count - 1;
             this.FiltersView.SelectedIndex = index;

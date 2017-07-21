@@ -23,7 +23,7 @@
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.InternalExtensions;
     using LostTech.Stack.Models;
-    using LostTech.Stack.Models.Filters;
+    using LostTech.Stack.Extensibility.Filters;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
     using LostTech.Stack.Windows;
@@ -91,6 +91,9 @@
 
             this.localSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(AppData.FullName);
             this.roamingSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(RoamingAppData.FullName);
+
+            await SettingsMigration.Migrate(this.localSettingsFolder);
+
             this.localSettings = XmlSettings.Create(this.localSettingsFolder);
             var settings = new StackSettings {
                 LayoutMap = await this.InitializeSettingsSet<ScreenLayouts>("LayoutMap.xml"),
@@ -147,7 +150,7 @@
         {
             SettingsSet<T, T> settingsSet;
             try {
-                settingsSet = await this.localSettings.LoadOrCreate<T, T>(fileName);
+                settingsSet = await this.localSettings.LoadOrCreate<T>(fileName);
             }
             catch (Exception settingsError) {
                 var errorFile = await this.localSettingsFolder.CreateFileAsync(
@@ -158,7 +161,7 @@
                 await brokenFile.MoveAsync(
                     Path.Combine(this.localSettingsFolder.Path, $"Err.{fileName}"),
                     NameCollisionOption.ReplaceExisting);
-                settingsSet = await this.localSettings.LoadOrCreate<T, T>(fileName);
+                settingsSet = await this.localSettings.LoadOrCreate<T>(fileName);
                 settingsSet.ScheduleSave();
             }
             settingsSet.Autosave = true;

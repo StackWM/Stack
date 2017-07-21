@@ -1,4 +1,4 @@
-﻿namespace LostTech.Stack.Models.Filters
+﻿namespace LostTech.Stack.Models
 {
     using System;
     using System.Collections.Generic;

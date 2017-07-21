@@ -4,7 +4,7 @@
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
-    using LostTech.Stack.Models.Filters;
+    using LostTech.Stack.Extensibility.Filters;
 
     /// <summary>
     /// Interaction logic for StringFilterEditor.xaml

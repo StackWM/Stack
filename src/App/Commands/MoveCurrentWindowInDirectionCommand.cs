@@ -8,7 +8,6 @@
     using System.Windows.Input;
     using JetBrains.Annotations;
     using LostTech.Stack.Models;
-    using LostTech.Stack.Models.Filters;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
     using LostTech.Stack.Zones;
