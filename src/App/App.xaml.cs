@@ -17,6 +17,7 @@
     using System.Windows.Markup;
     using System.Windows.Threading;
     using System.Xml;
+    using EventHook;
     using Gma.System.MouseKeyHook;
     using LostTech.App;
     using LostTech.Stack.Behavior;
@@ -62,8 +63,10 @@
         SettingsWindow SettingsWindow { get; set; }
 
         DragHook dragHook;
+        bool applicationWatcherStarted = false;
         StackSettings stackSettings;
         KeyboardArrowBehavior keyboardArrowBehavior;
+        NewWindowBehavior newWindowBehavior = new NewWindowBehavior();
         DispatcherTimer updateTimer;
         readonly IScreenProvider screenProvider = new Win32ScreenProvider();
         ObservableDirectory layoutsDirectory;
@@ -84,6 +87,8 @@
 
             this.MainWindow = this.winApiHandler;
             this.winApiHandler.Show();
+            ApplicationWatcher.Start();
+            this.applicationWatcherStarted = true;
 
             this.BeginCheckForUpdates();
             this.updateTimer = new DispatcherTimer(DispatcherPriority.Background) {Interval = TimeSpan.FromDays(1), IsEnabled = true};
@@ -389,6 +394,12 @@
 
         async Task DisposeAsync()
         {
+            this.newWindowBehavior?.Dispose();
+            this.newWindowBehavior = null;
+            if (this.applicationWatcherStarted) {
+                this.applicationWatcherStarted = false;
+                ApplicationWatcher.Stop();
+            }
             this.hook?.Dispose();
             this.dragHook?.Dispose();
             this.dragHook = null;
