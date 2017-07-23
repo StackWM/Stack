@@ -66,7 +66,7 @@
         bool applicationWatcherStarted;
         StackSettings stackSettings;
         KeyboardArrowBehavior keyboardArrowBehavior;
-        NewWindowBehavior newWindowBehavior;
+        LayoutManager layoutManager;
         DispatcherTimer updateTimer;
         readonly IScreenProvider screenProvider = new Win32ScreenProvider();
         ObservableDirectory layoutsDirectory;
@@ -305,30 +305,16 @@
             this.Move(window, zone);
         }
 
-        async void Move(IntPtr window, Zone zone)
+        void Move(IntPtr window, Zone zone)
         {
-            Rect targetBounds = zone.Target.GetPhysicalBounds();
-            try {
-                if (GetWindowPlacement(window).showCmd.HasFlag(WindowShowStyle.SW_MAXIMIZE)) {
-                    ShowWindow(window, WindowShowStyle.SW_RESTORE);
-                }
-            }
-            catch (Win32Exception) { }
+            zone.Windows.Add(new Win32Window(window));
+        }
 
-            if (!MoveWindow(window, (int) targetBounds.Left, (int) targetBounds.Top, (int) targetBounds.Width,
-                (int) targetBounds.Height, true)) {
-                this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
-                this.trayIcon.BalloonTipTitle = "Can't move";
-                this.trayIcon.BalloonTipText = new System.ComponentModel.Win32Exception().Message;
-                this.trayIcon.ShowBalloonTip(1000);
-            }
-            else {
-                // TODO: option to not activate on move
-                SetForegroundWindow(window);
-                await Task.Yield();
-                MoveWindow(window, (int)targetBounds.Left, (int)targetBounds.Top, (int)targetBounds.Width,
-                    (int)targetBounds.Height, true);
-            }
+        void NonCriticalErrorHandler(object sender, ErrorEventArgs error) {
+            this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
+            this.trayIcon.BalloonTipTitle = "Can't move";
+            this.trayIcon.BalloonTipText = error.GetException().Message;
+            this.trayIcon.ShowBalloonTip(1000);
         }
 
         static Point GetCursorPos()
@@ -394,8 +380,8 @@
 
         async Task DisposeAsync()
         {
-            this.newWindowBehavior?.Dispose();
-            this.newWindowBehavior = null;
+            this.layoutManager?.Dispose();
+            this.layoutManager = null;
             if (this.applicationWatcherStarted) {
                 this.applicationWatcherStarted = false;
                 ApplicationWatcher.Stop();
@@ -445,6 +431,7 @@
                 .Select(screen => this.GetLayoutForScreen(screen, settings, layoutsDirectory))
                 .ToArray());
             this.screenLayouts = new ObservableCollection<ScreenLayout>();
+            int zoneIndex = 0;
 
             async Task AddLayoutForScreen(Win32Screen screen)
             {
@@ -460,6 +447,10 @@
                 layout.DataContext = screen;
                 layout.Hide();
                 layout.Opacity = 0.7;
+                foreach (Zone zone in layout.Zones) {
+                    zone.NonFatalErrorOccurred += this.NonCriticalErrorHandler;
+                    zone.Id = zone.Id ?? $"{zoneIndex++}";
+                }
                 this.screenLayouts.Add(layout);
             }
 
@@ -467,6 +458,8 @@
             {
                 ScreenLayout layout = this.screenLayouts.FirstOrDefault(l => l.Screen == screen);
                 if (layout != null) {
+                    foreach (Zone zone in layout.Zones)
+                        zone.NonFatalErrorOccurred -= this.NonCriticalErrorHandler;
                     layout.Closed -= this.OnLayoutClosed;
                     layout.Close();
                     this.screenLayouts.Remove(layout);
@@ -534,7 +527,7 @@
                     settings.WindowGroups,
                     this.Move);
 
-            this.newWindowBehavior = new NewWindowBehavior(this.screenLayouts);
+            this.layoutManager = new LayoutManager(this.screenLayouts);
 
             if (settings.Behaviors.MouseMove.Enabled) {
                 this.dragHook = new DragHook(MouseButtons.Middle, this.hook);

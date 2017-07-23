@@ -224,7 +224,6 @@
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
     <Compile Include="Behavior\KeyboardArrowBehavior.cs" />
-    <Compile Include="Behavior\NewWindowBehavior.cs" />
     <Compile Include="Commands\MoveCurrentWindowInDirectionCommand.cs" />
     <Compile Include="DataBinding\Binder.cs" />
     <Compile Include="DataBinding\CopyableObservableCollection.cs" />
@@ -236,6 +235,9 @@
     <Compile Include="LicenseTermsAcceptance.xaml.cs">
       <DependentUpon>LicenseTermsAcceptance.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\IAppWindow.cs" />
+    <Compile Include="Models\LayoutManager.cs" />
+    <Compile Include="Models\Win32Window.cs" />
     <Compile Include="Models\Legacy\Filters\CommonStringMatchFilter.cs" />
     <Compile Include="Models\Legacy\Filters\IFilter.cs" />
     <Compile Include="Models\GroupListHelper.cs" />

@@ -2,39 +2,15 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
+    using System.IO;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
+    using LostTech.Stack.Models;
 
-    /// <summary>
-    /// Follow steps 1a or 1b and then 2 to use this custom control in a XAML file.
-    ///
-    /// Step 1a) Using this custom control in a XAML file that exists in the current project.
-    /// Add this XmlNamespace attribute to the root element of the markup file where it is
-    /// to be used:
-    ///
-    ///     xmlns:MyNamespace="clr-namespace:LostTech.Stack.Zones"
-    ///
-    ///
-    /// Step 1b) Using this custom control in a XAML file that exists in a different project.
-    /// Add this XmlNamespace attribute to the root element of the markup file where it is
-    /// to be used:
-    ///
-    ///     xmlns:MyNamespace="clr-namespace:LostTech.Stack.Zones;assembly=LostTech.Stack.Zones"
-    ///
-    /// You will also need to add a project reference from the project where the XAML file lives
-    /// to this project and Rebuild to avoid compilation errors:
-    ///
-    ///     Right click on the target project in the Solution Explorer and
-    ///     "Add Reference"->"Projects"->[Browse to and select this project]
-    ///
-    ///
-    /// Step 2)
-    /// Go ahead and use your control in the XAML file.
-    ///
-    ///     <MyNamespace:Zone/>
-    ///
-    /// </summary>
     public class Zone : ContentControl
     {
         static Zone()
@@ -45,26 +21,46 @@
         public Zone()
         {
             this.AllowDrop = true;
-#if DEBUG
-            this.Tag = Guid.NewGuid();
-#endif
+            this.Windows.CollectionChanged += this.OnWindowCollectionChanged;
         }
 
         public bool IsDragMouseOver {
-            get { return (bool)GetValue(IsDragMouseOverProperty); }
-            set { SetValue(IsDragMouseOverProperty, value); }
+            get => (bool)this.GetValue(IsDragMouseOverProperty);
+            set => this.SetValue(IsDragMouseOverProperty, value);
         }
-
         public static readonly DependencyProperty IsDragMouseOverProperty =
-            DependencyProperty.Register("IsDragMouseOver", typeof(bool), typeof(Zone), new PropertyMetadata(false));
+            DependencyProperty.Register(nameof(IsDragMouseOver), typeof(bool), typeof(Zone), new PropertyMetadata(false));
 
-        public Zone Target
-        {
-            get { return (Zone)GetValue(TargetProperty) ?? this; }
-            set { SetValue(TargetProperty, value); }
+        public Zone Target {
+            get => (Zone)this.GetValue(TargetProperty) ?? this;
+            set => this.SetValue(TargetProperty, value);
         }
         public static readonly DependencyProperty TargetProperty =
             DependencyProperty.Register(nameof(Target), typeof(Zone), typeof(Zone), new PropertyMetadata(null));
+
+        public string Role {
+            get => (string)this.GetValue(RoleDependencyProperty);
+            set => this.SetValue(RoleDependencyProperty, value);
+        }
+        public static readonly DependencyProperty RoleDependencyProperty =
+            DependencyProperty.Register(nameof(Role), typeof(string), typeof(Zone));
+
+        public ObservableCollection<IAppWindow> Windows { get; } = new ObservableCollection<IAppWindow>();
+
+        void OnWindowCollectionChanged(object sender, NotifyCollectionChangedEventArgs change) {
+            var uiThread = TaskScheduler.FromCurrentSynchronizationContext();
+            foreach (IAppWindow window in change.NewItems) {
+                Rect bounds = this.GetPhysicalBounds();
+                window.Move(bounds).ContinueWith(error => {
+                    if (error.Result != null)
+                        this?.NonFatalErrorOccurred.Invoke(this, new ErrorEventArgs(error.Result));
+                }, uiThread);
+            }
+        }
+
+        public EventHandler<ErrorEventArgs> NonFatalErrorOccurred;
+
+        public string Id { get; set; }
 
         public Zone GetFinalTarget()
         {
