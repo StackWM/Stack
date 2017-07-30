@@ -33,7 +33,7 @@
         void AddButtonClick(object sender, RoutedEventArgs e)
         {
             this.Filters.Add(new WindowFilter {
-                ClassFilter = new CommonStringMatchFilter {Value = "Class"},
+                ClassFilter = new CommonStringMatchFilter {Value = ""},
                 TitleFilter = new CommonStringMatchFilter {Value = "Title"},
             });
             int index = this.Filters.Count - 1;
