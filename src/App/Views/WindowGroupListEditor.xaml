@@ -18,6 +18,15 @@
                                  ItemsSource="{Binding AvailableGroups, ElementName=LayoutRoot}"
                                  DisplayMemberPath="Name"
                                  >
+                        <ContextMenu.Resources>
+                            <ResourceDictionary>
+                                <ResourceDictionary.MergedDictionaries>
+                                    <!-- Accent and AppTheme setting -->
+                                    <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                                    <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                                </ResourceDictionary.MergedDictionaries>
+                            </ResourceDictionary>
+                        </ContextMenu.Resources>
                         <ContextMenu.ItemContainerStyle>
                             <Style TargetType="MenuItem" BasedOn="{StaticResource MetroMenuItem}">
                                 <Setter Property="Command" Value="{Binding AddGroupCommand, ElementName=LayoutRoot}"/>
