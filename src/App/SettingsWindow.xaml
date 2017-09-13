@@ -34,7 +34,7 @@
             <DockPanel Margin="8">
                 <metro:ToggleSwitch Content="Use middle mouse button to move windows"
                                     DockPanel.Dock="Top"
-                                    IsChecked="{Binding Behaviors.KeyboardMove.Enabled}"/>
+                                    IsChecked="{Binding Behaviors.MouseMove.Enabled}"/>
                 <TextBlock DockPanel.Dock="Top">Disable for these windows:</TextBlock>
                 <views:WindowGroupListEditor AvailableGroups="{Binding WindowGroups}"
                                              Groups="{Binding Behaviors.MouseMove.WindowGroupIgnoreList}"/>
@@ -44,7 +44,7 @@
             <DockPanel Margin="8">
                 <metro:ToggleSwitch Content="Use keyboard to move windows horizontally or vertically"
                                     DockPanel.Dock="Top"
-                                    IsChecked="{Binding Behaviors.MouseMove.Enabled}"/>
+                                    IsChecked="{Binding Behaviors.KeyboardMove.Enabled}"/>
                 <TextBlock DockPanel.Dock="Top">Disable for these windows:</TextBlock>
                 <views:WindowGroupListEditor AvailableGroups="{Binding WindowGroups}"
                                              Groups="{Binding Behaviors.KeyboardMove.WindowGroupIgnoreList}" />
