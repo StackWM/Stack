@@ -1,0 +1,39 @@
+﻿<Grid
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:zones="clr-namespace:LostTech.Stack.Zones;assembly=Stack"
+    mc:Ignorable="d"
+    d:DesignWidth="640"
+    d:DesignHeight="480"
+>
+    <!-- ===================================================================== -->
+    <!-- ! This file is overwritten after every update. Please, modify a copy! -->
+    <!-- ===================================================================== -->
+    <Grid.Resources>
+        <ResourceDictionary>
+            <sys:Double x:Key="GripSize">80</sys:Double>
+        </ResourceDictionary>
+    </Grid.Resources>
+    
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="1*"/>
+        <ColumnDefinition Width="2*"/>
+    </Grid.ColumnDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <zones:Zone x:Name="Side" Grid.Row="0" Grid.RowSpan="2"/>
+
+        <zones:Zone Grid.Row="0"/>
+        <zones:Zone Grid.Row="1"/>
+        <zones:Zone Grid.RowSpan="2" Height="{StaticResource GripSize}" Target="{Binding ElementName=Side}"/>
+    </Grid>
+
+    <zones:Zone Grid.Column="1"/>
+</Grid>
