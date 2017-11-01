@@ -29,6 +29,7 @@
             new AppDependecy(nameof(ValueConverters), uri: "https://github.com/thomasgalliker/ValueConverters.NET", license: "Apache 2.0"),
             new AppDependecy(nameof(EventHook), uri: "https://github.com/justcoding121/Windows-User-Action-Hook", license: "MIT"),
             new AppDependecy("Nito.AsyncEx", uri: "https://github.com/StephenCleary/AsyncEx", license: "MIT"),
+            new AppDependecy("DesktopBridge.Helpers", uri: "https://github.com/qmatteoq/DesktopBridgeHelpers", license: "MIT"),
         };
     }
 }

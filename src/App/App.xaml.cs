@@ -90,9 +90,14 @@
             ApplicationWatcher.Start();
             this.applicationWatcherStarted = true;
 
-            this.BeginCheckForUpdates();
-            this.updateTimer = new DispatcherTimer(DispatcherPriority.Background) {Interval = TimeSpan.FromDays(1), IsEnabled = true};
-            this.updateTimer.Tick += (_, __) => this.BeginCheckForUpdates();
+            if (!new DesktopBridge.Helpers().IsRunningAsUwp()) {
+                this.BeginCheckForUpdates();
+                this.updateTimer = new DispatcherTimer(DispatcherPriority.Background) {
+                    Interval = TimeSpan.FromDays(1),
+                    IsEnabled = true,
+                };
+                this.updateTimer.Tick += (_, __) => this.BeginCheckForUpdates();
+            }
 
             this.localSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(AppData.FullName);
             this.roamingSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(RoamingAppData.FullName);
