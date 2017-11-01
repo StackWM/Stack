@@ -39,6 +39,8 @@
             base.OnClosed(e);
         }
 
+        protected bool IsHandleInitialized => this.handle != null;
+
         private IntPtr OnWindowMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             switch ((User32.WindowMessage) msg) {
@@ -96,18 +98,26 @@
                 this.AdjustToScreen();
         }
 
-        void AdjustToScreen()
+        async void AdjustToScreen()
         {
-            if (this.Screen == null)
-                return;
+            for (int retry = 0; retry < 8; retry++) {
+                if (this.Screen == null || !this.IsHandleInitialized)
+                    return;
 
-            var opacity = this.Opacity;
-            var visibility = this.Visibility;
-            this.Opacity = 0;
-            this.AdjustToClientArea(this.Screen);
-            this.Show();
-            this.Opacity = opacity;
-            this.Visibility = visibility;
+                var opacity = this.Opacity;
+                var visibility = this.Visibility;
+                this.Opacity = 0;
+                this.AdjustToClientArea(this.Screen);
+                try {
+                    this.Show();
+                } catch (InvalidOperationException) {
+                    await Task.Delay(400);
+                    continue;
+                }
+                this.Visibility = visibility;
+                this.Opacity = opacity;
+                return;
+            }
         }
 
         public IEnumerable<Zone> Zones
