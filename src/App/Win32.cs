@@ -25,16 +25,5 @@
         [DllImport("User32", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GetWindowInfo(IntPtr hwnd, out WINDOWINFO pwi);
-
-        public const int APPMODEL_ERROR_NO_PACKAGE = 15700;
-
-        [DllImport("Kernel32")]
-        public static extern int GetPackageFamilyName(IntPtr hProcess, out uint length, IntPtr buffer);
-
-        public static bool IsWindows8OrBetter()
-        {
-            var os = Environment.OSVersion;
-            return os.Platform == PlatformID.Win32NT && (os.Version >= new Version(6, 2));
-        }
     }
 }
