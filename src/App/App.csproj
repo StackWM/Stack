@@ -253,6 +253,9 @@
     <Compile Include="Models\Serializer.cs" />
     <Compile Include="Models\WindowGroup.cs" />
     <Compile Include="PixelTools.cs" />
+    <Compile Include="ScreenLayoutSelector.xaml.cs">
+      <DependentUpon>ScreenLayoutSelector.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Settings\Behaviors.cs" />
     <Compile Include="Settings\CopyableCommandKeyBinding.cs" />
     <Compile Include="Settings\KeyboardMoveBehaviorSettings.cs" />
@@ -343,6 +346,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="MyPos.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ScreenLayoutSelector.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
