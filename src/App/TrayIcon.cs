@@ -296,15 +296,15 @@
             foreach (var item in ((ToolStripMenuItem) menuItem.OwnerItem).DropDownItems.OfType<ToolStripMenuItem>()) {
                 item.Checked = false;
             }
+            menuItem.Checked = true;
 
             var mapping = (KeyValuePair<Win32Screen, string>) menuItem.Tag;
-            var entryIndex = this.stackSettings.LayoutMap.GetPreferredLayoutIndex(mapping.Key);
+            int entryIndex = this.stackSettings.LayoutMap.GetPreferredLayoutIndex(mapping.Key);
             var newMapping = new MutableKeyValuePair<string, string>(mapping.Key.ID, mapping.Value + ".xaml");
             if (entryIndex < 0)
                 this.stackSettings.LayoutMap.Map.Add(newMapping);
             else
                 this.stackSettings.LayoutMap.Map[entryIndex] = newMapping;
-            App.Restart();
         }
 
         [DllImport("shell32.dll")]

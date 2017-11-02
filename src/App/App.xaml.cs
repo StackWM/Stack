@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -70,6 +71,7 @@
         DispatcherTimer updateTimer;
         readonly IScreenProvider screenProvider = new Win32ScreenProvider();
         ObservableDirectory layoutsDirectory;
+        IFolder layoutsFolder;
         readonly StringBuilder layoutLoadProblems = new StringBuilder();
 
         protected override async void OnStartup(StartupEventArgs e)
@@ -425,15 +427,15 @@
 
         async Task StartLayout(StackSettings settings)
         {
-            var layoutsDirectory = await this.roamingSettingsFolder.CreateFolderAsync("Layouts", CreationCollisionOption.OpenIfExists);
-            if ((await layoutsDirectory.GetFilesAsync()).Count == 0)
-                await this.InstallDefaultLayouts(layoutsDirectory);
+            this.layoutsFolder = await this.roamingSettingsFolder.CreateFolderAsync("Layouts", CreationCollisionOption.OpenIfExists);
+            if ((await this.layoutsFolder.GetFilesAsync()).Count == 0)
+                await this.InstallDefaultLayouts(this.layoutsFolder);
 
-            this.layoutsDirectory = new ObservableDirectory(layoutsDirectory.Path);
+            this.layoutsDirectory = new ObservableDirectory(this.layoutsFolder.Path);
 
             var screens = this.screenProvider.Screens;
             FrameworkElement[] layouts = await Task.WhenAll(screens
-                .Select(screen => this.GetLayoutForScreen(screen, settings, layoutsDirectory))
+                .Select(screen => this.GetLayoutForScreen(screen, settings, this.layoutsFolder))
                 .ToArray());
             this.screenLayouts = new ObservableCollection<ScreenLayout>();
             int zoneIndex = 0;
@@ -447,7 +449,7 @@
                 // otherwise final position is unpredictable
                 layout.Show();
                 layout.AdjustToClientArea(screen);
-                layout.Content = await this.GetLayoutForScreen(screen, settings, layoutsDirectory);
+                layout.Content = await this.GetLayoutForScreen(screen, settings, this.layoutsFolder);
                 layout.Title = $"{screen.ID}:{layout.Left}x{layout.Top}";
                 layout.DataContext = screen;
                 layout.Hide();
@@ -476,7 +478,9 @@
 
             screens.OnChange<Win32Screen>(onAdd: s => AddLayoutForScreen(s), onRemove: RemoveLayoutForScreen);
 
-            this.trayIcon = (await TrayIcon.StartTrayIcon(layoutsDirectory, this.layoutsDirectory, settings, this.screenProvider, this.SettingsWindow)).Icon;
+            settings.LayoutMap.Map.CollectionChanged += this.MapOnCollectionChanged;
+
+            this.trayIcon = (await TrayIcon.StartTrayIcon(this.layoutsFolder, this.layoutsDirectory, settings, this.screenProvider, this.SettingsWindow)).Icon;
             if (this.layoutLoadProblems.Length > 0) {
                 this.trayIcon.BalloonTipTitle = "Some layouts were not loaded";
                 this.trayIcon.BalloonTipText = this.layoutLoadProblems.ToString();
@@ -489,6 +493,20 @@
                 this.trayIcon.BalloonTipText = "Find me in the system tray!";
                 this.trayIcon.BalloonTipIcon = ToolTipIcon.Info;
                 this.trayIcon.ShowBalloonTip(30);
+            }
+        }
+
+        async void MapOnCollectionChanged(object o, NotifyCollectionChangedEventArgs change) {
+            switch (change.Action) {
+            case NotifyCollectionChangedAction.Add:
+            case NotifyCollectionChangedAction.Replace when change.OldItems.Count == 1:
+                var newRecord = change.NewItems.OfType<MutableKeyValuePair<string, string>>().Single();
+                var layoutToUpdate = this.screenLayouts.FirstOrDefault(layout => layout.Screen?.ID == newRecord.Key);
+                if (layoutToUpdate != null)
+                    layoutToUpdate.Content = await this.GetLayoutForScreen(layoutToUpdate.Screen, this.stackSettings, this.layoutsFolder);
+                break;
+            default:
+                return;
             }
         }
 
