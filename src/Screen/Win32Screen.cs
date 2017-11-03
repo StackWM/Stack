@@ -3,7 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Interop;
     using System.Windows.Media;
@@ -79,17 +81,31 @@
                 if (oldDeviceInfo.IsPrimary != this.displayDevice.IsPrimary)
                     this.OnPropertyChanged(nameof(this.IsPrimary));
 
-                var newWorkingArea = this.GetWorkingArea();
-                if (!this.workingArea.Equals(newWorkingArea)) {
-                    this.workingArea = newWorkingArea;
-                    this.OnPropertyChanged(nameof(this.WorkingArea));
-                }
-                this.dirty = true;
+                this.BeginUpdateWorkingArea();
                 break;
             default:
                 return IntPtr.Zero;
             }
             return IntPtr.Zero;
+        }
+
+        async void BeginUpdateWorkingArea() {
+            for (int retry = 0; retry < 100; retry++) {
+                var newWorkingArea = this.GetWorkingArea();
+                if (newWorkingArea.IsEmpty) {
+                    await Task.Delay(50);
+                    continue;
+                }
+
+                if (!this.workingArea.Equals(newWorkingArea)) {
+                    this.workingArea = newWorkingArea;
+                    this.OnPropertyChanged(nameof(this.WorkingArea));
+                    Debug.WriteLine($"{this.ID}:{this.workingArea.Width}x{this.workingArea.Height}");
+                }
+                this.dirty = true;
+                return;
+            }
+            Debug.WriteLine($"failed to update working area for {this.ID}");
         }
 
         public Matrix TransformFromDevice
