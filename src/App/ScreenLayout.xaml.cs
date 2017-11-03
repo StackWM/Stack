@@ -71,6 +71,7 @@
             var dimensions = transformFromDevice.Transform(size);
             this.Width = dimensions.X;
             this.Height = dimensions.Y;
+            Debug.WriteLine($"{screen.ID} WPF: {this.Width}x{this.Height}");
         }
 
         public void AdjustToClientArea()

@@ -459,10 +459,10 @@
                     zone.Id = zone.Id ?? $"{zoneIndex++}";
                 }
                 this.screenLayouts.Add(layout);
+                
             }
 
-            void RemoveLayoutForScreen(Win32Screen screen)
-            {
+            void RemoveLayoutForScreen(Win32Screen screen) {
                 ScreenLayout layout = this.screenLayouts.FirstOrDefault(l => l.Screen == screen);
                 if (layout != null) {
                     foreach (Zone zone in layout.Zones)
@@ -473,10 +473,33 @@
                 }
             }
 
-            foreach (Win32Screen screen in screens)
-                await AddLayoutForScreen(screen);
+            async void ScreenPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+                var screen = (Win32Screen)sender;
+                switch (e.PropertyName) {
+                case nameof(Win32Screen.WorkingArea):
+                case nameof(Win32Screen.IsActive):
+                    if (!IsValidScreen(screen))
+                        RemoveLayoutForScreen(screen);
+                    else if (this.screenLayouts.All(layout => layout.Screen.ID != screen.ID))
+                        await AddLayoutForScreen(screen);
+                    return;
+                }
+            }
 
-            screens.OnChange<Win32Screen>(onAdd: s => AddLayoutForScreen(s), onRemove: RemoveLayoutForScreen);
+            foreach (Win32Screen screen in screens) {
+                if (IsValidScreen(screen))
+                    await AddLayoutForScreen(screen);
+                screen.PropertyChanged += ScreenPropertyChanged;
+            }
+
+            screens.OnChange<Win32Screen>(onAdd: async s => {
+                if (IsValidScreen(s))
+                    await AddLayoutForScreen(s);
+                s.PropertyChanged += ScreenPropertyChanged;
+            }, onRemove: s => {
+                s.PropertyChanged -= ScreenPropertyChanged;
+                RemoveLayoutForScreen(s);
+            });
 
             settings.LayoutMap.Map.CollectionChanged += this.MapOnCollectionChanged;
 
@@ -495,6 +518,8 @@
                 this.trayIcon.ShowBalloonTip(30);
             }
         }
+
+        static bool IsValidScreen(Win32Screen screen) => screen.IsActive && screen.WorkingArea.Width > 1 && screen.WorkingArea.Height > 1;
 
         async void MapOnCollectionChanged(object o, NotifyCollectionChangedEventArgs change) {
             switch (change.Action) {
