@@ -22,7 +22,8 @@
         static Stream GetTermsAndCondtions()
         {
             string @namespace = typeof(LicenseTermsAcceptance).Namespace;
-            string resourceName = $"{@namespace}.Terms.html";
+            string resourceName = new DesktopBridge.Helpers().IsRunningAsUwp() ? "StoreTerms" : "Terms";
+            resourceName = $"{@namespace}.{resourceName}.html";
             return Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
         }
 

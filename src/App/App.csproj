@@ -460,7 +460,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Terms.html" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="StoreTerms.html" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release'">
     <Exec Command="signtool sign /v /n &quot;Lost Tech LLC&quot; /t http://timestamp.verisign.com/scripts/timstamp.dll $(TargetPath)" />

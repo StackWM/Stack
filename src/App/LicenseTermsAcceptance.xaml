@@ -16,6 +16,7 @@
             <Setter Property="MinHeight" Value="40"/>
             <Setter Property="FontSize" Value="24"/>
             <Setter Property="Margin" Value="12"/>
+            <Setter Property="Foreground" Value="Black"/>
         </Style>
     </Window.Resources>
     <Grid>
