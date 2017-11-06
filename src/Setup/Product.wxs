@@ -205,6 +205,18 @@
       <Component Id="Nito.AsyncEx.dll" Guid="fba74a2e-fc71-4332-a5a0-7a1b795b2da5">
         <File Id="Nito.AsyncEx.dll" Name="Nito.AsyncEx.dll" Source="$(var.App_TargetDir)Nito.AsyncEx.dll" />
       </Component>
+      <Component Id="Windows.winmd" Guid="2b0adbb8-91c6-4a37-b1e7-4b438adea9fe">
+        <File Id="Windows.winmd" Name="Windows.winmd" Source="$(var.App_TargetDir)Windows.winmd" />
+      </Component>
+      <Component Id="System.Runtime.WindowsRuntime.dll" Guid="d8b1e70d-5dc6-4530-9ea5-d44f1f75b18f">
+        <File Id="System.Runtime.WindowsRuntime.dll" Name="System.Runtime.WindowsRuntime.dll" Source="$(var.App_TargetDir)System.Runtime.WindowsRuntime.dll" />
+      </Component>
+      <Component Id="DesktopBridge.Helpers.dll" Guid="6b146cff-e2d6-4a6e-8552-1c085126bda2">
+        <File Id="DesktopBridge.Helpers.dll" Name="DesktopBridge.Helpers.dll" Source="$(var.App_TargetDir)DesktopBridge.Helpers.dll" />
+      </Component>
+      <Component Id="System.Threading.Tasks.dll" Guid="21e44f00-8a7b-4c9e-9d97-e2df945d689e">
+        <File Id="System.Threading.Tasks.dll" Name="System.Threading.Tasks.dll" Source="$(var.App_TargetDir)System.Threading.Tasks.dll" />
+      </Component>
     </ComponentGroup>
     <ComponentGroup Id="Shortcuts" Directory="ApplicationProgramsFolder">
       <Component Id="Stack.exe.lnk.Component" Guid="c218d8d9-3dcf-4c6a-a6b1-6ea368f61bf6">

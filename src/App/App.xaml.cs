@@ -74,6 +74,8 @@
         IFolder layoutsFolder;
         readonly StringBuilder layoutLoadProblems = new StringBuilder();
 
+        static readonly bool IsUwp = new DesktopBridge.Helpers().IsRunningAsUwp();
+
         protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -92,7 +94,7 @@
             ApplicationWatcher.Start();
             this.applicationWatcherStarted = true;
 
-            if (!new DesktopBridge.Helpers().IsRunningAsUwp()) {
+            if (!IsUwp) {
                 this.BeginCheckForUpdates();
                 this.updateTimer = new DispatcherTimer(DispatcherPriority.Background) {
                     Interval = TimeSpan.FromDays(1),
@@ -527,8 +529,8 @@
             case NotifyCollectionChangedAction.Replace when change.OldItems.Count == 1:
                 var newRecord = change.NewItems.OfType<MutableKeyValuePair<string, string>>().Single();
                 var layoutToUpdate = this.screenLayouts.FirstOrDefault(
-                    layout => layout.Screen?.ID == newRecord.Key
-                              || layout.Screen != null && ScreenLayouts.GetDesignation(layout.Screen) == newRecord.Key);
+                    layout => layout.Screen?.ID == newRecord.Key 
+                    || layout.Screen != null && ScreenLayouts.GetDesignation(layout.Screen) == newRecord.Key);
                 if (layoutToUpdate != null)
                     layoutToUpdate.Content = await this.GetLayoutForScreen(layoutToUpdate.Screen, this.stackSettings, this.layoutsFolder);
                 break;
@@ -630,8 +632,13 @@
 
         public static DirectoryInfo AppData {
             get {
-                var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                var path = Path.Combine(appData, "Lost Tech LLC", nameof(Stack));
+                string path;
+                if (IsUwp) {
+                    path = global::Windows.Storage.ApplicationData.Current.LocalFolder.Path;
+                } else {
+                    string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                    path = Path.Combine(appData, "Lost Tech LLC", nameof(Stack));
+                }
                 return Directory.CreateDirectory(path);
             }
         }
@@ -639,8 +646,13 @@
         public static DirectoryInfo RoamingAppData
         {
             get {
-                var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                var path = Path.Combine(appData, "Lost Tech LLC", nameof(Stack));
+                string path;
+                if (IsUwp) {
+                    path = global::Windows.Storage.ApplicationData.Current.RoamingFolder.Path;
+                } else {
+                    var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                    path = Path.Combine(appData, "Lost Tech LLC", nameof(Stack));
+                }
                 return Directory.CreateDirectory(path);
             }
         }
