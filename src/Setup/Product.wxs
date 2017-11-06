@@ -214,9 +214,6 @@
       <Component Id="DesktopBridge.Helpers.dll" Guid="6b146cff-e2d6-4a6e-8552-1c085126bda2">
         <File Id="DesktopBridge.Helpers.dll" Name="DesktopBridge.Helpers.dll" Source="$(var.App_TargetDir)DesktopBridge.Helpers.dll" />
       </Component>
-      <Component Id="System.Threading.Tasks.dll" Guid="21e44f00-8a7b-4c9e-9d97-e2df945d689e">
-        <File Id="System.Threading.Tasks.dll" Name="System.Threading.Tasks.dll" Source="$(var.App_TargetDir)System.Threading.Tasks.dll" />
-      </Component>
     </ComponentGroup>
     <ComponentGroup Id="Shortcuts" Directory="ApplicationProgramsFolder">
       <Component Id="Stack.exe.lnk.Component" Guid="c218d8d9-3dcf-4c6a-a6b1-6ea368f61bf6">
