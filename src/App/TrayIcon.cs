@@ -224,7 +224,7 @@
             var boldFont = new Font(font, FontStyle.Bold);
             foreach (var screen in screenProvider.Screens)
             {
-                var menu = new ToolStripMenuItem(screen.ToString()){DisplayStyle = ToolStripItemDisplayStyle.Text};
+                var menu = new ToolStripMenuItem(ScreenLayouts.GetDesignation(screen)){DisplayStyle = ToolStripItemDisplayStyle.Text};
                 screen.OnChange(s => s.IsPrimary, val => menu.Font = val ? boldFont : font);
                 screen.OnChange(s => s.IsActive, val => menu.Visible = val);
 
@@ -298,7 +298,8 @@
 
             var mapping = (KeyValuePair<Win32Screen, string>) menuItem.Tag;
             int entryIndex = this.stackSettings.LayoutMap.GetPreferredLayoutIndex(mapping.Key);
-            var newMapping = new MutableKeyValuePair<string, string>(mapping.Key.ID, mapping.Value + ".xaml");
+            string screenDesignation = ScreenLayouts.GetDesignation(mapping.Key);
+            var newMapping = new MutableKeyValuePair<string, string>(screenDesignation, mapping.Value + ".xaml");
             if (entryIndex < 0)
                 this.stackSettings.LayoutMap.Map.Add(newMapping);
             else
