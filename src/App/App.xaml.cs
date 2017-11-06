@@ -526,7 +526,9 @@
             case NotifyCollectionChangedAction.Add:
             case NotifyCollectionChangedAction.Replace when change.OldItems.Count == 1:
                 var newRecord = change.NewItems.OfType<MutableKeyValuePair<string, string>>().Single();
-                var layoutToUpdate = this.screenLayouts.FirstOrDefault(layout => layout.Screen?.ID == newRecord.Key);
+                var layoutToUpdate = this.screenLayouts.FirstOrDefault(
+                    layout => layout.Screen?.ID == newRecord.Key
+                              || layout.Screen != null && ScreenLayouts.GetDesignation(layout.Screen) == newRecord.Key);
                 if (layoutToUpdate != null)
                     layoutToUpdate.Content = await this.GetLayoutForScreen(layoutToUpdate.Screen, this.stackSettings, this.layoutsFolder);
                 break;
