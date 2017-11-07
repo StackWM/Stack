@@ -8,30 +8,42 @@
         mc:Ignorable="d"
         x:Name="Self"
         ShowInTaskbar="False" ShowActivated="True"
-        Topmost="True"
-        Height="350" Width="525" ResizeMode="NoResize" WindowStyle="None">
-    <Window.Resources>
+        Loaded="ScreenLayoutSelector_OnLoaded"
+        Background="White"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        FocusManager.FocusedElement="{Binding ElementName=Layouts}"
+        Height="700" Width="1366">
+    <!--<Window.Resources>
         <ResourceDictionary Source="Themes/Generic.xaml"/>
-    </Window.Resources>
+    </Window.Resources>-->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <views:LayoutPreview Grid.RowSpan="2" DataContext="{Binding SelectedItem, ElementName=Layouts, Mode=OneWay}"/>
-        
+
         <StackPanel Grid.Row="0" Orientation="Vertical">
             <TextBlock HorizontalAlignment="Center" Margin="10" FontSize="36">Pick a layout for this screen</TextBlock>
-            <TextBlock HorizontalAlignment="Center" Margin="10" FontSize="24"
+            <TextBlock HorizontalAlignment="Center" Margin="10,0,10,10" FontSize="24"
                        Text="{Binding ScreenName, FallbackValue=640x480}"/>
         </StackPanel>
         
-        <ListView x:Name="Layouts" Grid.Row="1" Margin="20" ItemsSource="{Binding Layouts, Mode=OneWay}" SelectedItem="{Binding Selected}">
-            <ListView.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ListView.ItemsPanel>
+        <ListView x:Name="Layouts" Grid.Row="1" Margin="40,0,40,20"
+                  SelectedItem="{Binding Selected, Mode=TwoWay}"
+                  SelectionMode="Single"
+                  IsSynchronizedWithCurrentItem="False"
+                  ItemsSource="{Binding Layouts, Mode=OneWay}"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListView.ItemsPanel><ItemsPanelTemplate><WrapPanel IsItemsHost="True"/></ItemsPanelTemplate></ListView.ItemsPanel>
             
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <views:LayoutPreview LayoutLoader="{Binding LayoutLoader,ElementName=Self,Mode=OneWay}"/>
+                    <StackPanel Orientation="Vertical">
+                        <views:LayoutPreview Width="260" Height="260" Background="White" Margin="12"
+                                             LayoutLoader="{Binding LayoutLoader,ElementName=Self,Mode=OneWay}"/>
+                        <TextBlock Foreground="Black" FontSize="24" TextAlignment="Center" Text="{Binding}" Margin="20,0,20,20"/>
+                    </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

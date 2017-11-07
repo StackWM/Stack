@@ -28,6 +28,7 @@
     using LostTech.Stack.Extensibility.Filters;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
+    using LostTech.Stack.ViewModels;
     using LostTech.Stack.Windows;
     using LostTech.Stack.Zones;
     using LostTech.Windows;
@@ -451,7 +452,7 @@
                 // windows must be visible before calling AdjustToClientArea,
                 // otherwise final position is unpredictable
                 layout.Show();
-                layout.AdjustToClientArea(screen);
+                ScreenLayout.AdjustToClientArea(layout, screen);
                 layout.Content = await this.GetLayoutForScreen(screen, settings, this.layoutsFolder);
                 layout.Title = $"{screen.ID}:{layout.Left}x{layout.Top}";
                 layout.DataContext = screen;
@@ -489,9 +490,27 @@
                 }
             }
 
+            var layoutsCollection = new TransformObservableCollection<string, ObservableFile, 
+                ReadOnlyObservableCollection<ObservableFile>>(
+                this.layoutsDirectory.Files,
+                file => Path.GetFileNameWithoutExtension(file.FullName));
+
             foreach (Win32Screen screen in screens) {
-                if (IsValidScreen(screen))
+                if (IsValidScreen(screen)) {
                     await AddLayoutForScreen(screen);
+                    var defaultOption =
+                        Path.GetFileNameWithoutExtension(settings.LayoutMap.GetPreferredLayout(screen) ?? "Default");
+                    var selectorViewModel = new LayoutSelectorViewModel {
+                        Layouts = layoutsCollection,
+                        ScreenName = ScreenLayouts.GetDesignation(screen),
+                        Selected = defaultOption,
+                    };
+                    var selector = new ScreenLayoutSelector {
+                        LayoutLoader = this.layoutLoader,
+                        DataContext = selectorViewModel,
+                    };
+                    selector.Show();
+                }
                 screen.PropertyChanged += ScreenPropertyChanged;
             }
 

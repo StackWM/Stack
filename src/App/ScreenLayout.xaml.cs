@@ -56,7 +56,7 @@
             set => this.DataContext = value;
         }
 
-        public void AdjustToClientArea(Win32Screen screen)
+        public static void AdjustToClientArea(Window window, Win32Screen screen)
         {
             if (screen == null)
                 throw new ArgumentNullException(nameof(screen));
@@ -64,20 +64,20 @@
             Debug.WriteLine(screen.WorkingArea);
             var transformFromDevice = screen.TransformFromDevice;
             var topLeft = transformFromDevice.Transform(screen.WorkingArea.TopLeft);
-            this.Left = topLeft.X;
-            this.Top = topLeft.Y;
+            window.Left = topLeft.X;
+            window.Top = topLeft.Y;
 
             var size = new Vector(screen.WorkingArea.Width, screen.WorkingArea.Height);
             var dimensions = transformFromDevice.Transform(size);
-            this.Width = dimensions.X;
-            this.Height = dimensions.Y;
-            Debug.WriteLine($"{screen.ID} WPF: {this.Width}x{this.Height}");
+            window.Width = dimensions.X;
+            window.Height = dimensions.Y;
+            Debug.WriteLine($"{screen.ID} WPF: {window.Width}x{window.Height}");
         }
 
         public void AdjustToClientArea()
         {
             if (this.DataContext is Win32Screen screen)
-                this.AdjustToClientArea(screen);
+                AdjustToClientArea(this, screen);
             else
                 throw new InvalidOperationException();
         }
@@ -108,7 +108,7 @@
                 var opacity = this.Opacity;
                 var visibility = this.Visibility;
                 this.Opacity = 0;
-                this.AdjustToClientArea(this.Screen);
+                AdjustToClientArea(this, this.Screen);
                 try {
                     this.Show();
                 } catch (InvalidOperationException) {

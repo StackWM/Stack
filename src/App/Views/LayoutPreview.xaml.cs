@@ -14,11 +14,34 @@
             this.DataContextChanged += this.OnDataContextChanged;
         }
 
-        internal LayoutLoader LayoutLoader { get; set; }
+        public LayoutLoader LayoutLoader {
+            get => (LayoutLoader)this.GetValue(LayoutLoaderProperty);
+            set => this.SetValue(LayoutLoaderProperty, value);
+        }
+        public static readonly DependencyProperty LayoutLoaderProperty =
+            DependencyProperty.Register(nameof(LayoutLoader), typeof(LayoutLoader),
+                                        typeof(LayoutPreview), new PropertyMetadata(null) {
+                                            PropertyChangedCallback = OnLayoutPreviewChanged,
+                                        });
 
-        async void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs) {
-            this.Viewbox.Child = dependencyPropertyChangedEventArgs.NewValue is string layout 
-                ? await this.LayoutLoader.LoadLayoutOrDefault(layout) : null;
+        static void OnLayoutPreviewChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            ((LayoutPreview)d).UpdateView();
+        }
+
+        void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs) {
+            this.UpdateView();
+        }
+
+        async void UpdateView() {
+            if (this.LayoutLoader != null && this.DataContext is string layoutName) {
+                var layout = await this.LayoutLoader.LoadLayoutOrDefault(layoutName + ".xaml");
+                if (double.IsNaN(layout.Width))
+                    layout.Width = 1024;
+                if (double.IsNaN(layout.Height))
+                    layout.Height = 1024;
+                this.Viewbox.Child = layout;
+            } else
+                this.Viewbox.Child = null;
         }
     }
 }

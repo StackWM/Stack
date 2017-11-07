@@ -1,11 +1,12 @@
 ﻿namespace LostTech.Stack.ViewModels
 {
-    using System.Collections.ObjectModel;
+    using System.Collections.Generic;
+    using LostTech.Windows;
 
     class LayoutSelectorViewModel: SimpleViewModel
     {
         string selected;
-        public ObservableCollection<string> Layouts { get; set; }
+        public IEnumerable<string> Layouts { get; set; }
         public string ScreenName { get; set; }
 
         public string Selected {

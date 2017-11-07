@@ -240,6 +240,7 @@
     <Compile Include="DataBinding\Binder.cs" />
     <Compile Include="DataBinding\CopyableObservableCollection.cs" />
     <Compile Include="DataBinding\PropertyHelper.cs" />
+    <Compile Include="DataBinding\TransformObservableCollection.cs" />
     <Compile Include="DataBinding\ValueToBoolConverter.cs" />
     <Compile Include="DebugHelper.cs" />
     <Compile Include="AppDependecy.cs" />

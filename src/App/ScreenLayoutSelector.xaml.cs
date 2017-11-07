@@ -21,5 +21,10 @@
         public static readonly DependencyProperty LayoutLoaderProperty =
             DependencyProperty.Register(nameof(LayoutLoader), typeof(LayoutLoader), 
                 typeof(ScreenLayoutSelector), new PropertyMetadata(null));
+
+        void ScreenLayoutSelector_OnLoaded(object sender, RoutedEventArgs e) {
+            if (this.Layouts.SelectedIndex >= 0)
+                this.Layouts.ScrollIntoView(this.Layouts.SelectedItem);
+        }
     }
 }
