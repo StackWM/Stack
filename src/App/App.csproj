@@ -248,6 +248,7 @@
       <DependentUpon>LicenseTermsAcceptance.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\IAppWindow.cs" />
+    <Compile Include="Models\LayoutLoader.cs" />
     <Compile Include="Models\LayoutManager.cs" />
     <Compile Include="Models\Win32Window.cs" />
     <Compile Include="Models\Legacy\Filters\CommonStringMatchFilter.cs" />
@@ -281,6 +282,11 @@
     <Compile Include="Utils\DragHookEventArgs.cs" />
     <Compile Include="Utils\EnumUtils.cs" />
     <Compile Include="Utils\RectExtensions.cs" />
+    <Compile Include="ViewModels\LayoutSelectorViewModel.cs" />
+    <Compile Include="ViewModels\SimpleViewModel.cs" />
+    <Compile Include="Views\LayoutPreview.xaml.cs">
+      <DependentUpon>LayoutPreview.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\StringFilterEditor.xaml.cs">
       <DependentUpon>StringFilterEditor.xaml</DependentUpon>
     </Compile>
@@ -371,6 +377,10 @@
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\LayoutPreview.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\StringFilterEditor.xaml">
       <SubType>Designer</SubType>

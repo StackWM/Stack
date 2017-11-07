@@ -72,7 +72,7 @@
         readonly IScreenProvider screenProvider = new Win32ScreenProvider();
         ObservableDirectory layoutsDirectory;
         IFolder layoutsFolder;
-        readonly StringBuilder layoutLoadProblems = new StringBuilder();
+        LayoutLoader layoutLoader;
 
         static readonly bool IsUwp = new DesktopBridge.Helpers().IsRunningAsUwp();
 
@@ -432,6 +432,7 @@
             this.layoutsFolder = await this.roamingSettingsFolder.CreateFolderAsync("Layouts", CreationCollisionOption.OpenIfExists);
             if ((await this.layoutsFolder.GetFilesAsync()).Count == 0)
                 await this.InstallDefaultLayouts(this.layoutsFolder);
+            this.layoutLoader = new LayoutLoader(this.layoutsFolder);
 
             this.layoutsDirectory = new ObservableDirectory(this.layoutsFolder.Path);
 
@@ -506,9 +507,9 @@
             settings.LayoutMap.Map.CollectionChanged += this.MapOnCollectionChanged;
 
             this.trayIcon = (await TrayIcon.StartTrayIcon(this.layoutsFolder, this.layoutsDirectory, settings, this.screenProvider, this.SettingsWindow)).Icon;
-            if (this.layoutLoadProblems.Length > 0) {
+            if (this.layoutLoader.Problems.Length > 0) {
                 this.trayIcon.BalloonTipTitle = "Some layouts were not loaded";
-                this.trayIcon.BalloonTipText = this.layoutLoadProblems.ToString();
+                this.trayIcon.BalloonTipText = this.layoutLoader.Problems;
                 this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
                 this.trayIcon.ShowBalloonTip(30);
             }
@@ -565,8 +566,8 @@
         {
             var layout = settings.LayoutMap.GetPreferredLayout(screen);
             if (layout == null)
-                return this.MakeDefaultLayout();
-            return await this.LoadLayoutOrDefault(layoutsDirectory, layout);
+                return LayoutLoader.MakeDefaultLayout();
+            return await this.layoutLoader.LoadLayoutOrDefault(layout);
         }
 
         private void BindHandlers(StackSettings settings)
@@ -590,45 +591,6 @@
                 this.hook.KeyDown += this.GlobalKeyDown;
             }
         }
-
-        private async Task<FrameworkElement> LoadLayoutOrDefault(IFolder layoutDirectory, string fileName)
-        {
-            // TODO: SEC: untrusted XAML https://msdn.microsoft.com/en-us/library/ee856646(v=vs.110).aspx
-
-            if (layoutDirectory == null)
-                throw new ArgumentNullException(nameof(layoutDirectory));
-            if (string.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException(nameof(fileName));
-
-
-            if (Path.GetInvalidFileNameChars().Any(fileName.Contains))
-                throw new ArgumentException();
-
-            var file = await layoutDirectory.GetFileOrNull(fileName);
-            if (file == null) {
-                Debug.WriteLine($"layout {fileName} was not found. loading default");
-                return this.MakeDefaultLayout();
-            }
-
-            using (var stream = await file.OpenAsync(FileAccess.Read))
-            using (var xmlReader = XmlReader.Create(stream)) {
-                try {
-                    var layout = (FrameworkElement) XamlReader.Load(xmlReader);
-                    Debug.WriteLine($"loaded layout {fileName}");
-                    return layout;
-                }
-                catch (XamlParseException e) {
-                    this.layoutLoadProblems.AppendLine($"{file.Name}: {e.Message}");
-                    return this.MakeDefaultLayout();
-                }
-            }
-        }
-
-        FrameworkElement MakeDefaultLayout() => new Grid {
-            Children = {
-                new Zone {},
-            }
-        };
 
         public static DirectoryInfo AppData {
             get {
