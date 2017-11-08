@@ -53,7 +53,7 @@
                 Rect bounds = this.GetPhysicalBounds();
                 window.Move(bounds).ContinueWith(error => {
                     if (error.Result != null)
-                        this?.NonFatalErrorOccurred.Invoke(this, new ErrorEventArgs(error.Result));
+                        this.NonFatalErrorOccurred?.Invoke(this, new ErrorEventArgs(error.Result));
                 }, uiThread);
             }
         }
