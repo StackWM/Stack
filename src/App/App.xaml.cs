@@ -484,8 +484,13 @@
                 case nameof(Win32Screen.IsActive):
                     if (!IsValidScreen(screen))
                         RemoveLayoutForScreen(screen);
-                    else if (this.screenLayouts.All(layout => layout.Screen.ID != screen.ID))
-                        await AddLayoutForScreen(screen);
+                    else {
+                        var layout = this.screenLayouts.FirstOrDefault(l => l.Screen.ID == screen.ID);
+                        if (layout == null)
+                            await AddLayoutForScreen(screen);
+                        else
+                            layout.Content = await this.GetLayoutForScreen(screen, settings, this.layoutsFolder);
+                    }
                     return;
                 }
             }
@@ -498,18 +503,21 @@
             foreach (Win32Screen screen in screens) {
                 if (IsValidScreen(screen)) {
                     await AddLayoutForScreen(screen);
-                    var defaultOption =
-                        Path.GetFileNameWithoutExtension(settings.LayoutMap.GetPreferredLayout(screen) ?? "Default");
-                    var selectorViewModel = new LayoutSelectorViewModel {
-                        Layouts = layoutsCollection,
-                        ScreenName = ScreenLayouts.GetDesignation(screen),
-                        Selected = defaultOption,
-                    };
-                    var selector = new ScreenLayoutSelector {
-                        LayoutLoader = this.layoutLoader,
-                        DataContext = selectorViewModel,
-                    };
-                    selector.Show();
+
+                    if (settings.LayoutMap.NeedsUpdate(screen)) {
+                        string defaultOption = settings.LayoutMap.GetPreferredLayout(screen) ?? "Default";
+                        defaultOption = Path.GetFileNameWithoutExtension(defaultOption);
+                        var selectorViewModel = new LayoutSelectorViewModel {
+                            Layouts = layoutsCollection,
+                            ScreenName = ScreenLayouts.GetDesignation(screen),
+                            Selected = defaultOption,
+                        };
+                        var selector = new ScreenLayoutSelector {
+                            LayoutLoader = this.layoutLoader,
+                            DataContext = selectorViewModel,
+                        };
+                        selector.Show();
+                    }
                 }
                 screen.PropertyChanged += ScreenPropertyChanged;
             }

@@ -3,6 +3,7 @@ namespace LostTech.Stack.Settings
     using System;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
+    using System.Globalization;
     using System.Linq;
     using System.Runtime.Serialization;
     using System.Windows;
@@ -48,6 +49,14 @@ namespace LostTech.Stack.Settings
                 if (designation == this.Map[i].Key || this.Map[i].Key == screen.ID)
                     return i;
             return -1;
+        }
+
+        public bool NeedsUpdate(Win32Screen screen) {
+            int currentIndex = this.GetPreferredLayoutIndex(screen);
+            if (currentIndex < 0)
+                return true;
+            string key = this.Map[currentIndex].Key;
+            return int.TryParse(key, NumberStyles.Integer, CultureInfo.InvariantCulture, out int _);
         }
 
         public static string GetDesignation(Win32Screen screen) {
