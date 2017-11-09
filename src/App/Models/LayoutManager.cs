@@ -40,11 +40,11 @@
             var app = applicationEventArgs.ApplicationData;
             if (applicationEventArgs.Event != ApplicationEvents.Launched) {
                 bool wasTracked = this.locations.Remove(new Win32Window(app.HWnd));
-                Debug.WriteLine($"Disappeared: {app.AppTitle} traked: {wasTracked}");
+                //Debug.WriteLine($"Disappeared: {app.AppTitle} traked: {wasTracked}");
                 return;
             }
 
-            Debug.WriteLine($"Appeared: {app.AppTitle} from {app.AppName}, {app.AppPath}");
+            //Debug.WriteLine($"Appeared: {app.AppTitle} from {app.AppName}, {app.AppPath}");
             // TODO: determine if window appeared in an existing zone, and if it needs to be moved
             var window = new Win32Window(app.HWnd);
             this.locations.Add(window, null);

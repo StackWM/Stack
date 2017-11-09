@@ -75,8 +75,8 @@
                     screen = new Win32Screen(device);
                     this.screens.Add(screen);
                 }
-                Debug.WriteLine(
-                    $"name: {device.Name}; str: {device.String}; flags: {device.StateFlags}; ID: {device.ID}; key: {device.Key}");
+                //Debug.WriteLine(
+                //    $"name: {device.Name}; str: {device.String}; flags: {device.StateFlags}; ID: {device.ID}; key: {device.Key}");
             }
 
             for (int i = 0; i < this.screens.Count;) {

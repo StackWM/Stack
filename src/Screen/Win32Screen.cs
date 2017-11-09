@@ -100,7 +100,7 @@
                 if (!this.workingArea.Equals(newWorkingArea)) {
                     this.workingArea = newWorkingArea;
                     this.OnPropertyChanged(nameof(this.WorkingArea));
-                    Debug.WriteLine($"{this.ID}:{this.workingArea.Width}x{this.workingArea.Height}");
+                    Debug.WriteLine($"screen {this.ID} new working area: {this.workingArea.Width}x{this.workingArea.Height}");
                 }
                 this.dirty = true;
                 return;
