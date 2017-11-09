@@ -512,7 +512,8 @@
 
                     if (settings.LayoutMap.NeedsUpdate(screen))
                     {
-                        string defaultOption = settings.LayoutMap.GetPreferredLayout(screen) ?? "Default";
+                        string defaultOption = settings.LayoutMap.GetPreferredLayout(screen)
+                                               ?? this.GetSuggestedLayout(screen);
                         defaultOption = Path.GetFileNameWithoutExtension(defaultOption);
                         var selectorViewModel = new LayoutSelectorViewModel {
                             Layouts = layoutsCollection,
@@ -557,6 +558,19 @@
                 this.trayIcon.BalloonTipIcon = ToolTipIcon.Info;
                 this.trayIcon.ShowBalloonTip(30);
             }
+        }
+
+        string GetSuggestedLayout(Win32Screen screen) {
+            if (!screen.WorkingArea.IsHorizontal())
+                return "V Top+Rest";
+
+            string[] screens = this.screenProvider.Screens
+                               .Where(IsValidScreen)
+                               .OrderBy(s => s.WorkingArea.Left)
+                               .Select(s => s.ID).ToArray();
+            bool isOnTheRight = screens.Length > 1 && screens[0] != screen.ID;
+            string leftOrRight = isOnTheRight ? "Right" : "Left";
+            return $"Large Horizontal {leftOrRight}";
         }
 
         static bool IsValidScreen(Win32Screen screen) => screen.IsActive && screen.WorkingArea.Width > 1 && screen.WorkingArea.Height > 1;
