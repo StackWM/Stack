@@ -26,5 +26,7 @@
             rect.Inflate(x, y);
             return rect;
         }
+
+        public static bool IsHorizontal(this Rect rect) => rect.Width > rect.Height;
     }
 }

@@ -13,6 +13,8 @@
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         FocusManager.FocusedElement="{Binding ElementName=Layouts}"
+        MaxWidth="1366" MaxHeight="1600"
+        Margin="120"
         Height="700" Width="1366">
     <!--<Window.Resources>
         <ResourceDictionary Source="Themes/Generic.xaml"/>
@@ -32,6 +34,7 @@
         <ListView x:Name="Layouts" Grid.Row="1" Margin="40,0,40,20"
                   SelectedItem="{Binding Selected, Mode=TwoWay}"
                   SelectionMode="Single"
+                  BorderThickness="0"
                   IsSynchronizedWithCurrentItem="False"
                   ItemsSource="{Binding Layouts, Mode=OneWay}"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled">

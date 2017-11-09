@@ -3,12 +3,12 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Interop;
     using System.Windows.Media;
+    using LostTech.Stack.ScreenCoordinates;
     using LostTech.Stack.Zones;
     using LostTech.Windows;
     using PInvoke;
@@ -77,26 +77,10 @@
             }
         }
 
-        public static void AdjustToClientArea(Window window, Win32Screen screen)
-        {
-            if (screen == null)
-                throw new ArgumentNullException(nameof(screen));
-
-            var transformFromDevice = screen.TransformFromDevice;
-            var topLeft = transformFromDevice.Transform(screen.WorkingArea.TopLeft);
-            window.Left = topLeft.X;
-            window.Top = topLeft.Y;
-
-            var size = new Vector(screen.WorkingArea.Width, screen.WorkingArea.Height);
-            var dimensions = transformFromDevice.Transform(size);
-            window.Width = dimensions.X;
-            window.Height = dimensions.Y;
-        }
-
         public void AdjustToClientArea()
         {
             if (this.DataContext is Win32Screen screen)
-                AdjustToClientArea(this, screen);
+                this.AdjustToClientArea(screen);
             else
                 throw new InvalidOperationException();
         }
@@ -132,7 +116,7 @@
                     await Task.Delay(400);
                     continue;
                 }
-                AdjustToClientArea(this, this.Screen);
+                this.AdjustToClientArea(this.Screen);
                 this.Visibility = visibility;
                 this.Opacity = opacity;
                 return;

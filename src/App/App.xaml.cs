@@ -21,6 +21,7 @@
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.Models;
     using LostTech.Stack.Extensibility.Filters;
+    using LostTech.Stack.ScreenCoordinates;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
     using LostTech.Stack.ViewModels;
@@ -509,7 +510,8 @@
                 if (IsValidScreen(screen)) {
                     await AddLayoutForScreen(screen);
 
-                    if (settings.LayoutMap.NeedsUpdate(screen)) {
+                    if (settings.LayoutMap.NeedsUpdate(screen))
+                    {
                         string defaultOption = settings.LayoutMap.GetPreferredLayout(screen) ?? "Default";
                         defaultOption = Path.GetFileNameWithoutExtension(defaultOption);
                         var selectorViewModel = new LayoutSelectorViewModel {
@@ -522,6 +524,7 @@
                             DataContext = selectorViewModel,
                         };
                         selector.Show();
+                        selector.FitToMargin(screen);
                     }
                 }
                 screen.PropertyChanged += ScreenPropertyChanged;

@@ -262,6 +262,7 @@
     <Compile Include="Models\Serializer.cs" />
     <Compile Include="Models\WindowGroup.cs" />
     <Compile Include="PixelTools.cs" />
+    <Compile Include="ScreenCoordinates\WindowScreenLayouts.cs" />
     <Compile Include="ScreenLayoutSelector.xaml.cs">
       <DependentUpon>ScreenLayoutSelector.xaml</DependentUpon>
     </Compile>

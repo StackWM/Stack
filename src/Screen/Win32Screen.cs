@@ -115,6 +115,13 @@
                 return this.presentationSource.CompositionTarget.TransformFromDevice;
             }
         }
+
+        public Matrix TransformToDevice {
+            get {
+                this.EnsureUpToDate();
+                return this.presentationSource.CompositionTarget.TransformToDevice;
+            }
+        }
         public bool IsActive => this.displayDevice.IsActive;
         public string ID => this.DeviceName.Replace(@"\\.\DISPLAY", "");
         internal string DeviceName => this.displayDevice.Name;
