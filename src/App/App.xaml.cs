@@ -516,8 +516,10 @@
                         defaultOption = Path.GetFileNameWithoutExtension(defaultOption);
                         var selectorViewModel = new LayoutSelectorViewModel {
                             Layouts = layoutsCollection,
+                            Screen = screen,
                             ScreenName = ScreenLayouts.GetDesignation(screen),
                             Selected = defaultOption,
+                            Settings = settings.LayoutMap,
                         };
                         var selector = new ScreenLayoutSelector {
                             LayoutLoader = this.layoutLoader,
