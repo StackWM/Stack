@@ -8,22 +8,17 @@
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
-    using System.Windows.Controls;
     using System.Windows.Forms;
     using System.Windows.Interop;
-    using System.Windows.Markup;
     using System.Windows.Threading;
-    using System.Xml;
     using EventHook;
     using Gma.System.MouseKeyHook;
     using LostTech.App;
     using LostTech.Stack.Behavior;
     using LostTech.Stack.DataBinding;
-    using LostTech.Stack.InternalExtensions;
     using LostTech.Stack.Models;
     using LostTech.Stack.Extensibility.Filters;
     using LostTech.Stack.Settings;
@@ -446,28 +441,28 @@
 
             async Task AddLayoutForScreen(Win32Screen screen)
             {
-                var layout = new ScreenLayout { Opacity = 0 };
+                var layoutTask = this.GetLayoutForScreen(screen, settings, this.layoutsFolder);
+                var layout = new ScreenLayout {
+                    Opacity = 0.7,
+                    Screen = screen,
+                    Title = $"{screen.ID}: {ScreenLayouts.GetDesignation(screen)}"
+                };
                 layout.Closed += this.OnLayoutClosed;
                 layout.QueryContinueDrag += (sender, args) => args.Action = DragAction.Cancel;
+                layout.SizeChanged += LayoutBoundsChanged;
+                layout.LocationChanged += LayoutBoundsChanged;
                 // windows must be visible before calling AdjustToClientArea,
                 // otherwise final position is unpredictable
-                layout.Show();
-                ScreenLayout.AdjustToClientArea(layout, screen);
-                layout.Content = await this.GetLayoutForScreen(screen, settings, this.layoutsFolder);
-                layout.Title = $"{screen.ID}:{layout.Left}x{layout.Top}";
-                layout.DataContext = screen;
-                layout.Hide();
-                layout.Opacity = 0.7;
                 foreach (Zone zone in layout.Zones) {
                     zone.NonFatalErrorOccurred += this.NonCriticalErrorHandler;
                     zone.Id = zone.Id ?? $"{zoneIndex++}";
                 }
                 this.screenLayouts.Add(layout);
-                
+                layout.Content = await layoutTask;
             }
 
             void RemoveLayoutForScreen(Win32Screen screen) {
-                ScreenLayout layout = this.screenLayouts.FirstOrDefault(l => l.Screen == screen);
+                ScreenLayout layout = this.screenLayouts.FirstOrDefault(l => l.Screen?.ID == screen.ID);
                 if (layout != null) {
                     foreach (Zone zone in layout.Zones)
                         zone.NonFatalErrorOccurred -= this.NonCriticalErrorHandler;
@@ -475,6 +470,18 @@
                     layout.Close();
                     this.screenLayouts.Remove(layout);
                 }
+            }
+
+            Task changeGroupTask;
+            async void LayoutBoundsChanged(object sender, EventArgs e) {
+                var layout = (ScreenLayout)sender;
+                Task delay = Task.Delay(millisecondsDelay: 15);
+                changeGroupTask = delay;
+                await delay;
+                if (delay.Equals(changeGroupTask))
+                    layout.Content = await this.GetLayoutForScreen(layout.Screen, settings, this.layoutsFolder);
+                else
+                    Debug.WriteLine("grouped updates!");
             }
 
             async void ScreenPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
@@ -488,8 +495,6 @@
                         var layout = this.screenLayouts.FirstOrDefault(l => l.Screen.ID == screen.ID);
                         if (layout == null)
                             await AddLayoutForScreen(screen);
-                        else
-                            layout.Content = await this.GetLayoutForScreen(screen, settings, this.layoutsFolder);
                     }
                     return;
                 }
