@@ -5,8 +5,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:zones="clr-namespace:LostTech.Stack.Zones;assembly=Stack"
     mc:Ignorable="d"
-    d:DesignWidth="400"
-    d:DesignHeight="240"
+    Width="1024" Height="576"
+    d:DesignWidth="1024"
+    d:DesignHeight="576"
     >
     <!-- for a tutorial on how to lay the zones out,
          see https://www.codeproject.com/Articles/140613/WPF-Tutorial-Layout-Panels-Containers-Layout-Trans

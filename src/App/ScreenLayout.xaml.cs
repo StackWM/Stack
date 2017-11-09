@@ -27,6 +27,11 @@
             this.Hide();
         }
 
+        public void SetLayout(FrameworkElement layout) {
+            layout.Width = layout.Height = double.NaN;
+            this.Content = layout;
+        }
+
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
@@ -94,7 +99,7 @@
 
         Task idleAdjustDelay;
         async void AdjustToScreenWhenIdle() {
-            var delay = Task.Delay(millisecondsDelay: 2000);
+            var delay = Task.Delay(millisecondsDelay: 1000);
             this.idleAdjustDelay = delay;
             await delay;
             if (delay == this.idleAdjustDelay && this.IsLoaded)

@@ -6,8 +6,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:zones="clr-namespace:LostTech.Stack.Zones;assembly=Stack"
     mc:Ignorable="d"
-    d:DesignWidth="640"
-    d:DesignHeight="480"
+    Width="1024" Height="576"
+    d:DesignWidth="1024"
+    d:DesignHeight="576"
 >
     <!-- ===================================================================== -->
     <!-- ! This file is overwritten after every update. Please, modify a copy! -->

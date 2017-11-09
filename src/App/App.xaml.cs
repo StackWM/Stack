@@ -459,7 +459,7 @@
                     zone.Id = zone.Id ?? $"{zoneIndex++}";
                 }
                 this.screenLayouts.Add(layout);
-                layout.Content = await layoutTask;
+                layout.SetLayout(await layoutTask);
             }
 
             void RemoveLayoutForScreen(Win32Screen screen) {
@@ -480,7 +480,7 @@
                 changeGroupTask = delay;
                 await delay;
                 if (delay.Equals(changeGroupTask))
-                    layout.Content = await this.GetLayoutForScreen(layout.Screen, settings, this.layoutsFolder);
+                    layout.SetLayout(await this.GetLayoutForScreen(layout.Screen, settings, this.layoutsFolder));
                 else
                     Debug.WriteLine("grouped updates!");
             }
@@ -583,8 +583,7 @@
                 var layoutToUpdate = this.screenLayouts.FirstOrDefault(
                     layout => layout.Screen?.ID == newRecord.Key 
                     || layout.Screen != null && ScreenLayouts.GetDesignation(layout.Screen) == newRecord.Key);
-                if (layoutToUpdate != null)
-                    layoutToUpdate.Content = await this.GetLayoutForScreen(layoutToUpdate.Screen, this.stackSettings, this.layoutsFolder);
+                layoutToUpdate?.SetLayout(await this.GetLayoutForScreen(layoutToUpdate.Screen, this.stackSettings, this.layoutsFolder));
                 break;
             default:
                 return;

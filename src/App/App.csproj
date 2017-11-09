@@ -241,6 +241,7 @@
     <Compile Include="DataBinding\CopyableObservableCollection.cs" />
     <Compile Include="DataBinding\PropertyHelper.cs" />
     <Compile Include="DataBinding\TransformObservableCollection.cs" />
+    <Compile Include="DataBinding\UniformThicknessConverter.cs" />
     <Compile Include="DataBinding\ValueToBoolConverter.cs" />
     <Compile Include="DebugHelper.cs" />
     <Compile Include="AppDependecy.cs" />
@@ -311,10 +312,6 @@
     <Compile Include="WindowDragOperation.cs" />
     <Compile Include="Windows\DragHook.cs" />
     <Compile Include="Zones\Zone.cs" />
-    <EmbeddedResource Include="OOBLayouts\H 40 inch.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="OOBLayouts\V Top+Rest.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -346,6 +343,14 @@
     <EmbeddedResource Include="OOBLayouts\Large Horizontal Right.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OOBLayouts\Wide Left.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OOBLayouts\Wide Right.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <Page Include="ScreenLayout.xaml">
       <Generator>MSBuild:Compile</Generator>

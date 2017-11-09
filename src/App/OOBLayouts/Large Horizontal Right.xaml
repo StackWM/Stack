@@ -6,8 +6,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:zones="clr-namespace:LostTech.Stack.Zones;assembly=Stack"
     mc:Ignorable="d"
-    d:DesignWidth="640"
-    d:DesignHeight="480"
+    Width="1024" Height="576"
+    d:DesignWidth="1024"
+    d:DesignHeight="576"
 >
     <!-- ===================================================================== -->
     <!-- ! This file is overwritten after every update. Please, modify a copy! -->
@@ -67,10 +68,10 @@
         <zones:Zone Grid.Column="1" Grid.Row="1"/>
 
         <zones:Zone Grid.Column="0" Grid.RowSpan="2"
-                    VerticalAlignment="Center" Height="{StaticResource GripSize}"
+                    Margin="{Binding Source={StaticResource GripSize}, Converter={StaticResource ThicknessConverter}}"
                     Target="{Binding ElementName=LeftMain}"/>
         <zones:Zone Grid.Column="1" Grid.RowSpan="2"
-                    VerticalAlignment="Center" Height="{StaticResource GripSize}"
+                    Margin="{Binding Source={StaticResource GripSize}, Converter={StaticResource ThicknessConverter}}"
                     Target="{Binding ElementName=RightMain}"/>
         <zones:Zone Grid.Row="0" Grid.ColumnSpan="2"
                     HorizontalAlignment="Center" Width="{StaticResource GripSize}"

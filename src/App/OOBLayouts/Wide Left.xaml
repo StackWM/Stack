@@ -6,16 +6,16 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:zones="clr-namespace:LostTech.Stack.Zones;assembly=Stack"
     mc:Ignorable="d"
-    Width="1024" Height="576"
-    d:DesignWidth="1024"
-    d:DesignHeight="576"
+    Width="1050" Height="450"
+    d:DesignWidth="1050"
+    d:DesignHeight="450"
 >
     <!-- ===================================================================== -->
     <!-- ! This file is overwritten after every update. Please, modify a copy! -->
     <!-- ===================================================================== -->
     <Grid.Resources>
         <ResourceDictionary>
-            <sys:Double x:Key="GripSize">80</sys:Double>
+            <sys:Double x:Key="GripSize">200</sys:Double>
         </ResourceDictionary>
     </Grid.Resources>
     
@@ -27,30 +27,21 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <zones:Zone x:Name="Side" Grid.Row="0" Grid.RowSpan="3"/>
-        <zones:Zone x:Name="SideTop" Grid.Row="0" Grid.RowSpan="2"/>
-        <zones:Zone x:Name="SideBottom" Grid.Row="1" Grid.RowSpan="2"/>
+        <zones:Zone x:Name="Side" Grid.Row="0" Grid.RowSpan="2"/>
 
         <zones:Zone Grid.Row="0"/>
-        <zones:Zone Grid.Row="0" Height="{StaticResource GripSize}" Target="{Binding ElementName=Side}" VerticalAlignment="Top"/>
         <zones:Zone Grid.Row="1"/>
-        <zones:Zone Grid.Row="2"/>
-
-        <zones:Zone Grid.Row="0" Grid.RowSpan="2" Height="{StaticResource GripSize}"
-                    Target="{Binding ElementName=SideTop}"/>
-        <zones:Zone Grid.Row="1" Grid.RowSpan="2" Height="{StaticResource GripSize}"
-                    Target="{Binding ElementName=SideBottom}"/>
+        <zones:Zone Grid.RowSpan="2" Height="{StaticResource GripSize}" Target="{Binding ElementName=Side}"/>
     </Grid>
 
     <zones:Zone x:Name="Main" Grid.Column="1"/>
 
     <Grid Grid.Column="1">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="9*"/>
+            <ColumnDefinition Width="6*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -73,15 +64,9 @@
         <zones:Zone Grid.Column="1" Grid.RowSpan="2"
                     Margin="{Binding Source={StaticResource GripSize}, Converter={StaticResource ThicknessConverter}}"
                     Target="{Binding ElementName=RightMain}"/>
-        <zones:Zone Grid.Row="0" Grid.ColumnSpan="2"
-                    HorizontalAlignment="Center" Width="{StaticResource GripSize}"
-                    Target="{Binding ElementName=TopMain}"/>
-        <zones:Zone Grid.Row="1" Grid.ColumnSpan="2"
-                    HorizontalAlignment="Center" Width="{StaticResource GripSize}"
-                    Target="{Binding ElementName=BottomMain}"/>
     </Grid>
     
     <zones:Zone Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
-                Width="160" Height="160"
+                Width="360" Height="360"
                 Target="{Binding ElementName=Main}"/>
 </Grid>
