@@ -297,13 +297,7 @@
             menuItem.Checked = true;
 
             var mapping = (KeyValuePair<Win32Screen, string>) menuItem.Tag;
-            int entryIndex = this.stackSettings.LayoutMap.GetPreferredLayoutIndex(mapping.Key);
-            string screenDesignation = ScreenLayouts.GetDesignation(mapping.Key);
-            var newMapping = new MutableKeyValuePair<string, string>(screenDesignation, mapping.Value + ".xaml");
-            if (entryIndex < 0)
-                this.stackSettings.LayoutMap.Map.Add(newMapping);
-            else
-                this.stackSettings.LayoutMap.Map[entryIndex] = newMapping;
+            this.stackSettings.LayoutMap.SetPreferredLayout(mapping.Key, mapping.Value + ".xaml");
         }
 
         [DllImport("shell32.dll")]

@@ -4,9 +4,11 @@ namespace LostTech.Stack.Settings
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Runtime.Serialization;
     using System.Windows;
+    using JetBrains.Annotations;
     using LostTech.App.DataBinding;
     using LostTech.Stack.Models;
     using LostTech.Windows;
@@ -49,6 +51,24 @@ namespace LostTech.Stack.Settings
                 if (designation == this.Map[i].Key || this.Map[i].Key == screen.ID)
                     return i;
             return -1;
+        }
+
+        public void SetPreferredLayout([NotNull] Win32Screen screen, [NotNull] string fileName) {
+            if (screen == null)
+                throw new ArgumentNullException(nameof(screen));
+            if (string.IsNullOrEmpty(fileName))
+                throw new ArgumentNullException(nameof(fileName));
+            char[] invalidChars = Path.GetInvalidFileNameChars();
+            if (fileName.Any(invalidChars.Contains))
+                throw new ArgumentException($"{nameof(fileName)} contains invalid chars", paramName: nameof(fileName));
+
+            string key = GetDesignation(screen);
+            int existingEntryIndex = this.GetPreferredLayoutIndex(screen);
+            var entry = new MutableKeyValuePair<string, string>(key, fileName);
+            if (existingEntryIndex < 0)
+                this.Map.Add(entry);
+            else
+                this.Map[existingEntryIndex] = entry;
         }
 
         public bool NeedsUpdate(Win32Screen screen) {
