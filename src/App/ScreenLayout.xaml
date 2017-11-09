@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:LostTech.Stack"
         mc:Ignorable="d"
         AllowsTransparency="True"
+        DataContextChanged="OnDataContextChanged"
         ShowInTaskbar="False" ShowActivated="False"
         Topmost="True"
         Background="#80FFFFFF"

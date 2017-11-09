@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
@@ -22,6 +23,8 @@
         public ScreenLayout()
         {
             this.InitializeComponent();
+            this.Show();
+            this.Hide();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -56,12 +59,29 @@
             set => this.DataContext = value;
         }
 
+        void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
+            if (e.OldValue is Win32Screen old)
+                old.PropertyChanged -= this.OnScreenPropertyChanged;
+            if (e.NewValue is Win32Screen @new) {
+                @new.PropertyChanged += this.OnScreenPropertyChanged;
+                this.AdjustToScreenWhenIdle();
+            }
+        }
+
+        void OnScreenPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            switch (e.PropertyName) {
+            case nameof(this.Screen.WorkingArea):
+            case nameof(this.Screen.TransformFromDevice):
+                this.AdjustToScreenWhenIdle();
+                break;
+            }
+        }
+
         public static void AdjustToClientArea(Window window, Win32Screen screen)
         {
             if (screen == null)
                 throw new ArgumentNullException(nameof(screen));
 
-            Debug.WriteLine(screen.WorkingArea);
             var transformFromDevice = screen.TransformFromDevice;
             var topLeft = transformFromDevice.Transform(screen.WorkingArea.TopLeft);
             window.Left = topLeft.X;
@@ -71,7 +91,6 @@
             var dimensions = transformFromDevice.Transform(size);
             window.Width = dimensions.X;
             window.Height = dimensions.Y;
-            Debug.WriteLine($"{screen.ID} WPF: {window.Width}x{window.Height}");
         }
 
         public void AdjustToClientArea()
@@ -90,8 +109,7 @@
         }
 
         Task idleAdjustDelay;
-        async void AdjustToScreenWhenIdle()
-        {
+        async void AdjustToScreenWhenIdle() {
             var delay = Task.Delay(millisecondsDelay: 2000);
             this.idleAdjustDelay = delay;
             await delay;
@@ -108,13 +126,13 @@
                 var opacity = this.Opacity;
                 var visibility = this.Visibility;
                 this.Opacity = 0;
-                AdjustToClientArea(this, this.Screen);
                 try {
                     this.Show();
                 } catch (InvalidOperationException) {
                     await Task.Delay(400);
                     continue;
                 }
+                AdjustToClientArea(this, this.Screen);
                 this.Visibility = visibility;
                 this.Opacity = opacity;
                 return;
