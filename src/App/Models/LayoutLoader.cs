@@ -19,6 +19,7 @@
     {
         readonly StringBuilder problems = new StringBuilder();
         readonly IFolder layoutDirectory;
+        readonly Stopwatch loadTimer = new Stopwatch();
 
         public LayoutLoader(IFolder layoutDirectory) {
             this.layoutDirectory = layoutDirectory ?? throw new ArgumentNullException(nameof(layoutDirectory));
@@ -33,6 +34,7 @@
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentNullException(nameof(fileName));
 
+            this.loadTimer.Restart();
 
             if (Path.GetInvalidFileNameChars().Any(fileName.Contains))
                 throw new ArgumentException();
@@ -43,17 +45,18 @@
                 return MakeDefaultLayout();
             }
 
+            FrameworkElement layout;
             using (var stream = await file.OpenAsync(FileAccess.Read))
             using (var xmlReader = XmlReader.Create(stream)) {
                 try {
-                    var layout = (FrameworkElement)XamlReader.Load(xmlReader);
-                    Debug.WriteLine($"loaded layout {fileName}");
-                    return layout;
+                    layout = (FrameworkElement)XamlReader.Load(xmlReader);
                 } catch (XamlParseException e) {
                     this.problems.AppendLine($"{file.Name}: {e.Message}");
                     return MakeDefaultLayout();
                 }
             }
+            Debug.WriteLine($"loaded layout {fileName} in {this.loadTimer.ElapsedMilliseconds}ms");
+            return layout;
         }
 
         public string Problems => this.problems.ToString();
