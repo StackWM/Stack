@@ -39,6 +39,7 @@
                     layout.Width = 1024;
                 if (double.IsNaN(layout.Height))
                     layout.Height = 1024;
+                this.Width = this.Height * layout.Width / layout.Height;
                 this.Viewbox.Child = layout;
             } else
                 this.Viewbox.Child = null;

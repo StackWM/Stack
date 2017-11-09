@@ -43,7 +43,7 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Vertical">
-                        <views:LayoutPreview Width="260" Height="260" Background="White" Margin="12"
+                        <views:LayoutPreview Height="260" Background="White" Margin="12"
                                              LayoutLoader="{Binding LayoutLoader,ElementName=Self,Mode=OneWay}"/>
                         <TextBlock Foreground="Black" FontSize="24" TextAlignment="Center" Text="{Binding}" Margin="20,0,20,20"/>
                     </StackPanel>
