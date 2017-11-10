@@ -37,6 +37,7 @@
                   BorderThickness="0"
                   IsSynchronizedWithCurrentItem="False"
                   ItemsSource="{Binding Layouts, Mode=OneWay}"
+                  SelectionChanged="Layouts_OnSelectionChanged"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListView.ItemsPanel><ItemsPanelTemplate><WrapPanel IsItemsHost="True"/></ItemsPanelTemplate></ListView.ItemsPanel>
             

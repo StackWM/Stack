@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Windows;
-
+    using System.Windows.Controls;
     using LostTech.Stack.Models;
 
     public partial class ScreenLayoutSelector
@@ -23,8 +23,16 @@
                 typeof(ScreenLayoutSelector), new PropertyMetadata(null));
 
         void ScreenLayoutSelector_OnLoaded(object sender, RoutedEventArgs e) {
+            this.ScrollToSelection();
+        }
+
+        internal void ScrollToSelection() {
             if (this.Layouts.SelectedIndex >= 0)
                 this.Layouts.ScrollIntoView(this.Layouts.SelectedItem);
+        }
+
+        void Layouts_OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
+            this.ScrollToSelection();
         }
     }
 }

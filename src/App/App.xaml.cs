@@ -527,6 +527,8 @@
                         };
                         selector.Show();
                         selector.FitToMargin(screen);
+                        selector.UpdateLayout();
+                        selector.ScrollToSelection();
                     }
                 }
                 screen.PropertyChanged += ScreenPropertyChanged;
