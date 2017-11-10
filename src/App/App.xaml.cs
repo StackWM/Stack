@@ -694,7 +694,9 @@
             return IntPtr.Zero;
         }
 
-        public static Version Version => Assembly.GetExecutingAssembly().GetName().Version;
+        public static Version Version => IsUwp
+            ? global::Windows.ApplicationModel.Package.Current.Id.Version.ToVersion()
+            : Assembly.GetExecutingAssembly().GetName().Version;
 
         public int DragThreshold { get; private set; } = 40;
         public static void Restart() { Process.Start(Process.GetCurrentProcess().MainModule.FileName); }

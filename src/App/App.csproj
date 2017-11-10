@@ -286,6 +286,7 @@
     <Compile Include="Utils\DragHookEventArgs.cs" />
     <Compile Include="Utils\EnumUtils.cs" />
     <Compile Include="Utils\RectExtensions.cs" />
+    <Compile Include="Utils\VersionUtils.cs" />
     <Compile Include="ViewModels\LayoutSelectorViewModel.cs" />
     <Compile Include="ViewModels\SimpleViewModel.cs" />
     <Compile Include="Views\LayoutPreview.xaml.cs">
