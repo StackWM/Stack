@@ -1,6 +1,7 @@
 ﻿namespace LostTech.Stack
 {
     using System;
+    using System.Linq;
 
     public class AppDependecy
     {
@@ -18,7 +19,7 @@
         public string License { get; set; }
         public Uri Uri { get; set; }
 
-        public static AppDependecy[] Dependencies { get; } = {
+        public static AppDependecy[] Dependencies { get; } = new[]{
             new AppDependecy(nameof(PCLStorage)){ Uri = new Uri("https://github.com/dsplaisted/PCLStorage"), License = "MS-PL"},
             new AppDependecy(nameof(Validation)){Uri = new Uri("https://github.com/aarnott/Validation"), License = "MS-PL"},
             new AppDependecy(nameof(Microsoft.HockeyApp)){Uri = new Uri("https://hockeyapp.net/"), License = "MIT"},
@@ -30,6 +31,6 @@
             new AppDependecy(nameof(EventHook), uri: "https://github.com/justcoding121/Windows-User-Action-Hook", license: "MIT"),
             new AppDependecy("Nito.AsyncEx", uri: "https://github.com/StephenCleary/AsyncEx", license: "MIT"),
             new AppDependecy("DesktopBridge.Helpers", uri: "https://github.com/qmatteoq/DesktopBridgeHelpers", license: "MIT"),
-        };
+        }.OrderBy(dependency => dependency.Name).ToArray();
     }
 }
