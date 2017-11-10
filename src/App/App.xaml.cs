@@ -514,6 +514,7 @@
                         string defaultOption = settings.LayoutMap.GetPreferredLayout(screen)
                                                ?? this.GetSuggestedLayout(screen);
                         defaultOption = Path.GetFileNameWithoutExtension(defaultOption);
+                        settings.LayoutMap.SetPreferredLayout(screen, fileName: $"{defaultOption}.xaml");
                         var selectorViewModel = new LayoutSelectorViewModel {
                             Layouts = layoutsCollection,
                             Screen = screen,
@@ -569,9 +570,12 @@
                                .Where(IsValidScreen)
                                .OrderBy(s => s.WorkingArea.Left)
                                .Select(s => s.ID).ToArray();
-            bool isOnTheRight = screens.Length > 1 && screens[0] != screen.ID;
+            bool isOnTheRight = screens.Length > 1 && screens.Last() == screen.ID;
+            bool isBig = screen.TransformFromDevice.Transform((Vector)screen.WorkingArea.Size).X > 2000;
+            bool isWide = screen.WorkingArea.Width > 2.1 * screen.WorkingArea.Height;
             string leftOrRight = isOnTheRight ? "Right" : "Left";
-            return $"Large Horizontal {leftOrRight}";
+            string kind = isWide ? "Wide" : isBig ? "Large Horizontal" : "Small Horizontal";
+            return $"{kind} {leftOrRight}";
         }
 
         static bool IsValidScreen(Win32Screen screen) => screen.IsActive && screen.WorkingArea.Width > 1 && screen.WorkingArea.Height > 1;
