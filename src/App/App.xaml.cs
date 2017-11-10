@@ -626,9 +626,8 @@
         internal static Assembly GetResourceContainer() => Assembly.GetExecutingAssembly();
         async Task<FrameworkElement> GetLayoutForScreen(Win32Screen screen, StackSettings settings, IFolder layoutsDirectory)
         {
-            var layout = settings.LayoutMap.GetPreferredLayout(screen);
-            if (layout == null)
-                return LayoutLoader.MakeDefaultLayout();
+            string layout = settings.LayoutMap.GetPreferredLayout(screen) 
+                          ?? $"{this.GetSuggestedLayout(screen)}.xaml";
             return await this.layoutLoader.LoadLayoutOrDefault(layout);
         }
 
