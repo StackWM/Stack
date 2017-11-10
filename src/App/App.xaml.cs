@@ -427,8 +427,7 @@
         async Task StartLayout(StackSettings settings)
         {
             this.layoutsFolder = await this.roamingSettingsFolder.CreateFolderAsync("Layouts", CreationCollisionOption.OpenIfExists);
-            if ((await this.layoutsFolder.GetFilesAsync()).Count == 0)
-                await this.InstallDefaultLayouts(this.layoutsFolder);
+            await this.InstallDefaultLayouts(this.layoutsFolder);
             this.layoutLoader = new LayoutLoader(this.layoutsFolder);
 
             this.layoutsDirectory = new ObservableDirectory(this.layoutsFolder.Path);
@@ -595,14 +594,21 @@
         internal static readonly string OutOfBoxLayoutsResourcePrefix = typeof(App).Namespace + ".OOBLayouts.";
         LostTech.App.Settings localSettings;
 
-        async Task InstallDefaultLayouts(IFolder destination)
-        {
+        async Task InstallDefaultLayouts(IFolder destination) {
+            IList<IFile> layoutFiles = await this.layoutsFolder.GetFilesAsync().ConfigureAwait(false);
+
+            DateTime appTimestamp = File.GetLastWriteTimeUtc(Assembly.GetExecutingAssembly().Location);
+
             var resourceContainer = GetResourceContainer();
             foreach (var resource in resourceContainer.GetManifestResourceNames()
                                                       .Where(name => name.StartsWith(OutOfBoxLayoutsResourcePrefix))) {
                 var name = resource.Substring(OutOfBoxLayoutsResourcePrefix.Length);
+                IFile existing = layoutFiles.FirstOrDefault(file => Path.GetFullPath(file.Name) == Path.GetFullPath(name));
+                if (existing != null && File.GetLastWriteTimeUtc(existing.Path) > appTimestamp)
+                    continue;
+
                 using (var stream = resourceContainer.GetManifestResourceStream(resource)) {
-                    var file = await destination.CreateFileAsync(name, CreationCollisionOption.FailIfExists).ConfigureAwait(false);
+                    IFile file = await destination.CreateFileAsync(name, CreationCollisionOption.ReplaceExisting).ConfigureAwait(false);
                     using (var targetStream = await file.OpenAsync(FileAccess.ReadAndWrite).ConfigureAwait(false)) {
                         await stream.CopyToAsync(targetStream).ConfigureAwait(false);
                         targetStream.Close();
