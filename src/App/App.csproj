@@ -483,9 +483,6 @@
     <EmbeddedResource Include="StoreTerms.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release'">
-    <Exec Command="signtool sign /v /n &quot;Lost Tech LLC&quot; /t http://timestamp.verisign.com/scripts/timstamp.dll $(TargetPath)" />
-  </Target>
   <Import Project="..\..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
