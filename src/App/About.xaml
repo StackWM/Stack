@@ -8,6 +8,7 @@
         xmlns:art="clr-namespace:Art.Stack"
         mc:Ignorable="d"
         Title="About Stack"
+        Icon="StackTaskbarIcon.ico" ShowIconOnTitleBar="False"
         BorderThickness="1" BorderBrush="Black"
         WindowStartupLocation="CenterScreen"
         Width="500"

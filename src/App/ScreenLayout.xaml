@@ -10,7 +10,8 @@
         ShowInTaskbar="False" ShowActivated="False"
         Topmost="True"
         Background="#80FFFFFF"
-        Title="Layout Editor" Height="350" Width="525" ResizeMode="NoResize" WindowStyle="None">
+        Title="Layout Editor" Icon="StackTaskbarIcon.ico"
+        Height="350" Width="525" ResizeMode="NoResize" WindowStyle="None">
     <Window.Resources>
         <ResourceDictionary Source="Themes/Generic.xaml"/>
     </Window.Resources>

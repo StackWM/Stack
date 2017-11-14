@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:LostTech.Stack"
         mc:Ignorable="d"
         WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen"
-        Title="Stack Terms &amp; Conditions"
+        Title="Stack Terms &amp; Conditions" Icon="StackTaskbarIcon.ico"
         Height="720" Width="600"
         >
     <Window.Resources>

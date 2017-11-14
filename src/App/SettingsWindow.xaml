@@ -12,6 +12,7 @@
         BorderThickness="1" BorderBrush="Black"
         mc:Ignorable="d"
         Title="Stack Settings: changes here might require application to be restarted!"
+        Icon="StackTaskbarIcon.ico" ShowIconOnTitleBar="False"
         Height="480" Width="800"
         WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignInstance Type=settings:StackSettings, IsDesignTimeCreatable=True}"
