@@ -38,8 +38,9 @@ namespace LostTech.Stack.Settings
             if (screen == null)
                 throw new ArgumentNullException(nameof(screen));
             string designation = GetDesignation(screen);
-            return this.Map.FirstOrDefault(kv => kv.Key == designation)?.Value
-                ?? this.Map.FirstOrDefault(kv => kv.Key == screen.ID)?.Value;
+            string layoutByDesignation = this.Map.FirstOrDefault(kv => kv.Key == designation)?.Value;
+            string finalLayout = layoutByDesignation ?? this.Map.FirstOrDefault(kv => kv.Key == screen.ID)?.Value;
+            return finalLayout;
         }
 
         public int GetPreferredLayoutIndex(Win32Screen screen)
