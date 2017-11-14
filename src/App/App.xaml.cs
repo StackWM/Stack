@@ -8,6 +8,7 @@
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
@@ -657,7 +658,7 @@
             get {
                 string path;
                 if (IsUwp) {
-                    path = global::Windows.Storage.ApplicationData.Current.LocalFolder.Path;
+                    path = GetUwpAppData();
                 } else {
                     string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                     path = Path.Combine(appData, "Lost Tech LLC", nameof(Stack));
@@ -666,12 +667,15 @@
             }
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static string GetUwpAppData() => global::Windows.Storage.ApplicationData.Current.LocalFolder.Path;
+
         public static DirectoryInfo RoamingAppData
         {
             get {
                 string path;
                 if (IsUwp) {
-                    path = global::Windows.Storage.ApplicationData.Current.RoamingFolder.Path;
+                    path = GetUwpRoamingAppData();
                 } else {
                     var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                     path = Path.Combine(appData, "Lost Tech LLC", nameof(Stack));
@@ -679,6 +683,9 @@
                 return Directory.CreateDirectory(path);
             }
         }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static string GetUwpRoamingAppData() => global::Windows.Storage.ApplicationData.Current.RoamingFolder.Path;
 
         private void SetupScreenHooks()
         {
@@ -695,8 +702,10 @@
         }
 
         public static Version Version => IsUwp
-            ? global::Windows.ApplicationModel.Package.Current.Id.Version.ToVersion()
+            ? GetUwpVersion()
             : Assembly.GetExecutingAssembly().GetName().Version;
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static Version GetUwpVersion() => global::Windows.ApplicationModel.Package.Current.Id.Version.ToVersion();
 
         public int DragThreshold { get; private set; } = 40;
         public static void Restart() { Process.Start(Process.GetCurrentProcess().MainModule.FileName); }
