@@ -22,6 +22,7 @@
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.Models;
     using LostTech.Stack.Extensibility.Filters;
+    using LostTech.Stack.Licensing;
     using LostTech.Stack.ScreenCoordinates;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
@@ -99,6 +100,11 @@
                     IsEnabled = true,
                 };
                 this.updateTimer.Tick += (_, __) => this.BeginCheckForUpdates();
+            }
+
+            if (await Expiration.HasExpired()) {
+                this.Shutdown(2);
+                return;
             }
 
             this.localSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(AppData.FullName);
