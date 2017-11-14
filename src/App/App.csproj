@@ -243,7 +243,6 @@
     <Compile Include="DataBinding\PropertyHelper.cs" />
     <Compile Include="DataBinding\TransformObservableCollection.cs" />
     <Compile Include="DataBinding\UniformThicknessConverter.cs" />
-    <Compile Include="DataBinding\ValueToBoolConverter.cs" />
     <Compile Include="DebugHelper.cs" />
     <Compile Include="AppDependecy.cs" />
     <Compile Include="IOExtensions.cs" />
