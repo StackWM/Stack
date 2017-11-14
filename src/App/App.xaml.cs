@@ -557,7 +557,7 @@
             if (!settings.Notifications.IamInTrayDone) {
                 settings.Notifications.IamInTrayDone = true;
                 this.trayIcon.BalloonTipTitle = "Stack";
-                this.trayIcon.BalloonTipText = "Find me in the system tray!";
+                this.trayIcon.BalloonTipText = "You can now move windows around using middle mouse button or Win+Arrow";
                 this.trayIcon.BalloonTipIcon = ToolTipIcon.Info;
                 this.trayIcon.ShowBalloonTip(30);
             }
