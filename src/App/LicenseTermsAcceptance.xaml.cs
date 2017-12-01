@@ -1,6 +1,7 @@
 ﻿namespace LostTech.Stack
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Reflection;
     using System.Security.Cryptography;
@@ -21,7 +22,13 @@
             this.LicenseContent.Navigated += delegate {
                 this.LicenseContent.Navigating += (_, args) => {
                     args.Cancel = true;
-                    Launcher.LaunchUriAsync(args.Uri).GetAwaiter();
+                    if (!"http".Equals(args.Uri.Scheme, StringComparison.InvariantCultureIgnoreCase)
+                        && !"https".Equals(args.Uri.Scheme, StringComparison.InvariantCultureIgnoreCase))
+                        return;
+                    if (new DesktopBridge.Helpers().IsRunningAsUwp())
+                        Launcher.LaunchUriAsync(args.Uri).GetAwaiter();
+                    else
+                        Process.Start(args.Uri.AbsoluteUri);
                 };
             };
         }
