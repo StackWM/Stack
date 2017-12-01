@@ -42,7 +42,7 @@
     <EntryPointProjectUniqueName>..\App\App.csproj</EntryPointProjectUniqueName>
     <PackageCertificateThumbprint>7A9C98BDFEDEC4A68F85E0B6D417C02E2D243EF4</PackageCertificateThumbprint>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
-    <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
+    <AppxBundlePlatforms>neutral</AppxBundlePlatforms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <AppxBundle>Always</AppxBundle>

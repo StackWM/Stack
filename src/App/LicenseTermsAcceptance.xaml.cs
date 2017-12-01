@@ -5,6 +5,7 @@
     using System.Reflection;
     using System.Security.Cryptography;
     using System.Windows;
+    using global::Windows.System;
 
     /// <summary>
     /// Interaction logic for LicenseTermsAcceptance.xaml
@@ -17,6 +18,12 @@
 
             Stream resource = GetTermsAndCondtions();
             this.LicenseContent.NavigateToStream(resource);
+            this.LicenseContent.Navigated += delegate {
+                this.LicenseContent.Navigating += (_, args) => {
+                    args.Cancel = true;
+                    Launcher.LaunchUriAsync(args.Uri).GetAwaiter();
+                };
+            };
         }
 
         static Stream GetTermsAndCondtions()
