@@ -37,6 +37,10 @@
 
         <TextBlock Margin="0,12">Powered by Microsoft .NET Framework</TextBlock>
 
+        <TextBlock Margin="0,12"><Hyperlink NavigateUri="http://myapppolicy.com/app/stack"
+                                            ToolTip="http://myapppolicy.com/app/stack"
+                                            RequestNavigate="Hyperlink_RequestNavigate">Privacy Policy</Hyperlink></TextBlock>
+
         <TextBlock Margin="0,12,0,0">Third-party software:</TextBlock>
         <ItemsControl
             ItemsSource="{x:Static local:AppDependecy.Dependencies}"
