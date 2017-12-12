@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LostTech.Stack"
         mc:Ignorable="d"
-        WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen"
+        ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen"
         Title="Stack Terms &amp; Conditions" Icon="StackTaskbarIcon.ico"
         Height="720" Width="600"
         >
