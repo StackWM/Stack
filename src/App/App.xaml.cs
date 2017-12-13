@@ -138,7 +138,8 @@
             }
             settings.Behaviors.AddMissingBindings();
 
-            if (settings.Notifications.AcceptedTerms != LicenseTermsAcceptance.GetTermsAndConditionsVersion()) {
+            bool termsVersionMismatch = settings.Notifications.AcceptedTerms != LicenseTermsAcceptance.GetTermsAndConditionsVersion();
+            if (termsVersionMismatch) {
                 var termsWindow = new LicenseTermsAcceptance();
                 if (!true.Equals(termsWindow.ShowDialog())) {
                     this.Shutdown();
@@ -148,8 +149,11 @@
                 settings.Notifications.AcceptedTerms = LicenseTermsAcceptance.GetTermsAndConditionsVersion();
             }
 
-            if (!this.winApiHandler.IsLoaded)
+            if (!this.winApiHandler.IsLoaded) {
+                if (termsVersionMismatch)
+                    Restart();
                 return;
+            }
 
             this.SettingsWindow = new SettingsWindow{ DataContext = settings };
 
@@ -507,7 +511,7 @@
                 }
             }
 
-            var layoutsCollection = new TransformObservableCollection<string, ObservableFile, 
+            var layoutsCollection = new TransformObservableCollection<string, ObservableFile,
                 ReadOnlyObservableCollection<ObservableFile>>(
                 this.layoutsDirectory.Files,
                 file => Path.GetFileNameWithoutExtension(file.FullName));
@@ -593,7 +597,7 @@
             case NotifyCollectionChangedAction.Replace when change.OldItems.Count == 1:
                 var newRecord = change.NewItems.OfType<MutableKeyValuePair<string, string>>().Single();
                 var layoutToUpdate = this.screenLayouts.FirstOrDefault(
-                    layout => layout.Screen?.ID == newRecord.Key 
+                    layout => layout.Screen?.ID == newRecord.Key
                     || layout.Screen != null && ScreenLayouts.GetDesignation(layout.Screen) == newRecord.Key);
                 layoutToUpdate?.SetLayout(await this.GetLayoutForScreen(layoutToUpdate.Screen, this.stackSettings, this.layoutsFolder));
                 break;
@@ -633,7 +637,7 @@
         internal static Assembly GetResourceContainer() => Assembly.GetExecutingAssembly();
         async Task<FrameworkElement> GetLayoutForScreen(Win32Screen screen, StackSettings settings, IFolder layoutsDirectory)
         {
-            string layout = settings.LayoutMap.GetPreferredLayout(screen) 
+            string layout = settings.LayoutMap.GetPreferredLayout(screen)
                           ?? $"{this.GetSuggestedLayout(screen)}.xaml";
             return await this.layoutLoader.LoadLayoutOrDefault(layout);
         }
