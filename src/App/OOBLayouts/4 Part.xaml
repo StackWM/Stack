@@ -16,6 +16,7 @@
     <Grid.Resources>
         <ResourceDictionary>
             <system:Double x:Key="GripSize">80</system:Double>
+            <system:Double x:Key="GripFontSize">40</system:Double>
         </ResourceDictionary>
     </Grid.Resources>
     
@@ -47,14 +48,30 @@
         <zones:Zone Grid.Column="1" Grid.RowSpan="2"
                     Margin="{Binding Source={StaticResource GripSize}, Converter={StaticResource ThicknessConverter}}"
                     Target="{Binding ElementName=RightMain}"/>
+        <Border Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Width="{StaticResource GripSize}" Background="#44F">
+            <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontFamily="Segoe UI Symbol" Foreground="White" Text="" FontSize="{StaticResource GripFontSize}"/>
+        </Border>
         <zones:Zone Grid.Row="0" Grid.ColumnSpan="2"
                     HorizontalAlignment="Center" Width="{StaticResource GripSize}"
                     Target="{Binding ElementName=TopMain}"/>
+        <Border Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" Width="{StaticResource GripSize}" Background="#44F">
+            <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontFamily="Segoe UI Symbol" Foreground="White" Text="" FontSize="{StaticResource GripFontSize}"/>
+        </Border>
         <zones:Zone Grid.Row="1" Grid.ColumnSpan="2"
                     HorizontalAlignment="Center" Width="{StaticResource GripSize}"
                     Target="{Binding ElementName=BottomMain}"/>
     </Grid>
 
+    <Border Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Width="160" Height="160" Background="#44F">
+        <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontFamily="Segoe UI Symbol" Foreground="White" Text="" FontSize="80"/>
+    </Border>
     <zones:Zone Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
                 Width="160" Height="160"
                 Target="{Binding ElementName=Main}"/>

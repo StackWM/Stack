@@ -16,6 +16,7 @@
     <Grid.Resources>
         <ResourceDictionary>
             <sys:Double x:Key="GripSize">200</sys:Double>
+            <sys:Double x:Key="GripFontSize">100</sys:Double>
         </ResourceDictionary>
     </Grid.Resources>
     
@@ -33,6 +34,11 @@
 
         <zones:Zone Grid.Row="0"/>
         <zones:Zone Grid.Row="1"/>
+        <Border Grid.RowSpan="2" Height="{StaticResource GripSize}" Background="#44F">
+            <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontFamily="Segoe UI Symbol" Foreground="White" Text="⇕" FontSize="{StaticResource GripFontSize}"/>
+        </Border>
         <zones:Zone Grid.RowSpan="2" Height="{StaticResource GripSize}" Target="{Binding ElementName=Side}"/>
     </Grid>
 

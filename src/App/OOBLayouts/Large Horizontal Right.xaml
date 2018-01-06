@@ -45,8 +45,28 @@
         <zones:Zone Grid.Row="1"/>
         <zones:Zone Grid.Row="2"/>
 
+        <Border Grid.Row="0" Grid.RowSpan="2" Height="{StaticResource GripSize}" Background="#44F">
+            <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                       RenderTransformOrigin="0.5,0.5"
+                   FontFamily="Segoe UI Symbol" Foreground="White" Text="" FontSize="{StaticResource GripFontSize}">
+                <TextBlock.RenderTransform>
+                    <RotateTransform Angle="90"/>
+                </TextBlock.RenderTransform>
+            </TextBlock>
+        </Border>
         <zones:Zone Grid.Row="0" Grid.RowSpan="2" Height="{StaticResource GripSize}"
                     Target="{Binding ElementName=SideTop}"/>
+        <Border Grid.Row="1" Grid.RowSpan="2" Height="{StaticResource GripSize}" Background="#44F">
+            <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                       RenderTransformOrigin="0.5,0.5"
+                   FontFamily="Segoe UI Symbol" Foreground="White" Text="" FontSize="{StaticResource GripFontSize}">
+                <TextBlock.RenderTransform>
+                    <RotateTransform Angle="90"/>
+                </TextBlock.RenderTransform>
+            </TextBlock>
+        </Border>
         <zones:Zone Grid.Row="1" Grid.RowSpan="2" Height="{StaticResource GripSize}"
                     Target="{Binding ElementName=SideBottom}"/>
     </Grid>
@@ -79,9 +99,19 @@
         <zones:Zone Grid.Column="1" Grid.RowSpan="2"
                     Margin="{Binding Source={StaticResource GripSize}, Converter={StaticResource ThicknessConverter}}"
                     Target="{Binding ElementName=RightMain}"/>
+        <Border Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Width="{StaticResource GripSize}" Background="#44F">
+            <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontFamily="Segoe UI Symbol" Foreground="White" Text="" FontSize="{StaticResource GripFontSize}"/>
+        </Border>
         <zones:Zone Grid.Row="0" Grid.ColumnSpan="2"
                     HorizontalAlignment="Center" Width="{StaticResource GripSize}"
                     Target="{Binding ElementName=TopMain}"/>
+        <Border Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" Width="{StaticResource GripSize}" Background="#44F">
+            <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontFamily="Segoe UI Symbol" Foreground="White" Text="" FontSize="{StaticResource GripFontSize}"/>
+        </Border>
         <zones:Zone Grid.Row="1" Grid.ColumnSpan="2"
                     HorizontalAlignment="Center" Width="{StaticResource GripSize}"
                     Target="{Binding ElementName=BottomMain}"/>
