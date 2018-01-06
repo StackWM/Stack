@@ -65,7 +65,13 @@
                     Margin="{Binding Source={StaticResource GripSize}, Converter={StaticResource ThicknessConverter}}"
                     Target="{Binding ElementName=RightMain}"/>
     </Grid>
-    
+
+    <Border Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Width="360" Height="360" Background="#44F">
+        <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontFamily="Segoe UI Symbol" Foreground="White" Text="" FontSize="180"/>
+    </Border>
     <zones:Zone Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
                 Width="360" Height="360"
                 Target="{Binding ElementName=Main}"/>

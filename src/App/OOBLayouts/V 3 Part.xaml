@@ -1,0 +1,48 @@
+﻿<Grid
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:zones="clr-namespace:LostTech.Stack.Zones;assembly=Stack"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Width="576" Height="1024"
+    d:DesignWidth="576"
+    d:DesignHeight="1024"
+    >
+    
+    <!-- ===================================================================== -->
+    <!-- ! This file is overwritten after every update. Please, modify a copy! -->
+    <!-- ===================================================================== -->
+    <Grid.Resources>
+        <ResourceDictionary>
+            <sys:Double x:Key="GripSize">80</sys:Double>
+            <sys:Double x:Key="GripFontSize">40</sys:Double>
+        </ResourceDictionary>
+    </Grid.Resources>
+    
+    <Grid.RowDefinitions>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <zones:Zone x:Name="Full" Grid.Row="0" Grid.RowSpan="3"/>
+    <zones:Zone x:Name="Top" Grid.Row="0" Grid.RowSpan="2"/>
+    <zones:Zone x:Name="Bottom" Grid.Row="1" Grid.RowSpan="2"/>
+
+    <zones:Zone Grid.Row="0"/>
+    <Border Grid.Row="0" Height="{StaticResource GripSize}" VerticalAlignment="Top" Background="#44F">
+        <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontFamily="Segoe UI Symbol" Foreground="White" Text="⇕" FontSize="{StaticResource GripFontSize}"/>
+    </Border>
+    <zones:Zone Grid.Row="0" Height="{StaticResource GripSize}" Target="{Binding ElementName=Full}" VerticalAlignment="Top"/>
+    <zones:Zone Grid.Row="1"/>
+    <zones:Zone Grid.Row="2"/>
+
+    <zones:Zone Grid.Row="0" Grid.RowSpan="2" Height="{StaticResource GripSize}"
+                Target="{Binding ElementName=Top}"/>
+    <zones:Zone Grid.Row="1" Grid.RowSpan="2" Height="{StaticResource GripSize}"
+                Target="{Binding ElementName=Bottom}"/>
+</Grid>

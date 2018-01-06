@@ -16,6 +16,7 @@
     <Grid.Resources>
         <ResourceDictionary>
             <sys:Double x:Key="GripSize">80</sys:Double>
+            <sys:Double x:Key="GripFontSize">40</sys:Double>
         </ResourceDictionary>
     </Grid.Resources>
     
@@ -35,6 +36,11 @@
         <zones:Zone x:Name="SideBottom" Grid.Row="1" Grid.RowSpan="2"/>
 
         <zones:Zone Grid.Row="0"/>
+        <Border Grid.Row="0" Height="{StaticResource GripSize}" VerticalAlignment="Top" Background="#44F">
+            <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontFamily="Segoe UI Symbol" Foreground="White" Text="⇕" FontSize="{StaticResource GripFontSize}"/>
+        </Border>
         <zones:Zone Grid.Row="0" Height="{StaticResource GripSize}" Target="{Binding ElementName=Side}" VerticalAlignment="Top"/>
         <zones:Zone Grid.Row="1"/>
         <zones:Zone Grid.Row="2"/>
@@ -80,7 +86,13 @@
                     HorizontalAlignment="Center" Width="{StaticResource GripSize}"
                     Target="{Binding ElementName=BottomMain}"/>
     </Grid>
-    
+
+    <Border Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Width="160" Height="160" Background="#44F">
+        <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontFamily="Segoe UI Symbol" Foreground="White" Text="" FontSize="80"/>
+    </Border>
     <zones:Zone Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
                 Width="160" Height="160"
                 Target="{Binding ElementName=Main}"/>
