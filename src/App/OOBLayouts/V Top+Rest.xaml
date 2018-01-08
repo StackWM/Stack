@@ -17,5 +17,10 @@
   <zones:Zone x:Name="Full" Grid.RowSpan="2"/>
   <zones:Zone Grid.Row="0"/>
   <zones:Zone Grid.Row="1"/>
-  <zones:Zone Grid.RowSpan="2" Height="160" Target="{Binding ElementName=Full}"/>
+  <Border Grid.RowSpan="2" Height="160" VerticalAlignment="Bottom" Background="#44F">
+      <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
+      <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                  FontFamily="Segoe UI Symbol" Foreground="White" Text="⇕" FontSize="80"/>
+  </Border>
+    <zones:Zone Grid.RowSpan="2" Height="160" Target="{Binding ElementName=Full}" VerticalAlignment="Bottom"/>
 </Grid>
