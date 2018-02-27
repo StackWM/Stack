@@ -47,6 +47,9 @@
     <ApplicationIcon>StackIcon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ControlzEx, Version=3.0.2.4, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ControlzEx.3.0.2.4\lib\net462\ControlzEx.dll</HintPath>
+    </Reference>
     <Reference Include="DesktopBridge.Helpers, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\DesktopBridge.Helpers.1.1\lib\net45\DesktopBridge.Helpers.dll</HintPath>
     </Reference>
@@ -66,13 +69,13 @@
       <HintPath>..\..\packages\LostTech.App.XmlSettings.0.1.0-b2017071801\lib\netstandard1.4\LostTech.App.XmlSettings.dll</HintPath>
     </Reference>
     <Reference Include="LostTech.Checkpoint, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LostTech.Checkpoint.0.2.0-b2017040802\lib\netstandard1.0\LostTech.Checkpoint.dll</HintPath>
+      <HintPath>..\..\packages\LostTech.Checkpoint.0.2.0\lib\netstandard1.0\LostTech.Checkpoint.dll</HintPath>
     </Reference>
     <Reference Include="LostTech.Stack.Extensibility, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LostTech.Stack.Extensibility.0.1.0\lib\net462\LostTech.Stack.Extensibility.dll</HintPath>
     </Reference>
-    <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MahApps.Metro.1.5.0\lib\net45\MahApps.Metro.dll</HintPath>
+    <Reference Include="MahApps.Metro, Version=1.6.0.362, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MahApps.Metro.1.6.0\lib\net45\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.HockeyApp.Core45, Version=4.1.6.1005, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\HockeySDK.WPF.4.1.6\lib\net45\Microsoft.HockeyApp.Core45.dll</HintPath>
@@ -100,19 +103,19 @@
       <HintPath>..\..\packages\PCLStorage.Desktop.1.0.4-b2017032802\lib\net45\PCLStorage.Desktop.dll</HintPath>
     </Reference>
     <Reference Include="PInvoke.Kernel32, Version=0.5.0.0, Culture=neutral, PublicKeyToken=9e300f9f87f04a7a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PInvoke.Kernel32.0.5.111\lib\net45\PInvoke.Kernel32.dll</HintPath>
+      <HintPath>..\..\packages\PInvoke.Kernel32.0.5.126\lib\net45\PInvoke.Kernel32.dll</HintPath>
     </Reference>
     <Reference Include="PInvoke.User32, Version=0.5.0.0, Culture=neutral, PublicKeyToken=9e300f9f87f04a7a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PInvoke.User32.0.5.111\lib\net45\PInvoke.User32.dll</HintPath>
+      <HintPath>..\..\packages\PInvoke.User32.0.5.126\lib\net45\PInvoke.User32.dll</HintPath>
     </Reference>
     <Reference Include="PInvoke.Windows.Core, Version=0.5.0.0, Culture=neutral, PublicKeyToken=9e300f9f87f04a7a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PInvoke.Windows.Core.0.5.111\lib\net35\PInvoke.Windows.Core.dll</HintPath>
+      <HintPath>..\..\packages\PInvoke.Windows.Core.0.5.126\lib\net35\PInvoke.Windows.Core.dll</HintPath>
     </Reference>
     <Reference Include="PInvoke.Windows.ShellScalingApi, Version=0.5.0.0, Culture=neutral, PublicKeyToken=9e300f9f87f04a7a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PInvoke.Windows.ShellScalingApi.0.5.111\lib\net45\PInvoke.Windows.ShellScalingApi.dll</HintPath>
+      <HintPath>..\..\packages\PInvoke.Windows.ShellScalingApi.0.5.126\lib\net45\PInvoke.Windows.ShellScalingApi.dll</HintPath>
     </Reference>
-    <Reference Include="Prism, Version=6.3.0.0, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Prism.Core.6.3.0\lib\net45\Prism.dll</HintPath>
+    <Reference Include="Prism, Version=7.0.0.396, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Prism.Core.7.0.0.396\lib\net45\Prism.dll</HintPath>
     </Reference>
     <Reference Include="RecursiveChangeNotifier, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\RecursiveChangeNotifier.0.3.0-b2017050701\lib\netstandard1.0\RecursiveChangeNotifier.dll</HintPath>
@@ -188,7 +191,7 @@
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETCore\v4.5\System.Runtime.WindowsRuntime.dll</HintPath>
     </Reference>
     <Reference Include="System.Security.Cryptography.Algorithms, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Security.Cryptography.Algorithms.4.3.0\lib\net461\System.Security.Cryptography.Algorithms.dll</HintPath>
+      <HintPath>..\..\packages\System.Security.Cryptography.Algorithms.4.3.1\lib\net461\System.Security.Cryptography.Algorithms.dll</HintPath>
     </Reference>
     <Reference Include="System.Security.Cryptography.Encoding, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Security.Cryptography.Encoding.4.3.0\lib\net46\System.Security.Cryptography.Encoding.dll</HintPath>
@@ -196,12 +199,12 @@
     <Reference Include="System.Security.Cryptography.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Security.Cryptography.Primitives.4.3.0\lib\net46\System.Security.Cryptography.Primitives.dll</HintPath>
     </Reference>
-    <Reference Include="System.Security.Cryptography.X509Certificates, Version=4.1.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Security.Cryptography.X509Certificates.4.3.1\lib\net461\System.Security.Cryptography.X509Certificates.dll</HintPath>
+    <Reference Include="System.Security.Cryptography.X509Certificates, Version=4.1.1.2, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.Cryptography.X509Certificates.4.3.2\lib\net461\System.Security.Cryptography.X509Certificates.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MahApps.Metro.1.5.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <HintPath>..\..\packages\ControlzEx.3.0.2.4\lib\net462\System.Windows.Interactivity.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml" />
@@ -213,13 +216,13 @@
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Xml.ReaderWriter, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Xml.ReaderWriter.4.3.0\lib\net46\System.Xml.ReaderWriter.dll</HintPath>
+      <HintPath>..\..\packages\System.Xml.ReaderWriter.4.3.1\lib\net46\System.Xml.ReaderWriter.dll</HintPath>
     </Reference>
     <Reference Include="Validation, Version=2.4.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Validation.2.4.18\lib\net45\Validation.dll</HintPath>
     </Reference>
-    <Reference Include="ValueConverters, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ValueConverters.1.0.6\lib\net45\ValueConverters.dll</HintPath>
+    <Reference Include="ValueConverters, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ValueConverters.1.0.7\lib\net45\ValueConverters.dll</HintPath>
     </Reference>
     <Reference Include="Windows">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Windows Kits\10\UnionMetadata\Windows.winmd</HintPath>
