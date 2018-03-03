@@ -43,7 +43,7 @@
                 bool wasTracked = this.locations.TryGetValue(window, out var existedAt);
                 if (wasTracked) {
                     this.locations.Remove(window);
-                    this.StartOnParentThread(() => existedAt.Windows.Remove(window));
+                    this.StartOnParentThread(() => existedAt?.Windows.Remove(window));
                 }
                 Debug.WriteLine($"Disappeared: {app.AppTitle} traked: {wasTracked}");
                 return;
@@ -53,20 +53,33 @@
             // TODO: determine if window appeared in an existing zone, and if it needs to be moved
             this.locations.Add(window, null);
 
-            if (app.AppTitle == "Windows PowerShell") {
-                this.StartOnParentThread(() => {
-                    var toolZone = this.screenLayouts
-                        .SelectMany(layout => layout.Zones)
-                        .FirstOrDefault(zone => zone.Id != null && zone.Id.StartsWith("Tools"));
-                    if (toolZone != null) {
-                        this.Move(window, toolZone);
+#if DEBUG
+            this.DecideInitialZone(app)
+                .ContinueWith(zone => {
+                    if (zone.Result != null) {
+                        this.Move(window, zone.Result);
                         Debug.WriteLine("Did it!");
                     }
-                });
-            }
+                }, this.taskScheduler);
+#endif
         }
 
+        Task<Zone> DecideInitialZone(WindowData window) {
+            if (window.AppTitle == "Windows PowerShell")
+                return this.GetZoneByID("Tools");
+
+            if (window.AppTitle?.Contains("Visual Studio Code") == true)
+                return this.GetZoneByID("Main");
+
+            return Task.FromResult<Zone>(null);
+        }
+
+        private Task<Zone> GetZoneByID(string layoutID) => this.StartOnParentThread(() => this.screenLayouts
+                                .SelectMany(layout => layout.Zones)
+                                .FirstOrDefault(zone => zone.Id != null && zone.Id.StartsWith(layoutID))
+                        );
         void StartOnParentThread(Action action) => Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.None, this.taskScheduler);
+        Task<T> StartOnParentThread<T>(Func<T> action) => Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.None, this.taskScheduler);
 
         public void Dispose() {
             ApplicationWatcher.OnApplicationWindowChange -= this.OnApplicationWindowChange;
