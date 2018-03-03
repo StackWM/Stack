@@ -38,19 +38,23 @@
         void OnApplicationWindowChange(object sender, ApplicationEventArgs applicationEventArgs)
         {
             var app = applicationEventArgs.ApplicationData;
+            var window = new Win32Window(app.HWnd);
             if (applicationEventArgs.Event != ApplicationEvents.Launched) {
-                bool wasTracked = this.locations.Remove(new Win32Window(app.HWnd));
-                //Debug.WriteLine($"Disappeared: {app.AppTitle} traked: {wasTracked}");
+                bool wasTracked = this.locations.TryGetValue(window, out var existedAt);
+                if (wasTracked) {
+                    this.locations.Remove(window);
+                    this.StartOnParentThread(() => existedAt.Windows.Remove(window));
+                }
+                Debug.WriteLine($"Disappeared: {app.AppTitle} traked: {wasTracked}");
                 return;
             }
 
-            //Debug.WriteLine($"Appeared: {app.AppTitle} from {app.AppName}, {app.AppPath}");
+            Debug.WriteLine($"Appeared: {app.AppTitle} from {app.AppName}, {app.AppPath}");
             // TODO: determine if window appeared in an existing zone, and if it needs to be moved
-            var window = new Win32Window(app.HWnd);
             this.locations.Add(window, null);
 
             if (app.AppTitle == "Windows PowerShell") {
-                Task.Factory.StartNew(() => {
+                this.StartOnParentThread(() => {
                     var toolZone = this.screenLayouts
                         .SelectMany(layout => layout.Zones)
                         .FirstOrDefault(zone => zone.Id != null && zone.Id.StartsWith("Tools"));
@@ -58,9 +62,11 @@
                         this.Move(window, toolZone);
                         Debug.WriteLine("Did it!");
                     }
-                }, CancellationToken.None, TaskCreationOptions.None, this.taskScheduler);
+                });
             }
         }
+
+        void StartOnParentThread(Action action) => Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.None, this.taskScheduler);
 
         public void Dispose() {
             ApplicationWatcher.OnApplicationWindowChange -= this.OnApplicationWindowChange;
