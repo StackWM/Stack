@@ -322,9 +322,10 @@
             this.Move(window, zone);
         }
 
-        void Move(IntPtr window, Zone zone)
+        void Move(IntPtr windowHandle, Zone zone)
         {
-            zone.Windows.Add(new Win32Window(window));
+            var window = new Win32Window(windowHandle);
+            this.layoutManager.Move(window, zone);
         }
 
         void NonCriticalErrorHandler(object sender, ErrorEventArgs error) {

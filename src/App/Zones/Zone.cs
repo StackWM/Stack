@@ -47,9 +47,9 @@
 
         public ObservableCollection<IAppWindow> Windows { get; } = new ObservableCollection<IAppWindow>();
 
-        void OnWindowCollectionChanged(object sender, NotifyCollectionChangedEventArgs change) {
+        protected virtual void OnWindowCollectionChanged(object sender, NotifyCollectionChangedEventArgs change) {
             var uiThread = TaskScheduler.FromCurrentSynchronizationContext();
-            foreach (IAppWindow window in change.NewItems) {
+            foreach (IAppWindow window in change.NewItems ?? new IAppWindow[0]) {
                 Rect bounds = this.GetPhysicalBounds();
                 window.Move(bounds).ContinueWith(error => {
                     if (error.Result != null)
