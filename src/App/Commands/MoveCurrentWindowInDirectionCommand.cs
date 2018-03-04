@@ -19,9 +19,11 @@
         [NotNull] readonly IEnumerable<WindowGroup> windowGroups;
         [NotNull] readonly Action<IntPtr, Zone> move;
         [NotNull] readonly ICollection<ScreenLayout> screenLayouts;
+        [NotNull] readonly LayoutManager layoutManager;
 
         public MoveCurrentWindowInDirectionCommand([NotNull] Action<IntPtr, Zone> move,
             [NotNull] ICollection<ScreenLayout> screenLayouts,
+            [NotNull] LayoutManager layoutManager,
             [NotNull] KeyboardMoveBehaviorSettings settings,
             [NotNull] IEnumerable<WindowGroup> windowGroups)
         {
@@ -29,6 +31,7 @@
             this.windowGroups = windowGroups ?? throw new ArgumentNullException(nameof(windowGroups));
             this.move = move ?? throw new ArgumentNullException(nameof(move));
             this.screenLayouts = screenLayouts ?? throw new ArgumentNullException(nameof(screenLayouts));
+            this.layoutManager = layoutManager ?? throw new ArgumentNullException(nameof(layoutManager));
         }
 
         public bool CanExecute(object parameter)
@@ -65,8 +68,8 @@
 
         bool MoveCurrentWindow(Vector direction)
         {
-            var window = User32.GetForegroundWindow();
-            if (!this.CanExecute(window) || !Win32.GetWindowInfo(window, out var info))
+            var windowHandle = User32.GetForegroundWindow();
+            if (!this.CanExecute(windowHandle) || !Win32.GetWindowInfo(windowHandle, out var info))
                 return false;
 
             var windowBounds = new Rect(info.rcWindow.left, info.rcWindow.top,
@@ -86,9 +89,8 @@
                 .Equals(windowCenter, epsilon: Epsilon)).ToArray();
 
             var reducedWindowBounds = windowBounds.Inflated(-1,-1);
-            var currentZone = sameCenter.FirstOrDefault(zone =>
-                windowBounds.Contains(zone.GetPhysicalBounds().Inflated(-1, -1))
-                && zone.GetPhysicalBounds().Contains(reducedWindowBounds));
+            Win32Window window = new Win32Window(windowHandle);
+            var currentZone = this.layoutManager.GetLocation(window);
 
             var next = currentZone == null
                 ? sameCenter.FirstOrDefault()
@@ -114,7 +116,7 @@
                        .FirstOrDefault();
 
             if (next != null)
-                this.move(window, next);
+                this.move(windowHandle, next);
             return true;
         }
 

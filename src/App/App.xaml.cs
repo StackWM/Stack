@@ -646,14 +646,15 @@
         private void BindHandlers(StackSettings settings)
         {
             this.hook = Hook.GlobalEvents();
+
+            this.layoutManager = new LayoutManager(this.screenLayouts);
+
             if (settings.Behaviors.KeyboardMove.Enabled)
                 this.keyboardArrowBehavior = new KeyboardArrowBehavior(
-                    this.hook, this.screenLayouts, settings.Behaviors.KeyBindings,
+                    this.hook, this.screenLayouts, this.layoutManager, settings.Behaviors.KeyBindings,
                     settings.Behaviors.KeyboardMove,
                     settings.WindowGroups,
                     this.Move);
-
-            this.layoutManager = new LayoutManager(this.screenLayouts);
 
             if (settings.Behaviors.MouseMove.Enabled) {
                 this.dragHook = new DragHook(MouseButtons.Middle, this.hook);

@@ -22,6 +22,12 @@
             this.taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
         }
 
+        public Zone GetLocation([NotNull] IAppWindow window) =>
+            this.locations.TryGetValue(
+                window ?? throw new ArgumentNullException(nameof(window)),
+                out Zone zone)
+                ? zone : null;
+
         public void Move([NotNull] IAppWindow window, [NotNull] Zone target) {
             if (window == null)
                 throw new ArgumentNullException(nameof(window));
