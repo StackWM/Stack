@@ -7,7 +7,7 @@
 
     static class Expiration
     {
-        public static readonly DateTimeOffset EnterpriseStoreExpirationDate = new DateTimeOffset(2018, 2, 15, 0, 0, 0, TimeSpan.Zero);
+        public static readonly DateTimeOffset EnterpriseStoreExpirationDate = new DateTimeOffset(2018, 7, 15, 0, 0, 0, TimeSpan.Zero);
         static readonly bool IsUwp = new DesktopBridge.Helpers().IsRunningAsUwp();
 
         public static async Task<bool> HasExpired(bool showWarnings = true) {
