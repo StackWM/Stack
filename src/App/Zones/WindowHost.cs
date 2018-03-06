@@ -2,6 +2,8 @@
 {
     using System;
     using System.Diagnostics;
+    using System.IO;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
     using LostTech.Stack.Models;
@@ -13,6 +15,7 @@
             this.VerticalAlignment = VerticalAlignment.Stretch;
             this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
             this.VerticalContentAlignment = VerticalAlignment.Stretch;
+            this.LayoutUpdated += delegate { this.AdjustWindow(); };
         }
 
         public IAppWindow Window {
@@ -36,26 +39,26 @@
                 return;
 
             Debug.WriteLine($"Host attached to {change.NewValue}");
-            this.AdjustWindow(new Size(this.ActualWidth, this.ActualHeight));
+            Debug.WriteIf(change.OldValue != null, $"Detached from {change.OldValue}");
+
+            this.AdjustWindow();
         }
+
+        public event EventHandler<ErrorEventArgs> NonFatalErrorOccurred;
 
         Rect lastRect;
-        protected override Size ArrangeOverride(Size finalSize) {
-            Size size = base.ArrangeOverride(finalSize);
-            Rect rect = this.GetPhysicalBounds(size);
-            if (rect.Equals(this.lastRect))
-                return size;
-            this.AdjustWindow(size);
-            return size;
-        }
+        async void AdjustWindow() {
+            await Task.Yield();
+            Rect? rect = this.TryGetPhysicalBounds();
+            if (rect.Equals(this.lastRect) || rect == null)
+                return;
 
-        async void AdjustWindow(Size size) {
-            Rect rect = this.GetPhysicalBounds(size);
-            this.lastRect = rect;
+            this.lastRect = rect.Value;
+
             IAppWindow windowToMove = this.Window;
-            Exception problem = await windowToMove.Move(rect);
-            if (problem != null)
-                Trace.WriteLine($"failed to move {windowToMove}: {problem}");
+            Exception error = await windowToMove.Move(this.lastRect);
+            if (error != null)
+                this.NonFatalErrorOccurred?.Invoke(this, new ErrorEventArgs(error));
         }
     }
 }
