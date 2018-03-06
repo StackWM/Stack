@@ -11,6 +11,7 @@
     using LostTech.Stack.ScreenCoordinates;
     using LostTech.Stack.Zones;
     using LostTech.Windows;
+    using MahApps.Metro.Controls;
     using PInvoke;
 
     /// <summary>
@@ -128,23 +129,7 @@
             }
         }
 
-        public IEnumerable<Zone> Zones
-        {
-            get {
-                var queue = new Queue<DependencyObject>();
-                queue.Enqueue(this);
-                while (queue.Count > 0) {
-                    var element = queue.Dequeue();
-                    if (element is Zone zone)
-                        yield return zone;
-
-                    int childrenCount = VisualTreeHelper.GetChildrenCount(element);
-                    for (int child = 0; child < childrenCount; child++) {
-                        queue.Enqueue(VisualTreeHelper.GetChild(element, child));
-                    }
-                }
-            }
-        }
+        public IEnumerable<Zone> Zones => this.FindChildren<Zone>();
 
         internal Zone GetZone(Point dropPoint)
         {

@@ -73,7 +73,7 @@
         IFolder layoutsFolder;
         LayoutLoader layoutLoader;
 
-        static readonly bool IsUwp = new DesktopBridge.Helpers().IsRunningAsUwp();
+        internal static readonly bool IsUwp = new DesktopBridge.Helpers().IsRunningAsUwp();
 
         protected override async void OnStartup(StartupEventArgs e)
         {

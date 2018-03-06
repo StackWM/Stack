@@ -251,6 +251,7 @@
       <DependentUpon>LicenseTermsAcceptance.xaml</DependentUpon>
     </Compile>
     <Compile Include="Licensing\Expiration.cs" />
+    <Compile Include="Licensing\ExtraFeatures.cs" />
     <Compile Include="Models\IAppWindow.cs" />
     <Compile Include="Models\LayoutLoader.cs" />
     <Compile Include="Models\LayoutManager.cs" />

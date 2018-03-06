@@ -12,6 +12,7 @@
     using System.Xml;
     using LostTech.Stack.InternalExtensions;
     using LostTech.Stack.Zones;
+    using MahApps.Metro.Controls;
     using PCLStorage;
     using FileAccess = PCLStorage.FileAccess;
 
@@ -55,6 +56,10 @@
                     return MakeDefaultLayout();
                 }
             }
+
+            foreach (string zoneProblem in layout.FindChildren<Zone>().SelectMany(zone => zone.LoadProblems))
+                this.problems.AppendLine($"{file.Name}: {zoneProblem}");
+
             Debug.WriteLine($"loaded layout {fileName} in {this.loadTimer.ElapsedMilliseconds}ms");
             return layout;
         }

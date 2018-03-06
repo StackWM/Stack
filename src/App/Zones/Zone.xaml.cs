@@ -1,11 +1,12 @@
 ﻿namespace LostTech.Stack.Zones
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.IO;
     using System.Windows;
     using System.Windows.Controls;
-
+    using LostTech.Stack.Licensing;
     using LostTech.Stack.Models;
 
     /// <summary>
@@ -41,16 +42,36 @@
         
         public ItemsPanelTemplate Layout {
             get => (ItemsPanelTemplate)this.GetValue(LayoutProperty);
-            set => this.SetValue(LayoutProperty, value);
+            set {
+                if (!App.IsUwp)
+                    return;
+
+                this.SetValue(LayoutProperty, value);
+            }
         }
 
+        static readonly ItemsPanelTemplate DefaultItemsPanelTemplate = new ItemsPanelTemplate { VisualTree = new FrameworkElementFactory(typeof(Grid)) };
         public static readonly DependencyProperty LayoutProperty =
             DependencyProperty.Register(nameof(Layout), typeof(ItemsPanelTemplate),
                 ownerType: typeof(Zone),
                 typeMetadata: new PropertyMetadata(
-                    defaultValue: new ItemsPanelTemplate { VisualTree = new FrameworkElementFactory(typeof(Grid)) }
-            ));
+                    defaultValue: DefaultItemsPanelTemplate,
+                    propertyChangedCallback: null,
+                    coerceValueCallback: CoerceLayout));
 
+        static object CoerceLayout(DependencyObject d, object baseValue) {
+            if (App.IsUwp)
+                return baseValue;
+
+            var zone = d as Zone;
+            ErrorEventArgs error = ExtraFeatures.PaidFeature("Zone Layouts");
+            zone?.NonFatalErrorOccurred?.Invoke(zone, error);
+            zone?.loadProblems.Add(error.GetException().Message);
+            return DefaultItemsPanelTemplate;
+        }
+
+        readonly List<string> loadProblems = new List<string>();
+        public IEnumerable<string> LoadProblems => new ReadOnlyCollection<string>(this.loadProblems);
         public ObservableCollection<IAppWindow> Windows { get; } = new ObservableCollection<IAppWindow>();
 
         public event EventHandler<ErrorEventArgs> NonFatalErrorOccurred;
