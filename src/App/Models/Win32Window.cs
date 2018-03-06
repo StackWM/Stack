@@ -1,9 +1,9 @@
 ﻿namespace LostTech.Stack.Models
 {
     using System;
+    using System.Runtime.InteropServices;
     using System.Threading.Tasks;
     using System.Windows;
-    using PInvoke;
     using static PInvoke.User32;
 
     class Win32Window : IAppWindow, IEquatable<Win32Window>
@@ -15,14 +15,14 @@
         }
 
         public async Task<Exception> Move(Rect targetBounds) {
-            try {
-                if (GetWindowPlacement(this.Handle).showCmd.HasFlag(WindowShowStyle.SW_MAXIMIZE)) {
-                    ShowWindow(this.Handle, WindowShowStyle.SW_RESTORE);
-                }
-            } catch (Win32Exception) { }
+            var windowPlacement = WINDOWPLACEMENT.Create();
+            if (GetWindowPlacement(this.Handle, ref windowPlacement) &&
+                windowPlacement.showCmd.HasFlag(WindowShowStyle.SW_MAXIMIZE)) {
+                ShowWindow(this.Handle, WindowShowStyle.SW_RESTORE);
+            }
 
-            if (!MoveWindow(this.Handle, (int)targetBounds.Left, (int)targetBounds.Top, (int)targetBounds.Width,
-                (int)targetBounds.Height, true)) {
+            if (!MoveWindow(this.Handle, (int)targetBounds.Left, (int)targetBounds.Top,
+                (int)targetBounds.Width, (int)targetBounds.Height, bRepaint: true)) {
                 return new System.ComponentModel.Win32Exception();
             } else {
                 // TODO: option to not activate on move
@@ -53,5 +53,8 @@
         }
 
         public override int GetHashCode() => this.Handle.GetHashCode();
+
+        [DllImport("User32.dll", SetLastError = true)]
+        static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
     }
 }

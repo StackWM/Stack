@@ -53,9 +53,6 @@
     <Reference Include="DesktopBridge.Helpers, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\DesktopBridge.Helpers.1.1\lib\net45\DesktopBridge.Helpers.dll</HintPath>
     </Reference>
-    <Reference Include="EventHook, Version=1.4.39.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\EventHook.1.4.39\lib\net45\EventHook.dll</HintPath>
-    </Reference>
     <Reference Include="JetBrains.Annotations, Version=11.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\..\packages\JetBrains.Annotations.11.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
@@ -71,8 +68,8 @@
     <Reference Include="LostTech.Checkpoint, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LostTech.Checkpoint.0.2.0\lib\netstandard1.0\LostTech.Checkpoint.dll</HintPath>
     </Reference>
-    <Reference Include="LostTech.Stack.Extensibility, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LostTech.Stack.Extensibility.0.1.0\lib\net462\LostTech.Stack.Extensibility.dll</HintPath>
+    <Reference Include="LostTech.Stack.Extensibility, Version=0.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LostTech.Stack.Extensibility.0.1.1\lib\net462\LostTech.Stack.Extensibility.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro, Version=1.6.0.362, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MahApps.Metro.1.6.0\lib\net45\MahApps.Metro.dll</HintPath>
@@ -479,6 +476,10 @@
     <ProjectReference Include="..\..\..\..\App\ObservableFileSystem\src\ObservableFileSystem.csproj">
       <Project>{b8ad0753-625f-41e0-a90d-05d587cf0780}</Project>
       <Name>ObservableFileSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\OSS\EventHook\EventHook\EventHook.csproj">
+      <Project>{3847a7f4-3f6b-4626-af4c-8fdfba6165f2}</Project>
+      <Name>EventHook</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\OSS\MouseKeyHook\MouseKeyHook\MouseKeyHook.csproj">
       <Project>{f52aa97e-180a-40ed-8f2b-09080171d6c7}</Project>
