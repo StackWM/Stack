@@ -25,7 +25,6 @@
         {
             this.InitializeComponent();
             this.Show();
-            this.Hide();
         }
 
         public void SetLayout(FrameworkElement layout) {

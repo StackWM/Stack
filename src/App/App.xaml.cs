@@ -9,11 +9,13 @@
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Forms;
     using System.Windows.Interop;
+    using System.Windows.Media;
     using System.Windows.Threading;
     using EventHook;
     using Gma.System.MouseKeyHook;
@@ -257,6 +259,7 @@
             if (!this.dragOperation.Activated) {
                 @event.Handled = true;
                 this.ShowLayoutGrid();
+                this.dragOperation.Activated = true;
             }
 
             var location = GetCursorPos();
@@ -296,9 +299,16 @@
         void ShowLayoutGrid()
         {
             foreach (ScreenLayout screenLayout in this.screenLayouts.Active()) {
-                screenLayout.Show();
+                Color visibleBackground = Colors.White;
+                visibleBackground.A = 0x80;
+                screenLayout.Background = new SolidColorBrush(visibleBackground);
             }
-            this.dragOperation.Activated = true;
+        }
+
+        void HideLayoutGrid() {
+            foreach (var screenLayout in this.screenLayouts) {
+                screenLayout.Background = Brushes.Transparent;
+            }
         }
 
         private void OnDragEnd(object sender, DragHookEventArgs @event)
@@ -313,12 +323,17 @@
 
             var screen = this.screenLayouts.Active()
                 .FirstOrDefault(layout => layout.GetPhysicalBounds().Contains(dropPoint));
-            if (screen == null)
+            if (screen == null) {
+                Debug.WriteLine("can't drop: no screen at the target point");
                 return;
+            }
             var relativeDropPoint = screen.PointFromScreen(dropPoint);
             var zone = screen.GetZone(relativeDropPoint)?.GetFinalTarget();
-            if (zone == null)
+            if (zone == null) {
+                Debug.WriteLine("can't drop: no zone at the target point");
                 return;
+            }
+
             this.Move(window, zone);
         }
 
@@ -356,9 +371,7 @@
             if (this.dragOperation.CurrentZone != null) {
                 this.dragOperation.CurrentZone.IsDragMouseOver = false;
             }
-            foreach (var screenLayout in this.screenLayouts) {
-                screenLayout.Hide();
-            }
+            this.HideLayoutGrid();
             SetForegroundWindow(this.dragOperation.OriginalActiveWindow);
             this.dragOperation = null;
         }
@@ -376,21 +389,25 @@
 
         WindowDragOperation DragStart()
         {
-            //var point = new POINT { x = (int)location.X, y = (int)location.Y };
             User32.GetCursorPos(out var point);
-            var desktop = GetDesktopWindow();
-            var child = ChildWindowFromPointEx(desktop, point, ChildWindowFromPointExFlags.CWP_SKIPINVISIBLE);
+            var child = WindowFromPoint(point);
+            child = GetAncestor(child, GetAncestorFlags.GA_ROOT);
+            if (child == IntPtr.Zero)
+                return null;
             try {
-                if (child == IntPtr.Zero)
-                    return null;
-
                 if (this.stackSettings.Behaviors.MouseMove.WindowGroupIgnoreList.Contains(
                         this.stackSettings.WindowGroups, child))
                     return null;
+
+                if (this.screenLayouts.Any(layout => new WindowInteropHelper(layout).Handle == child)) {
+                    Debug.WriteLine("don't drag self");
+                    return null;
+                }
             }
             catch (Win32Exception) {
                 return null;
             }
+            Debug.WriteLine($"started dragging {GetWindowText(child)}");
             return new WindowDragOperation(child) {
                 OriginalActiveWindow = GetForegroundWindow(),
             };

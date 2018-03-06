@@ -9,7 +9,7 @@
         DataContextChanged="OnDataContextChanged"
         ShowInTaskbar="False" ShowActivated="False"
         Topmost="True"
-        Background="#80FFFFFF"
+        Background="Transparent"
         Title="Layout Editor" Icon="StackTaskbarIcon.ico"
         Height="350" Width="525" ResizeMode="NoResize" WindowStyle="None">
     <Window.Resources>
