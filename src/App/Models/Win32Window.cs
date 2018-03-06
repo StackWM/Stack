@@ -1,6 +1,7 @@
 ﻿namespace LostTech.Stack.Models
 {
     using System;
+    using System.ComponentModel;
     using System.Runtime.InteropServices;
     using System.Threading.Tasks;
     using System.Windows;
@@ -33,6 +34,11 @@
                 return null;
             }
         }
+
+        public string Title => GetWindowText(this.Handle);
+
+        public Task<Exception> Activate() => Task.FromResult(
+            SetForegroundWindow(this.Handle) ? null : (Exception)new Win32Exception());
 
         public bool Equals(Win32Window other) {
             if (ReferenceEquals(null, other))
