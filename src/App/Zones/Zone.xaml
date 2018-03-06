@@ -13,5 +13,16 @@
           <local:WindowHost Window="{Binding Path=., Mode=OneWay}"/>
         </DataTemplate>
       </ItemsControl.ItemTemplate>
+
+      <ItemsControl.ItemContainerStyle>
+        <Style TargetType="ContentPresenter">
+          <Setter Property="HorizontalAlignment" Value="Stretch"/>
+          <Setter Property="VerticalAlignment" Value="Stretch"/>
+        </Style>
+      </ItemsControl.ItemContainerStyle>
+
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate><Grid/></ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
     </ItemsControl>
 </UserControl>

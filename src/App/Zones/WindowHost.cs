@@ -8,6 +8,13 @@
 
     sealed class WindowHost: Control
     {
+        public WindowHost() {
+            this.HorizontalAlignment = HorizontalAlignment.Stretch;
+            this.VerticalAlignment = VerticalAlignment.Stretch;
+            this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+            this.VerticalContentAlignment = VerticalAlignment.Stretch;
+        }
+
         public IAppWindow Window {
             get => (IAppWindow)this.GetValue(WindowProperty);
             set => this.SetValue(WindowProperty, value);
@@ -29,22 +36,21 @@
                 return;
 
             Debug.WriteLine($"Host attached to {change.NewValue}");
-            this.AdjustWindow();
+            this.AdjustWindow(new Size(this.ActualWidth, this.ActualHeight));
         }
-
 
         Rect lastRect;
         protected override Size ArrangeOverride(Size finalSize) {
             Size size = base.ArrangeOverride(finalSize);
-            Rect rect = this.GetPhysicalBounds();
+            Rect rect = this.GetPhysicalBounds(size);
             if (rect.Equals(this.lastRect))
                 return size;
-            this.AdjustWindow();
+            this.AdjustWindow(size);
             return size;
         }
 
-        async void AdjustWindow() {
-            Rect rect = this.GetPhysicalBounds();
+        async void AdjustWindow(Size size) {
+            Rect rect = this.GetPhysicalBounds(size);
             this.lastRect = rect;
             IAppWindow windowToMove = this.Window;
             Exception problem = await windowToMove.Move(rect);
