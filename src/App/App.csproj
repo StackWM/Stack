@@ -315,6 +315,9 @@
     <Compile Include="Win32.cs" />
     <Compile Include="WindowDragOperation.cs" />
     <Compile Include="Windows\DragHook.cs" />
+    <Compile Include="Zones\WindowButton.xaml.cs">
+      <DependentUpon>WindowButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Zones\WindowHost.cs" />
     <Compile Include="Zones\Zone.xaml.cs">
       <DependentUpon>Zone.xaml</DependentUpon>
@@ -425,6 +428,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\WindowGroupsEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Zones\WindowButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
