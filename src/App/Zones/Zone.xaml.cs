@@ -45,19 +45,7 @@
 
         public ObservableCollection<IAppWindow> Windows { get; } = new ObservableCollection<IAppWindow>();
 
-        protected virtual void OnWindowCollectionChanged(object sender, NotifyCollectionChangedEventArgs change) {
-            var uiThread = TaskScheduler.FromCurrentSynchronizationContext();
-            foreach (IAppWindow window in change.NewItems ?? new IAppWindow[0]) {
-                Rect bounds = this.GetPhysicalBounds();
-                window.Move(bounds).ContinueWith(error => {
-                    if (error.Result != null)
-#error NOT CONVERTED YET
-                        this.NonFatalErrorOccurred?.Invoke(this, new ErrorEventArgs(error.Result));
-                }, uiThread);
-            }
-        }
-
-        public EventHandler<ErrorEventArgs> NonFatalErrorOccurred;
+        public event EventHandler<ErrorEventArgs> NonFatalErrorOccurred;
 
         public string Id { get; set; }
 
@@ -68,5 +56,8 @@
             }
             return result;
         }
+
+        void Host_NonFatalErrorOccurred(object sender, ErrorEventArgs e) =>
+            this.NonFatalErrorOccurred?.Invoke(sender, e);
     }
 }

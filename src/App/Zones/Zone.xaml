@@ -10,7 +10,7 @@
     <ItemsControl x:Name="Items" ItemsSource="{Binding ElementName=Self, Path=Windows, Mode=OneTime}">
       <ItemsControl.ItemTemplate>
         <DataTemplate>
-          <local:WindowHost Window="{Binding Path=., Mode=OneWay}"/>
+        <local:WindowHost Window="{Binding Path=., Mode=OneWay}" NonFatalErrorOccurred="Host_NonFatalErrorOccurred"/>
         </DataTemplate>
       </ItemsControl.ItemTemplate>
 
