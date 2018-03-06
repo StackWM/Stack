@@ -37,7 +37,7 @@
             if (this.locations.TryGetValue(window, out var previousZone) && previousZone != null)
                 previousZone.Windows.Remove(window);
 
-            target.Windows.Add(window);
+            target.Windows.Insert(0, window);
             this.locations[window] = target;
         }
 
