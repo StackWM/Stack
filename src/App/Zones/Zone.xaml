@@ -7,22 +7,20 @@
              mc:Ignorable="d" 
              x:Name="Self"
              d:DesignHeight="450" d:DesignWidth="800">
-    <ItemsControl x:Name="Items" ItemsSource="{Binding ElementName=Self, Path=Windows, Mode=OneTime}">
-      <ItemsControl.ItemTemplate>
-        <DataTemplate>
+  <ItemsControl x:Name="Items"
+                ItemsSource="{Binding ElementName=Self, Path=Windows, Mode=OneTime}"
+                ItemsPanel="{Binding ElementName=Self, Path=Layout, Mode=OneWay}">
+    <ItemsControl.ItemTemplate>
+      <DataTemplate>
         <local:WindowHost Window="{Binding Path=., Mode=OneWay}" NonFatalErrorOccurred="Host_NonFatalErrorOccurred"/>
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
+      </DataTemplate>
+    </ItemsControl.ItemTemplate>
 
-      <ItemsControl.ItemContainerStyle>
-        <Style TargetType="ContentPresenter">
-          <Setter Property="HorizontalAlignment" Value="Stretch"/>
-          <Setter Property="VerticalAlignment" Value="Stretch"/>
-        </Style>
-      </ItemsControl.ItemContainerStyle>
-
-      <ItemsControl.ItemsPanel>
-        <ItemsPanelTemplate><Grid/></ItemsPanelTemplate>
-      </ItemsControl.ItemsPanel>
-    </ItemsControl>
+    <ItemsControl.ItemContainerStyle>
+      <Style TargetType="ContentPresenter">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+      </Style>
+    </ItemsControl.ItemContainerStyle>
+  </ItemsControl>
 </UserControl>

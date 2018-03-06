@@ -1,15 +1,11 @@
 ﻿namespace LostTech.Stack.Zones
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
+    using System.Collections.ObjectModel;
+    using System.IO;
     using System.Windows;
     using System.Windows.Controls;
-    using System.Collections;
-    using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
-    using System.IO;
+
     using LostTech.Stack.Models;
 
     /// <summary>
@@ -42,6 +38,18 @@
         }
         public static readonly DependencyProperty RoleDependencyProperty =
             DependencyProperty.Register(nameof(Role), typeof(string), typeof(Zone));
+        
+        public ItemsPanelTemplate Layout {
+            get => (ItemsPanelTemplate)this.GetValue(LayoutProperty);
+            set => this.SetValue(LayoutProperty, value);
+        }
+
+        public static readonly DependencyProperty LayoutProperty =
+            DependencyProperty.Register(nameof(Layout), typeof(ItemsPanelTemplate),
+                ownerType: typeof(Zone),
+                typeMetadata: new PropertyMetadata(
+                    defaultValue: new ItemsPanelTemplate { VisualTree = new FrameworkElementFactory(typeof(Grid)) }
+            ));
 
         public ObservableCollection<IAppWindow> Windows { get; } = new ObservableCollection<IAppWindow>();
 
