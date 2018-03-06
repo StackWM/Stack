@@ -2,26 +2,24 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
-    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Collections;
+    using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
+    using System.IO;
     using LostTech.Stack.Models;
 
-    public class Zone : ContentControl
+    /// <summary>
+    /// Interaction logic for Zone.xaml
+    /// </summary>
+    public partial class Zone : UserControl
     {
-        static Zone()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(Zone), new FrameworkPropertyMetadata(typeof(Zone)));
-        }
-
-        public Zone()
-        {
+        public Zone() {
+            this.InitializeComponent();
             this.AllowDrop = true;
-            this.Windows.CollectionChanged += this.OnWindowCollectionChanged;
         }
 
         public bool IsDragMouseOver {
@@ -53,6 +51,7 @@
                 Rect bounds = this.GetPhysicalBounds();
                 window.Move(bounds).ContinueWith(error => {
                     if (error.Result != null)
+#error NOT CONVERTED YET
                         this.NonFatalErrorOccurred?.Invoke(this, new ErrorEventArgs(error.Result));
                 }, uiThread);
             }
@@ -62,8 +61,7 @@
 
         public string Id { get; set; }
 
-        public Zone GetFinalTarget()
-        {
+        public Zone GetFinalTarget() {
             var result = this;
             while (result.Target != null && !result.Equals(result.Target)) {
                 result = result.Target;
