@@ -9,7 +9,6 @@
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
-    using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
@@ -296,13 +295,12 @@
             this.dragOperation.CurrentZone = zone;
         }
 
+        static readonly SolidColorBrush LayoutBackground = new SolidColorBrush(Color.FromArgb(
+            a: 0x80, r: 0xFF, g: 0xFF, b: 0xFF));
         void ShowLayoutGrid()
         {
-            foreach (ScreenLayout screenLayout in this.screenLayouts.Active()) {
-                Color visibleBackground = Colors.White;
-                visibleBackground.A = 0x80;
-                screenLayout.Background = new SolidColorBrush(visibleBackground);
-            }
+            foreach (ScreenLayout screenLayout in this.screenLayouts.Active())
+                screenLayout.Background = LayoutBackground;
         }
 
         void HideLayoutGrid() {
