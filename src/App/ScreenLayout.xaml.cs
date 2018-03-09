@@ -4,11 +4,13 @@
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Interop;
     using System.Windows.Media;
     using LostTech.Stack.ScreenCoordinates;
+    using LostTech.Stack.Utils;
     using LostTech.Stack.Zones;
     using LostTech.Windows;
     using MahApps.Metro.Controls;
@@ -26,6 +28,7 @@
             this.InitializeComponent();
             this.Show();
             this.Hide();
+            //this.TryEnableGlassEffect();
         }
 
         public void SetLayout(FrameworkElement layout) {

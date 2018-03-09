@@ -287,6 +287,7 @@
     <Compile Include="TrayIcon.cs" />
     <Compile Include="Utils\DragHookEventArgs.cs" />
     <Compile Include="Utils\EnumUtils.cs" />
+    <Compile Include="Utils\GlassEffect.cs" />
     <Compile Include="Utils\RectExtensions.cs" />
     <Compile Include="Utils\VersionUtils.cs" />
     <Compile Include="ViewModels\LayoutSelectorViewModel.cs" />
