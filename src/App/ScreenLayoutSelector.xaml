@@ -24,6 +24,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Vertical">
@@ -52,5 +53,13 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+      
+        <Button Grid.Row="2" Margin="10" Padding="36,8" HorizontalAlignment="Center"
+                IsDefault="True"
+                Background="White"
+                Click="Done_OnClick"
+                FontSize="32" FontWeight="Bold">
+          DONE
+        </Button>
     </Grid>
 </Window>
