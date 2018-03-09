@@ -316,6 +316,7 @@
     <Compile Include="Win32.cs" />
     <Compile Include="WindowDragOperation.cs" />
     <Compile Include="Windows\DragHook.cs" />
+    <Compile Include="Zones\Layout.cs" />
     <Compile Include="Zones\WindowButton.xaml.cs">
       <DependentUpon>WindowButton.xaml</DependentUpon>
     </Compile>
