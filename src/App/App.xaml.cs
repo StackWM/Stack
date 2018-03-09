@@ -299,12 +299,15 @@
             a: 0x80, r: 0xFF, g: 0xFF, b: 0xFF));
         void ShowLayoutGrid()
         {
-            foreach (ScreenLayout screenLayout in this.screenLayouts.Active())
+            foreach (ScreenLayout screenLayout in this.screenLayouts.Active()) {
+                screenLayout.ViewModel.ShowHints = true;
                 screenLayout.Background = LayoutBackground;
+            }
         }
 
         void HideLayoutGrid() {
             foreach (var screenLayout in this.screenLayouts) {
+                screenLayout.ViewModel.ShowHints = false;
                 screenLayout.Background = Brushes.Transparent;
             }
         }
@@ -471,7 +474,7 @@
                 var layoutTask = this.GetLayoutForScreen(screen, settings, this.layoutsFolder);
                 var layout = new ScreenLayout {
                     Opacity = 0.7,
-                    Screen = screen,
+                    ViewModel = new ScreenLayoutViewModel{Screen = screen},
                     Title = $"{screen.ID}: {ScreenLayouts.GetDesignation(screen)}"
                 };
                 layout.Closed += this.OnLayoutClosed;

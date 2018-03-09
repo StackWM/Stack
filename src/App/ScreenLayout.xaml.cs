@@ -9,6 +9,7 @@
     using System.Windows.Interop;
     using System.Windows.Media;
     using LostTech.Stack.ScreenCoordinates;
+    using LostTech.Stack.ViewModels;
     using LostTech.Stack.Zones;
     using LostTech.Windows;
     using MahApps.Metro.Controls;
@@ -59,17 +60,41 @@
             return IntPtr.Zero;
         }
 
-        public Win32Screen Screen {
-            get => (Win32Screen) this.DataContext;
+        Win32Screen lastScreen;
+        public Win32Screen Screen => this.ViewModel.Screen;
+
+        internal ScreenLayoutViewModel ViewModel {
+            get => (ScreenLayoutViewModel)this.DataContext;
             set => this.DataContext = value;
         }
 
         void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
-            if (e.OldValue is Win32Screen old)
-                old.PropertyChanged -= this.OnScreenPropertyChanged;
-            if (e.NewValue is Win32Screen @new) {
-                @new.PropertyChanged += this.OnScreenPropertyChanged;
+            if (e.OldValue is ScreenLayoutViewModel viewModel)
+                viewModel.PropertyChanged -= this.OnViewModelPropertyChanged;
+            if (e.NewValue is ScreenLayoutViewModel newViewModel) {
+                newViewModel.PropertyChanged += this.OnViewModelPropertyChanged;
+                this.SetScreen(newViewModel.Screen);
+            }
+        }
+
+        void SetScreen(Win32Screen newScreen) {
+            if (this.lastScreen == newScreen)
+                return;
+
+            if (this.lastScreen != null)
+                this.lastScreen.PropertyChanged -= this.OnScreenPropertyChanged;
+            this.lastScreen = newScreen;
+            if (this.lastScreen != null) {
+                this.lastScreen.PropertyChanged += this.OnScreenPropertyChanged;
                 this.AdjustToScreenWhenIdle();
+            }
+        }
+
+        void OnViewModelPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            switch (e.PropertyName) {
+            case nameof(ScreenLayoutViewModel.Screen):
+                this.SetScreen(this.ViewModel?.Screen);
+                break;
             }
         }
 
