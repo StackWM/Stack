@@ -7,11 +7,14 @@
     <Style TargetType="{x:Type local:Zone}">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="BorderBrush" Value="Black"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
         <Style.Triggers>
             <Trigger Property="IsDragMouseOver" Value="True">
                 <Setter Property="Background" Value="#A0000000"/>
             </Trigger>
+            <DataTrigger Binding="{Binding ShowHints}" Value="True">
+              <Setter Property="BorderBrush" Value="Black"/>
+            </DataTrigger>
         </Style.Triggers>
     </Style>
 </ResourceDictionary>
