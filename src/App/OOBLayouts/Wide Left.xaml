@@ -34,7 +34,8 @@
 
         <zones:Zone Grid.Row="0"/>
         <zones:Zone Grid.Row="1"/>
-        <Border Grid.RowSpan="2" Height="{StaticResource GripSize}" Background="#44F">
+        <Border Grid.RowSpan="2" Height="{StaticResource GripSize}" Background="#44F"
+                zones:Layout.IsHint="True">
             <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
                    FontFamily="Segoe UI Symbol" Foreground="White" Text="⇕" FontSize="{StaticResource GripFontSize}"/>
@@ -73,6 +74,7 @@
     </Grid>
 
     <Border Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+            zones:Layout.IsHint="True"
             Width="360" Height="360" Background="#44F">
         <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
