@@ -251,6 +251,7 @@
       <DependentUpon>LicenseTermsAcceptance.xaml</DependentUpon>
     </Compile>
     <Compile Include="Licensing\Expiration.cs" />
+    <Compile Include="Licensing\ExtraFeatures.cs" />
     <Compile Include="Models\IAppWindow.cs" />
     <Compile Include="Models\LayoutLoader.cs" />
     <Compile Include="Models\LayoutManager.cs" />
@@ -314,7 +315,10 @@
     <Compile Include="Win32.cs" />
     <Compile Include="WindowDragOperation.cs" />
     <Compile Include="Windows\DragHook.cs" />
-    <Compile Include="Zones\Zone.cs" />
+    <Compile Include="Zones\WindowHost.cs" />
+    <Compile Include="Zones\Zone.xaml.cs">
+      <DependentUpon>Zone.xaml</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="OOBLayouts\V Top+Rest.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -421,6 +425,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\WindowGroupsEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Zones\Zone.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
