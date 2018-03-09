@@ -17,6 +17,19 @@
         FontSize="16"
         WindowStyle="ToolWindow"
         >
+    <metro:MetroWindow.Resources>
+      <ResourceDictionary>
+        <ResourceDictionary.MergedDictionaries>
+          <!-- MahApps.Metro resource dictionaries. Make sure that all file names are Case Sensitive! -->
+          <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/VS/Window.xaml" />
+          <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+          <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+          <!-- Accent and AppTheme setting -->
+          <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+          <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
+        </ResourceDictionary.MergedDictionaries>
+      </ResourceDictionary>
+    </metro:MetroWindow.Resources>
     <StackPanel Margin="12,12">
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
             <art:StackIcon Width="64" Height="64"/>
@@ -27,7 +40,7 @@
             <Span>Stack</Span>
             <InlineUIContainer BaselineAlignment="Bottom">
                 <TextBox Text="{Binding Source={x:Static local:App.Version}, Mode=OneTime}"
-                         Margin="0" Padding="0" BorderThickness="0"
+                         Margin="-2,0" Padding="0" BorderThickness="0"
                          IsReadOnly="True"
                          />
             </InlineUIContainer>
