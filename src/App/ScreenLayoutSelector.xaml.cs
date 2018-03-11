@@ -34,5 +34,7 @@
         void Layouts_OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
             this.ScrollToSelection();
         }
+
+        void Done_OnClick(object sender, RoutedEventArgs e) => this.Close();
     }
 }
