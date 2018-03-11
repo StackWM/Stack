@@ -289,6 +289,7 @@
     <Compile Include="Utils\EnumUtils.cs" />
     <Compile Include="Utils\RectExtensions.cs" />
     <Compile Include="Utils\VersionUtils.cs" />
+    <Compile Include="ViewModels\DesignTimeWindow.cs" />
     <Compile Include="ViewModels\LayoutSelectorViewModel.cs" />
     <Compile Include="ViewModels\ScreenLayoutViewModel.cs" />
     <Compile Include="ViewModels\SimpleViewModel.cs" />
