@@ -303,6 +303,7 @@
                 screenLayout.ViewModel.ShowHints = true;
                 screenLayout.Background = LayoutBackground;
                 screenLayout.Topmost = true;
+                screenLayout.Opacity = 0.7;
             }
         }
 
@@ -311,6 +312,7 @@
                 screenLayout.Topmost = false;
                 screenLayout.ViewModel.ShowHints = false;
                 screenLayout.Background = Brushes.Transparent;
+                screenLayout.Opacity = 1;
             }
         }
 
@@ -475,7 +477,6 @@
             {
                 var layoutTask = this.GetLayoutForScreen(screen, settings, this.layoutsFolder);
                 var layout = new ScreenLayout {
-                    Opacity = 0.7,
                     ViewModel = new ScreenLayoutViewModel{Screen = screen},
                     Title = $"{screen.ID}: {ScreenLayouts.GetDesignation(screen)}"
                 };
