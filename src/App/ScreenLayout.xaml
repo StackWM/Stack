@@ -8,7 +8,6 @@
         AllowsTransparency="True"
         DataContextChanged="OnDataContextChanged"
         ShowInTaskbar="False" ShowActivated="False"
-        Topmost="True"
         Background="Transparent"
         Title="Layout" Icon="StackTaskbarIcon.ico"
         Height="350" Width="525" ResizeMode="NoResize" WindowStyle="None">

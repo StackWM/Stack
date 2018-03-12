@@ -302,11 +302,13 @@
             foreach (ScreenLayout screenLayout in this.screenLayouts.Active()) {
                 screenLayout.ViewModel.ShowHints = true;
                 screenLayout.Background = LayoutBackground;
+                screenLayout.Topmost = true;
             }
         }
 
         void HideLayoutGrid() {
             foreach (var screenLayout in this.screenLayouts) {
+                screenLayout.Topmost = false;
                 screenLayout.ViewModel.ShowHints = false;
                 screenLayout.Background = Brushes.Transparent;
             }
