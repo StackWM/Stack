@@ -9,6 +9,7 @@
     {
         public string Title { get; } = nameof(DesignTimeWindow);
         public Task<Exception> Activate() => throw new NotSupportedException();
+        public Task<Exception> BringToFront() => throw new NotSupportedException();
         public Task<Exception> Move(Rect targetBounds) => throw new NotSupportedException();
     }
 }

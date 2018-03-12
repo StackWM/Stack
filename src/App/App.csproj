@@ -326,6 +326,9 @@
     <Compile Include="Zones\Zone.xaml.cs">
       <DependentUpon>Zone.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Zones\ZoneButton.xaml.cs">
+      <DependentUpon>ZoneButton.xaml</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="OOBLayouts\V Top+Rest.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -440,6 +443,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Zones\Zone.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Zones\ZoneButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

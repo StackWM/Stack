@@ -1,11 +1,11 @@
 ﻿namespace LostTech.Stack.Models
 {
     using System;
-    using System.ComponentModel;
     using System.Runtime.InteropServices;
     using System.Threading.Tasks;
     using System.Windows;
     using static PInvoke.User32;
+    using Win32Exception = System.ComponentModel.Win32Exception;
 
     class Win32Window : IAppWindow, IEquatable<Win32Window>
     {
@@ -39,6 +39,8 @@
 
         public Task<Exception> Activate() => Task.FromResult(
             SetForegroundWindow(this.Handle) ? null : (Exception)new Win32Exception());
+        public Task<Exception> BringToFront() => Task.FromResult(
+            BringWindowToTop(this.Handle) ? null : (Exception)new Win32Exception());
 
         public bool Equals(Win32Window other) {
             if (ReferenceEquals(null, other))
@@ -62,5 +64,8 @@
 
         [DllImport("User32.dll", SetLastError = true)]
         static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern bool BringWindowToTop(IntPtr handle);
     }
 }
