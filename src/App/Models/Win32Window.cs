@@ -27,7 +27,6 @@
                 return new System.ComponentModel.Win32Exception();
             } else {
                 // TODO: option to not activate on move
-                SetForegroundWindow(this.Handle);
                 await Task.Yield();
                 MoveWindow(this.Handle, (int)targetBounds.Left, (int)targetBounds.Top, (int)targetBounds.Width,
                     (int)targetBounds.Height, true);
@@ -40,7 +39,9 @@
         public Task<Exception> Activate() => Task.FromResult(
             SetForegroundWindow(this.Handle) ? null : (Exception)new Win32Exception());
         public Task<Exception> BringToFront() => Task.FromResult(
-            BringWindowToTop(this.Handle) ? null : (Exception)new Win32Exception());
+            SetWindowPos(this.Handle, HWND_NOTOPMOST, 0,0,0,0,
+                SetWindowPosFlags.SWP_NOMOVE | SetWindowPosFlags.SWP_NOACTIVATE |
+                SetWindowPosFlags.SWP_NOREDRAW | SetWindowPosFlags.SWP_NOSIZE) ? null : (Exception)new Win32Exception());
 
         public bool Equals(Win32Window other) {
             if (ReferenceEquals(null, other))
@@ -65,7 +66,6 @@
         [DllImport("User32.dll", SetLastError = true)]
         static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
 
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern bool BringWindowToTop(IntPtr handle);
+        static readonly IntPtr HWND_NOTOPMOST = IntPtr.Zero;
     }
 }
