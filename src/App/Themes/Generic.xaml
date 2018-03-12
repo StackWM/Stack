@@ -17,4 +17,13 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+
+    <Style TargetType="{x:Type local:WindowButton}">
+      <Style.Triggers>
+        <Trigger Property="IsForeground" Value="True">
+          <Setter Property="Background" Value="{x:Static SystemParameters.WindowGlassBrush}" />
+          <Setter Property="Foreground" Value="{x:Static SystemColors.ActiveCaptionTextBrush}" />
+        </Trigger>
+      </Style.Triggers>
+    </Style>
 </ResourceDictionary>

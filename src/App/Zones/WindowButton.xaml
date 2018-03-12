@@ -6,9 +6,14 @@
              xmlns:local="clr-namespace:LostTech.Stack.Zones"
              xmlns:vm="clr-namespace:LostTech.Stack.ViewModels"
              mc:Ignorable="d"
+             x:Name="Root"
              d:DataContext="{d:DesignInstance vm:DesignTimeWindow, d:IsDesignTimeCreatable=True}"
              >
-  <Button Padding="4,2" Click="Window_OnClick">
+  <Button Padding="4,2" Click="Window_OnClick"
+          Background="{Binding Background, ElementName=Root}"
+          Foreground="{Binding Foreground, ElementName=Root}"
+          BorderBrush="{Binding BorderBrush, ElementName=Root}"
+          >
     <Grid>
       <TextBlock Text="{Binding Title}"/>
     </Grid>
