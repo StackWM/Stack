@@ -6,10 +6,10 @@
              xmlns:local="clr-namespace:LostTech.Stack.Zones"
              x:Name="Root"
              mc:Ignorable="d" 
+             Background="Black" Foreground="White"
              d:DesignHeight="450" d:DesignWidth="800">
   <ItemsControl x:Name="Items"
                 ItemsSource="{Binding ItemsSource, ElementName=Root}"
-                Background="Black" Foreground="White"
   >
     <ItemsControl.ItemTemplate>
       <DataTemplate>
