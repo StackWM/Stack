@@ -5,8 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:LostTech.Stack.Zones"
              mc:Ignorable="d" 
+             x:Name="Root"
              >
-  <Button Padding="4,2" Click="Zone_OnClick">
+  <Button Padding="4,2" Click="Zone_OnClick"
+          Background="{Binding Background, ElementName=Root}"
+          Foreground="{Binding Foreground, ElementName=Root}"
+          BorderBrush="{Binding BorderBrush, ElementName=Root}"
+          >
     <Grid>
       <TextBlock Text="{Binding Id, Mode=OneWay}"/>
     </Grid>

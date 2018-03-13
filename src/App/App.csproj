@@ -295,6 +295,7 @@
     <Compile Include="ViewModels\LayoutSelectorViewModel.cs" />
     <Compile Include="ViewModels\ScreenLayoutViewModel.cs" />
     <Compile Include="ViewModels\SimpleViewModel.cs" />
+    <Compile Include="ViewModels\ZoneViewModel.cs" />
     <Compile Include="Views\LayoutPreview.xaml.cs">
       <DependentUpon>LayoutPreview.xaml</DependentUpon>
     </Compile>
@@ -319,7 +320,9 @@
     <Compile Include="Win32.cs" />
     <Compile Include="WindowDragOperation.cs" />
     <Compile Include="Windows\DragHook.cs" />
+    <Compile Include="Zones\ForegroundTracker.cs" />
     <Compile Include="Zones\Layout.cs" />
+    <Compile Include="Zones\TabTemplateSelector.cs" />
     <Compile Include="Zones\WindowButton.xaml.cs">
       <DependentUpon>WindowButton.xaml</DependentUpon>
     </Compile>
@@ -333,6 +336,7 @@
     <Compile Include="Zones\ZoneButton.xaml.cs">
       <DependentUpon>ZoneButton.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Zones\ZoneElement.cs" />
     <EmbeddedResource Include="OOBLayouts\V Top+Rest.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

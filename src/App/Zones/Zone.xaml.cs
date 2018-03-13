@@ -8,6 +8,7 @@
     using System.Windows.Controls;
     using LostTech.Stack.Licensing;
     using LostTech.Stack.Models;
+    using LostTech.Stack.ViewModels;
 
     /// <summary>
     /// Interaction logic for Zone.xaml
@@ -15,6 +16,7 @@
     public partial class Zone : UserControl
     {
         public Zone() {
+            this.ViewModel.Windows = this.Windows;
             this.InitializeComponent();
             this.AllowDrop = true;
         }
@@ -76,7 +78,8 @@
 
         public event EventHandler<ErrorEventArgs> NonFatalErrorOccurred;
 
-        public string Id { get; set; }
+        public string Id { get => this.ViewModel.Id; set => this.ViewModel.Id = value; }
+        public ZoneViewModel ViewModel { get; } = new ZoneViewModel();
 
         public Zone GetFinalTarget() {
             var result = this;

@@ -4,7 +4,7 @@
     using System.Runtime.CompilerServices;
     using JetBrains.Annotations;
 
-    class SimpleViewModel: INotifyPropertyChanged
+    public class SimpleViewModel: INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

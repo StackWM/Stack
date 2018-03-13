@@ -25,4 +25,12 @@
         </Trigger>
       </Style.Triggers>
     </Style>
+
+  <Style TargetType="{x:Type local:ZoneButton}">
+    <Style.Triggers>
+      <Trigger Property="IsForeground" Value="True">
+        <Setter Property="Background" Value="{x:Static SystemParameters.WindowGlassBrush}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
 </ResourceDictionary>
