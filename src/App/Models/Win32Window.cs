@@ -36,12 +36,28 @@
 
         public string Title => GetWindowText(this.Handle);
 
-        public Task<Exception> Activate() => Task.FromResult(
-            SetForegroundWindow(this.Handle) ? null : (Exception)new Win32Exception());
-        public Task<Exception> BringToFront() => Task.FromResult(
-            SetWindowPos(this.Handle, HWND_NOTOPMOST, 0,0,0,0,
-                SetWindowPosFlags.SWP_NOMOVE | SetWindowPosFlags.SWP_NOACTIVATE |
-                SetWindowPosFlags.SWP_NOREDRAW | SetWindowPosFlags.SWP_NOSIZE) ? null : (Exception)new Win32Exception());
+        public Task<Exception> Activate() {
+            this.EnsureNotMinimized();
+            return Task.FromResult(
+                SetForegroundWindow(this.Handle) ? null : (Exception)new Win32Exception());
+        }
+
+        public Task<Exception> BringToFront() {
+            this.EnsureNotMinimized();
+            return Task.FromResult(
+                SetWindowPos(this.Handle, HWND_NOTOPMOST, 0, 0, 0, 0,
+                    SetWindowPosFlags.SWP_NOMOVE | SetWindowPosFlags.SWP_NOACTIVATE |
+                    SetWindowPosFlags.SWP_NOREDRAW | SetWindowPosFlags.SWP_NOSIZE)
+                    ? null
+                    : (Exception)new Win32Exception());
+        }
+
+        Exception EnsureNotMinimized() {
+            if (!IsIconic(this.Handle))
+                return null;
+
+            return ShowWindow(this.Handle, WindowShowStyle.SW_RESTORE) ? null : new Win32Exception();
+        }
 
         public bool Equals(Win32Window other) {
             if (ReferenceEquals(null, other))
@@ -65,6 +81,9 @@
 
         [DllImport("User32.dll", SetLastError = true)]
         static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+
+        [DllImport("User32.dll")]
+        static extern bool IsIconic(IntPtr hwnd);
 
         static readonly IntPtr HWND_NOTOPMOST = IntPtr.Zero;
     }
