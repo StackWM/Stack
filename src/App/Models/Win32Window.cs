@@ -44,12 +44,12 @@
 
         public Task<Exception> BringToFront() {
             this.EnsureNotMinimized();
-            return Task.FromResult(
-                SetWindowPos(this.Handle, HWND_NOTOPMOST, 0, 0, 0, 0,
-                    SetWindowPosFlags.SWP_NOMOVE | SetWindowPosFlags.SWP_NOACTIVATE |
-                    SetWindowPosFlags.SWP_NOREDRAW | SetWindowPosFlags.SWP_NOSIZE)
-                    ? null
-                    : (Exception)new Win32Exception());
+            Exception issue = null;
+            if (!SetWindowPos(this.Handle, GetForegroundWindow(), 0, 0, 0, 0,
+                              SetWindowPosFlags.SWP_NOMOVE | SetWindowPosFlags.SWP_NOACTIVATE |
+                              SetWindowPosFlags.SWP_NOSIZE))
+                issue = new Win32Exception();
+            return Task.FromResult(issue);
         }
 
         Exception EnsureNotMinimized() {
@@ -85,6 +85,7 @@
         [DllImport("User32.dll")]
         static extern bool IsIconic(IntPtr hwnd);
 
-        static readonly IntPtr HWND_NOTOPMOST = IntPtr.Zero;
+        static readonly IntPtr HWND_TOP = IntPtr.Zero;
+        static readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
     }
 }
