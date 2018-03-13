@@ -241,6 +241,7 @@
     <Compile Include="Commands\MoveCurrentWindowInDirectionCommand.cs" />
     <Compile Include="DataBinding\Binder.cs" />
     <Compile Include="DataBinding\CopyableObservableCollection.cs" />
+    <Compile Include="DataBinding\MinimumNumberToVisibilityConverter.cs" />
     <Compile Include="DataBinding\PropertyHelper.cs" />
     <Compile Include="DataBinding\TransformObservableCollection.cs" />
     <Compile Include="DataBinding\UniformThicknessConverter.cs" />
@@ -323,6 +324,9 @@
       <DependentUpon>WindowButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="Zones\WindowHost.cs" />
+    <Compile Include="Zones\WindowTabs.xaml.cs">
+      <DependentUpon>WindowTabs.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Zones\Zone.xaml.cs">
       <DependentUpon>Zone.xaml</DependentUpon>
     </Compile>
@@ -439,6 +443,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Zones\WindowButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Zones\WindowTabs.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

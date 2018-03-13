@@ -1,0 +1,41 @@
+﻿<UserControl x:Class="LostTech.Stack.Zones.WindowTabs"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LostTech.Stack.Zones"
+             x:Name="Root"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+  <ItemsControl x:Name="Items"
+                ItemsSource="{Binding ItemsSource, ElementName=Root}"
+                Background="Black" Foreground="White"
+  >
+    <ItemsControl.ItemTemplate>
+      <DataTemplate>
+        <local:WindowButton />
+      </DataTemplate>
+    </ItemsControl.ItemTemplate>
+
+    <ItemsControl.ItemsPanel>
+      <ItemsPanelTemplate>
+        <StackPanel Orientation="Horizontal" />
+      </ItemsPanelTemplate>
+    </ItemsControl.ItemsPanel>
+    
+    <ItemsControl.Style>
+      <Style TargetType="ItemsControl">
+        <Style.Triggers>
+          <DataTrigger Binding="{Binding VisibilityCondition, ElementName=Root}"
+                       Value="{x:Static local:WindowTabs+VisibilityConditions.OneItem}">
+            <Setter Property="Visibility" Value="{Binding HasItems, ElementName=Items, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+          </DataTrigger>
+          <DataTrigger Binding="{Binding VisibilityCondition, ElementName=Root}"
+                       Value="{x:Static local:WindowTabs+VisibilityConditions.MultipleItems}">
+            <Setter Property="Visibility" Value="{Binding Items.Count, ElementName=Items, Converter={StaticResource MultipleItemsToVisibilityConverter}}"/>
+          </DataTrigger>
+        </Style.Triggers>
+      </Style>
+    </ItemsControl.Style>
+  </ItemsControl>
+</UserControl>

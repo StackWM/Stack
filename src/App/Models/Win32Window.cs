@@ -24,7 +24,7 @@
 
             if (!MoveWindow(this.Handle, (int)targetBounds.Left, (int)targetBounds.Top,
                 (int)targetBounds.Width, (int)targetBounds.Height, bRepaint: true)) {
-                return new System.ComponentModel.Win32Exception();
+                return new Win32Exception();
             } else {
                 // TODO: option to not activate on move
                 await Task.Yield();
