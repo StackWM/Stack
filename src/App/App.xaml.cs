@@ -345,10 +345,10 @@
         async void Move(IntPtr windowHandle, Zone zone)
         {
             var window = new Win32Window(windowHandle);
-            this.layoutManager.Move(window, zone);
             var problem = await window.Activate();
             if (problem != null)
                 this.NonCriticalErrorHandler(this, new ErrorEventArgs(problem));
+            this.layoutManager.Move(window, zone);
         }
 
         void NonCriticalErrorHandler(object sender, ErrorEventArgs error) {
