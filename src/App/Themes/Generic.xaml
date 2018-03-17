@@ -5,9 +5,6 @@
 
 
     <Style TargetType="{x:Type local:Zone}">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="BorderBrush" Value="Black"/>
         <Style.Triggers>
             <Trigger Property="IsDragMouseOver" Value="True">
                 <Setter Property="Background" Value="#A0000000"/>
