@@ -300,6 +300,7 @@
         void ShowLayoutGrid()
         {
             foreach (ScreenLayout screenLayout in this.screenLayouts.Active()) {
+                //screenLayout.TryEnableGlassEffect();
                 screenLayout.ViewModel.ShowHints = true;
                 screenLayout.Background = LayoutBackground;
                 screenLayout.Topmost = true;
@@ -313,6 +314,7 @@
                 screenLayout.ViewModel.ShowHints = false;
                 screenLayout.Background = Brushes.Transparent;
                 screenLayout.Opacity = 1;
+                //screenLayout.TryDisableGlassEffect();
             }
         }
 

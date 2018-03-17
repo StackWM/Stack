@@ -28,7 +28,7 @@
         {
             this.InitializeComponent();
             this.Show();
-            //this.TryEnableGlassEffect();
+            this.SetIsListedInTaskSwitcher(false);
         }
 
         public void SetLayout(FrameworkElement layout) {
