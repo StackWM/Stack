@@ -347,7 +347,7 @@
         async void Move(IntPtr windowHandle, Zone zone)
         {
             var window = new Win32Window(windowHandle);
-            var problem = await window.Activate();
+            Exception problem = await window.Activate();
             if (problem != null)
                 this.NonCriticalErrorHandler(this, new ErrorEventArgs(problem));
             this.layoutManager.Move(window, zone);

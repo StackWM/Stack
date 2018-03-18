@@ -15,7 +15,7 @@
           BorderBrush="{Binding BorderBrush, ElementName=Root}"
           >
     <Grid>
-      <TextBlock Text="{Binding Title}"/>
+      <TextBlock x:Name="TitleText" Text="{Binding Title}"/>
     </Grid>
   </Button>
 </UserControl>

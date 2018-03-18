@@ -7,10 +7,11 @@
 
     class ForegroundTracker
     {
-        readonly WindowHookEx windowHook = new WindowHookEx();
         readonly FrameworkElement attachedTo;
         readonly Func<IntPtr, bool> isForegroundLambda;
         readonly DependencyPropertyKey isForegroundKey;
+
+        public WindowHookEx Hook { get; } = new WindowHookEx();
 
         public ForegroundTracker(FrameworkElement attachTo,
             Func<IntPtr, bool> isForegroundLambda,
@@ -21,7 +22,7 @@
             attachTo.Unloaded += this.OnUnloaded;
             attachTo.Dispatcher.ShutdownStarted += this.DispatcherOnShutdownStarted;
             attachTo.DataContextChanged += this.OnDataContextChanged;
-            this.windowHook.Activated += this.WindowHookOnActivated;
+            this.Hook.Activated += this.WindowHookOnActivated;
         }
 
         void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs) {
@@ -35,12 +36,12 @@
 
         void OnUnloaded(object sender, RoutedEventArgs routedEventArgs) {
             this.attachedTo.DataContextChanged -= this.OnDataContextChanged;
-            this.windowHook.Dispose();
+            this.Hook.Dispose();
             this.attachedTo.Dispatcher.ShutdownStarted -= this.DispatcherOnShutdownStarted;
         }
         void DispatcherOnShutdownStarted(object sender, EventArgs eventArgs) {
             this.attachedTo.DataContextChanged -= this.OnDataContextChanged;
-            this.windowHook.Dispose();
+            this.Hook.Dispose();
         }
     }
 }
