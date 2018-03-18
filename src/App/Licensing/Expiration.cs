@@ -1,6 +1,7 @@
 ﻿namespace LostTech.Stack.Licensing
 {
     using System;
+    using System.DirectoryServices;
     using System.DirectoryServices.ActiveDirectory;
     using System.Threading.Tasks;
     using System.Windows;
@@ -46,6 +47,8 @@
             } catch (ActiveDirectoryObjectNotFoundException) {
                 return true;
             } catch (ActiveDirectoryOperationException) {
+                return true;
+            } catch (DirectoryServicesCOMException) {
                 return true;
             }
         }
