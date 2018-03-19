@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:LostTech.Stack.Zones"
              mc:Ignorable="d"
              Background="Transparent"
-             BorderThickness="1" BorderBrush="Black"
+             BorderThickness="1"
              x:Name="Self"
              d:DesignHeight="450" d:DesignWidth="800">
   <ItemsControl x:Name="Items"

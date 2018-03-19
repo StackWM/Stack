@@ -247,6 +247,7 @@
     <Compile Include="Commands\MoveCurrentWindowInDirectionCommand.cs" />
     <Compile Include="DataBinding\Binder.cs" />
     <Compile Include="DataBinding\CopyableObservableCollection.cs" />
+    <Compile Include="DataBinding\MinimumNumberToVisibilityConverter.cs" />
     <Compile Include="DataBinding\PropertyHelper.cs" />
     <Compile Include="DataBinding\TransformObservableCollection.cs" />
     <Compile Include="DataBinding\UniformThicknessConverter.cs" />
@@ -296,10 +297,14 @@
     <Compile Include="Utils\DragHookEventArgs.cs" />
     <Compile Include="Utils\EnumUtils.cs" />
     <Compile Include="Utils\GlassEffect.cs" />
+    <Compile Include="Utils\ListInTaskSwitcher.cs" />
     <Compile Include="Utils\RectExtensions.cs" />
     <Compile Include="Utils\VersionUtils.cs" />
+    <Compile Include="ViewModels\DesignTimeWindow.cs" />
     <Compile Include="ViewModels\LayoutSelectorViewModel.cs" />
+    <Compile Include="ViewModels\ScreenLayoutViewModel.cs" />
     <Compile Include="ViewModels\SimpleViewModel.cs" />
+    <Compile Include="ViewModels\ZoneViewModel.cs" />
     <Compile Include="Views\LayoutPreview.xaml.cs">
       <DependentUpon>LayoutPreview.xaml</DependentUpon>
     </Compile>
@@ -324,10 +329,23 @@
     <Compile Include="Win32.cs" />
     <Compile Include="WindowDragOperation.cs" />
     <Compile Include="Windows\DragHook.cs" />
+    <Compile Include="Zones\ForegroundTracker.cs" />
+    <Compile Include="Zones\Layout.cs" />
+    <Compile Include="Zones\TabTemplateSelector.cs" />
+    <Compile Include="Zones\WindowButton.xaml.cs">
+      <DependentUpon>WindowButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Zones\WindowHost.cs" />
+    <Compile Include="Zones\WindowTabs.xaml.cs">
+      <DependentUpon>WindowTabs.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Zones\Zone.xaml.cs">
       <DependentUpon>Zone.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Zones\ZoneButton.xaml.cs">
+      <DependentUpon>ZoneButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Zones\ZoneElement.cs" />
     <EmbeddedResource Include="OOBLayouts\V Top+Rest.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -437,7 +455,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Zones\WindowButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Zones\WindowTabs.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Zones\Zone.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Zones\ZoneButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

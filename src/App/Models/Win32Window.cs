@@ -39,12 +39,36 @@
                 return new Win32Exception();
             } else {
                 // TODO: option to not activate on move
-                SetForegroundWindow(this.Handle);
                 await Task.Yield();
                 MoveWindow(this.Handle, (int)targetBounds.Left, (int)targetBounds.Top, (int)targetBounds.Width,
                     (int)targetBounds.Height, true);
                 return null;
             }
+        }
+
+        public string Title => GetWindowText(this.Handle);
+
+        public Task<Exception> Activate() {
+            this.EnsureNotMinimized();
+            return Task.FromResult(
+                SetForegroundWindow(this.Handle) ? null : (Exception)new Win32Exception());
+        }
+
+        public Task<Exception> BringToFront() {
+            this.EnsureNotMinimized();
+            Exception issue = null;
+            if (!SetWindowPos(this.Handle, GetForegroundWindow(), 0, 0, 0, 0,
+                              SetWindowPosFlags.SWP_NOMOVE | SetWindowPosFlags.SWP_NOACTIVATE |
+                              SetWindowPosFlags.SWP_NOSIZE))
+                issue = new Win32Exception();
+            return Task.FromResult(issue);
+        }
+
+        Exception EnsureNotMinimized() {
+            if (!IsIconic(this.Handle))
+                return null;
+
+            return ShowWindow(this.Handle, WindowShowStyle.SW_RESTORE) ? null : new Win32Exception();
         }
 
         public bool Equals(Win32Window other) {
@@ -92,5 +116,11 @@
         static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
         [DllImport("Dwmapi.dll")]
         static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmApi.DWMWINDOWATTRIBUTE attribute, out RECT value, int valueSize);
+
+        [DllImport("User32.dll")]
+        static extern bool IsIconic(IntPtr hwnd);
+
+        static readonly IntPtr HWND_TOP = IntPtr.Zero;
+        static readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
     }
 }

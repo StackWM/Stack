@@ -17,9 +17,9 @@
         MaxWidth="1366" MaxHeight="1600"
         Margin="120"
         Height="700" Width="1366">
-    <!--<Window.Resources>
+    <Window.Resources>
         <ResourceDictionary Source="Themes/Generic.xaml"/>
-    </Window.Resources>-->
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

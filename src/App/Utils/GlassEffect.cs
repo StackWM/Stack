@@ -11,16 +11,22 @@
     {
         public static void TryEnableGlassEffect(this Window window) {
             try {
-                EnableGlassEffectImpl(window);
+                SetGlassEffectImpl(window, true);
             } catch { }
         }
 
-        static void EnableGlassEffectImpl(Window window) {
+        public static void TryDisableGlassEffect(this Window window) {
+            try {
+                SetGlassEffectImpl(window, false);
+            } catch { }
+        }
+
+        static void SetGlassEffectImpl(Window window, bool enable) {
             var windowHelper = new WindowInteropHelper(window);
 
             var accent = new AccentPolicy();
             int accentStructSize = Marshal.SizeOf(accent);
-            accent.AccentState = AccentState.ACCENT_ENABLE_BLURBEHIND;
+            accent.AccentState = enable ? AccentState.ACCENT_ENABLE_BLURBEHIND : AccentState.ACCENT_DISABLED;
 
             IntPtr accentPtr = Marshal.AllocHGlobal(accentStructSize);
             try {

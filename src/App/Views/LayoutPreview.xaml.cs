@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Windows;
     using LostTech.Stack.Models;
+    using LostTech.Stack.ViewModels;
 
     public partial class LayoutPreview
     {
@@ -35,6 +36,7 @@
         async void UpdateView() {
             if (this.LayoutLoader != null && this.DataContext is string layoutName) {
                 var layout = await this.LayoutLoader.LoadLayoutOrDefault(layoutName + ".xaml");
+                layout.DataContext = new ScreenLayoutViewModel{ ShowHints = true };
                 if (double.IsNaN(layout.Width))
                     layout.Width = 1024;
                 if (double.IsNaN(layout.Height))

@@ -17,7 +17,9 @@
                                                           IsInverted="True"
                                                           TrueValue="{x:Null}"
                                                           />
+                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
                     <binding:UniformThicknessConverter x:Key="ThicknessConverter"/>
+                    <binding:MinimumNumberToVisibilityConverter x:Key="MultipleItemsToVisibilityConverter" Minimum="2"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

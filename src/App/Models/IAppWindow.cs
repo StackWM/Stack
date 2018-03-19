@@ -7,5 +7,8 @@
     public interface IAppWindow
     {
         Task<Exception> Move(Rect targetBounds);
+        string Title { get; }
+        Task<Exception> Activate();
+        Task<Exception> BringToFront();
     }
 }

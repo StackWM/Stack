@@ -14,6 +14,7 @@
     using System.Windows;
     using System.Windows.Forms;
     using System.Windows.Interop;
+    using System.Windows.Media;
     using System.Windows.Threading;
     using EventHook;
     using Gma.System.MouseKeyHook;
@@ -261,6 +262,7 @@
             if (!this.dragOperation.Activated) {
                 @event.Handled = true;
                 this.ShowLayoutGrid();
+                this.dragOperation.Activated = true;
             }
 
             var location = GetCursorPos();
@@ -297,12 +299,27 @@
             this.dragOperation.CurrentZone = zone;
         }
 
+        static readonly SolidColorBrush LayoutBackground = new SolidColorBrush(Color.FromArgb(
+            a: 0x80, r: 0xFF, g: 0xFF, b: 0xFF));
         void ShowLayoutGrid()
         {
             foreach (ScreenLayout screenLayout in this.screenLayouts.Active()) {
-                screenLayout.Show();
+                //screenLayout.TryEnableGlassEffect();
+                screenLayout.ViewModel.ShowHints = true;
+                screenLayout.Background = LayoutBackground;
+                screenLayout.Topmost = true;
+                screenLayout.Opacity = 0.7;
             }
-            this.dragOperation.Activated = true;
+        }
+
+        void HideLayoutGrid() {
+            foreach (var screenLayout in this.screenLayouts) {
+                screenLayout.Topmost = false;
+                screenLayout.ViewModel.ShowHints = false;
+                screenLayout.Background = Brushes.Transparent;
+                screenLayout.Opacity = 1;
+                //screenLayout.TryDisableGlassEffect();
+            }
         }
 
         private void OnDragEnd(object sender, DragHookEventArgs @event)
@@ -317,18 +334,26 @@
 
             var screen = this.screenLayouts.Active()
                 .FirstOrDefault(layout => layout.GetPhysicalBounds().Contains(dropPoint));
-            if (screen == null)
+            if (screen == null) {
+                Debug.WriteLine("can't drop: no screen at the target point");
                 return;
+            }
             var relativeDropPoint = screen.PointFromScreen(dropPoint);
             var zone = screen.GetZone(relativeDropPoint)?.GetFinalTarget();
-            if (zone == null)
+            if (zone == null) {
+                Debug.WriteLine("can't drop: no zone at the target point");
                 return;
+            }
+
             this.Move(window, zone);
         }
 
-        void Move(IntPtr windowHandle, Zone zone)
+        async void Move(IntPtr windowHandle, Zone zone)
         {
             var window = this.win32WindowFactory.Create(windowHandle);
+            Exception problem = await window.Activate();
+            if (problem != null)
+                this.NonCriticalErrorHandler(this, new ErrorEventArgs(problem));
             this.layoutManager.Move(window, zone);
         }
 
@@ -360,9 +385,7 @@
             if (this.dragOperation.CurrentZone != null) {
                 this.dragOperation.CurrentZone.IsDragMouseOver = false;
             }
-            foreach (var screenLayout in this.screenLayouts) {
-                screenLayout.Hide();
-            }
+            this.HideLayoutGrid();
             SetForegroundWindow(this.dragOperation.OriginalActiveWindow);
             this.dragOperation = null;
         }
@@ -380,21 +403,25 @@
 
         WindowDragOperation DragStart()
         {
-            //var point = new POINT { x = (int)location.X, y = (int)location.Y };
             User32.GetCursorPos(out var point);
-            var desktop = GetDesktopWindow();
-            var child = ChildWindowFromPointEx(desktop, point, ChildWindowFromPointExFlags.CWP_SKIPINVISIBLE);
+            var child = WindowFromPoint(point);
+            child = GetAncestor(child, GetAncestorFlags.GA_ROOT);
+            if (child == IntPtr.Zero)
+                return null;
             try {
-                if (child == IntPtr.Zero)
-                    return null;
-
                 if (this.stackSettings.Behaviors.MouseMove.WindowGroupIgnoreList.Contains(
                         this.stackSettings.WindowGroups, child))
                     return null;
+
+                if (this.screenLayouts.Any(layout => new WindowInteropHelper(layout).Handle == child)) {
+                    Debug.WriteLine("don't drag self");
+                    return null;
+                }
             }
             catch (Win32Exception) {
                 return null;
             }
+            Debug.WriteLine($"started dragging {GetWindowText(child)}");
             return new WindowDragOperation(child) {
                 OriginalActiveWindow = GetForegroundWindow(),
             };
@@ -459,8 +486,7 @@
             {
                 var layoutTask = this.GetLayoutForScreen(screen, settings, this.layoutsFolder);
                 var layout = new ScreenLayout {
-                    Opacity = 0.7,
-                    Screen = screen,
+                    ViewModel = new ScreenLayoutViewModel{Screen = screen},
                     Title = $"{screen.ID}: {ScreenLayouts.GetDesignation(screen)}"
                 };
                 layout.Closed += this.OnLayoutClosed;

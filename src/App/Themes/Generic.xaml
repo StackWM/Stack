@@ -9,6 +9,25 @@
             <Trigger Property="IsDragMouseOver" Value="True">
                 <Setter Property="Background" Value="#A0000000"/>
             </Trigger>
+            <DataTrigger Binding="{Binding ShowHints}" Value="True">
+              <Setter Property="BorderBrush" Value="Black"/>
+            </DataTrigger>
         </Style.Triggers>
     </Style>
+
+    <Style TargetType="{x:Type local:WindowButton}">
+      <Style.Triggers>
+        <Trigger Property="IsForeground" Value="True">
+          <Setter Property="Background" Value="{x:Static SystemParameters.WindowGlassBrush}" />
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+
+  <Style TargetType="{x:Type local:ZoneButton}">
+    <Style.Triggers>
+      <Trigger Property="IsForeground" Value="True">
+        <Setter Property="Background" Value="{x:Static SystemParameters.WindowGlassBrush}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
 </ResourceDictionary>
