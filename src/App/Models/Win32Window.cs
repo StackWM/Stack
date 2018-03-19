@@ -1,17 +1,22 @@
 ﻿namespace LostTech.Stack.Models
 {
     using System;
+    using System.Diagnostics;
     using System.Runtime.InteropServices;
     using System.Threading.Tasks;
     using System.Windows;
+    using PInvoke;
     using static PInvoke.User32;
+    using Win32Exception = System.ComponentModel.Win32Exception;
 
     class Win32Window : IAppWindow, IEquatable<Win32Window>
     {
         public IntPtr Handle { get; }
+        public bool SuppressSystemMargin { get; set; }
 
-        public Win32Window(IntPtr handle) {
+        public Win32Window(IntPtr handle, bool suppressSystemMargin) {
             this.Handle = handle;
+            this.SuppressSystemMargin = suppressSystemMargin;
         }
 
         public async Task<Exception> Move(Rect targetBounds) {
@@ -21,9 +26,17 @@
                 ShowWindow(this.Handle, WindowShowStyle.SW_RESTORE);
             }
 
+            if (this.SuppressSystemMargin) {
+                RECT systemMargin = GetSystemMargin(this.Handle);
+                targetBounds.X -= systemMargin.left;
+                targetBounds.Y -= systemMargin.top;
+                targetBounds.Width += systemMargin.left + systemMargin.right;
+                targetBounds.Height += systemMargin.top + systemMargin.bottom;
+            }
+
             if (!MoveWindow(this.Handle, (int)targetBounds.Left, (int)targetBounds.Top,
                 (int)targetBounds.Width, (int)targetBounds.Height, bRepaint: true)) {
-                return new System.ComponentModel.Win32Exception();
+                return new Win32Exception();
             } else {
                 // TODO: option to not activate on move
                 SetForegroundWindow(this.Handle);
@@ -52,9 +65,32 @@
             return this.Equals((Win32Window) obj);
         }
 
+        static RECT GetSystemMargin(IntPtr handle) {
+            HResult success = DwmGetWindowAttribute(handle, DwmApi.DWMWINDOWATTRIBUTE.DWMWA_EXTENDED_FRAME_BOUNDS,
+                out var withMargin, Marshal.SizeOf<RECT>());
+            if (!success.Succeeded) {
+                Debug.WriteLine($"DwmGetWindowAttribute: {success.GetException()}");
+                return new RECT();
+            }
+
+            if (!GetWindowRect(handle, out var noMargin)) {
+                Debug.WriteLine($"GetWindowRect: {new Win32Exception()}");
+                return new RECT();
+            }
+
+            return new RECT {
+                left = withMargin.left - noMargin.left,
+                top = withMargin.top - noMargin.top,
+                right = noMargin.right - withMargin.right,
+                bottom = noMargin.bottom - withMargin.bottom,
+            };
+        }
+
         public override int GetHashCode() => this.Handle.GetHashCode();
 
         [DllImport("User32.dll", SetLastError = true)]
         static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+        [DllImport("Dwmapi.dll")]
+        static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmApi.DWMWINDOWATTRIBUTE attribute, out RECT value, int valueSize);
     }
 }

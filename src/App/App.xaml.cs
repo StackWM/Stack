@@ -72,6 +72,7 @@
         ObservableDirectory layoutsDirectory;
         IFolder layoutsFolder;
         LayoutLoader layoutLoader;
+        readonly Win32WindowFactory win32WindowFactory = new Win32WindowFactory();
 
         internal static readonly bool IsUwp = new DesktopBridge.Helpers().IsRunningAsUwp();
 
@@ -137,6 +138,9 @@
                 settings.Behaviors.KeyboardMove.WindowGroupIgnoreList.Add(remoteControlGroupName);
             }
             settings.Behaviors.AddMissingBindings();
+            this.win32WindowFactory.SuppressSystemMargin = settings.Behaviors.General.SuppressSystemMargin;
+            settings.Behaviors.General.OnChange(s => s.SuppressSystemMargin,
+                suppress => this.win32WindowFactory.SuppressSystemMargin = suppress);
 
             bool termsVersionMismatch = settings.Notifications.AcceptedTerms != LicenseTermsAcceptance.GetTermsAndConditionsVersion();
             if (termsVersionMismatch) {
@@ -324,7 +328,7 @@
 
         void Move(IntPtr windowHandle, Zone zone)
         {
-            var window = new Win32Window(windowHandle);
+            var window = this.win32WindowFactory.Create(windowHandle);
             this.layoutManager.Move(window, zone);
         }
 
@@ -647,14 +651,14 @@
         {
             this.hook = Hook.GlobalEvents();
 
-            this.layoutManager = new LayoutManager(this.screenLayouts);
+            this.layoutManager = new LayoutManager(this.screenLayouts, this.win32WindowFactory);
 
             if (settings.Behaviors.KeyboardMove.Enabled)
                 this.keyboardArrowBehavior = new KeyboardArrowBehavior(
                     this.hook, this.screenLayouts, this.layoutManager, settings.Behaviors.KeyBindings,
                     settings.Behaviors.KeyboardMove,
                     settings.WindowGroups,
-                    this.Move);
+                    this.Move, this.win32WindowFactory);
 
             if (settings.Behaviors.MouseMove.Enabled) {
                 this.dragHook = new DragHook(MouseButtons.Middle, this.hook);

@@ -15,9 +15,12 @@
         readonly ICollection<ScreenLayout> screenLayouts;
         readonly Dictionary<IAppWindow, Zone> locations = new Dictionary<IAppWindow, Zone>();
         readonly TaskScheduler taskScheduler;
+        readonly Win32WindowFactory windowFactory;
 
-        public LayoutManager([NotNull] ICollection<ScreenLayout> screenLayouts) {
+        public LayoutManager([NotNull] ICollection<ScreenLayout> screenLayouts,
+            [NotNull] Win32WindowFactory windowFactory) {
             this.screenLayouts = screenLayouts ?? throw new ArgumentNullException(nameof(screenLayouts));
+            this.windowFactory = windowFactory ?? throw new ArgumentNullException(nameof(windowFactory));
             ApplicationWatcher.OnApplicationWindowChange += this.OnApplicationWindowChange;
             this.taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
         }
@@ -44,7 +47,7 @@
         void OnApplicationWindowChange(object sender, ApplicationEventArgs applicationEventArgs)
         {
             var app = applicationEventArgs.ApplicationData;
-            var window = new Win32Window(app.HWnd);
+            var window = this.windowFactory.Create(app.HWnd);
             if (applicationEventArgs.Event != ApplicationEvents.Launched) {
                 bool wasTracked = this.locations.TryGetValue(window, out var existedAt);
                 if (wasTracked) {

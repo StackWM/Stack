@@ -32,6 +32,12 @@
         </ResourceDictionary>
     </metro:MetroWindow.Resources>
     <metro:MetroAnimatedSingleRowTabControl Margin="8">
+        <TabItem Header="General">
+          <StackPanel Margin="8" Orientation="Vertical">
+            <metro:ToggleSwitch Content="Suppress system margin around windows (empty area)"
+                                IsChecked="{Binding Behaviors.General.SuppressSystemMargin}"/>
+          </StackPanel>
+        </TabItem>
         <TabItem Header="Mouse Drag">
             <DockPanel Margin="8">
                 <metro:ToggleSwitch Content="Use middle mouse button to move windows"

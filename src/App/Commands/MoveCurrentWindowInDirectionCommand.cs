@@ -20,15 +20,17 @@
         [NotNull] readonly Action<IntPtr, Zone> move;
         [NotNull] readonly ICollection<ScreenLayout> screenLayouts;
         [NotNull] readonly LayoutManager layoutManager;
+        [NotNull] readonly Win32WindowFactory win32WindowFactory;
 
         public MoveCurrentWindowInDirectionCommand([NotNull] Action<IntPtr, Zone> move,
             [NotNull] ICollection<ScreenLayout> screenLayouts,
             [NotNull] LayoutManager layoutManager,
             [NotNull] KeyboardMoveBehaviorSettings settings,
-            [NotNull] IEnumerable<WindowGroup> windowGroups)
+            [NotNull] IEnumerable<WindowGroup> windowGroups, [NotNull] Win32WindowFactory win32WindowFactory)
         {
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
             this.windowGroups = windowGroups ?? throw new ArgumentNullException(nameof(windowGroups));
+            this.win32WindowFactory = win32WindowFactory ?? throw new ArgumentNullException(nameof(win32WindowFactory));
             this.move = move ?? throw new ArgumentNullException(nameof(move));
             this.screenLayouts = screenLayouts ?? throw new ArgumentNullException(nameof(screenLayouts));
             this.layoutManager = layoutManager ?? throw new ArgumentNullException(nameof(layoutManager));
@@ -89,7 +91,7 @@
                 .Equals(windowCenter, epsilon: Epsilon)).ToArray();
 
             var reducedWindowBounds = windowBounds.Inflated(-1,-1);
-            Win32Window window = new Win32Window(windowHandle);
+            Win32Window window = this.win32WindowFactory.Create(windowHandle);
             var currentZone = this.layoutManager.GetLocation(window);
 
             var next = currentZone == null

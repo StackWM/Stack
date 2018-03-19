@@ -211,6 +211,15 @@
       <Component Id="DesktopBridge.Helpers.dll" Guid="6b146cff-e2d6-4a6e-8552-1c085126bda2">
         <File Id="DesktopBridge.Helpers.dll" Name="DesktopBridge.Helpers.dll" Source="$(var.App_TargetDir)DesktopBridge.Helpers.dll" />
       </Component>
+      <Component Id="ControlzEx.dll" Guid="20ca21c6-3841-42fb-85b0-29d6397c2fb2">
+        <File Id="ControlzEx.dll" Name="ControlzEx.dll" Source="$(var.App_TargetDir)ControlzEx.dll" />
+      </Component>
+      <Component Id="PInvoke.DwmApi.dll" Guid="1fa41de9-62ba-4314-a1e3-0955e2bc4d75">
+        <File Id="PInvoke.DwmApi.dll" Name="PInvoke.DwmApi.dll" Source="$(var.App_TargetDir)PInvoke.DwmApi.dll" />
+      </Component>
+      <Component Id="PInvoke.UxTheme.dll" Guid="f8ede20b-baf4-4e75-926d-e195cbc618bc">
+        <File Id="PInvoke.UxTheme.dll" Name="PInvoke.UxTheme.dll" Source="$(var.App_TargetDir)PInvoke.UxTheme.dll" />
+      </Component>
     </ComponentGroup>
     <ComponentGroup Id="Shortcuts" Directory="ApplicationProgramsFolder">
       <Component Id="Stack.exe.lnk.Component" Guid="c218d8d9-3dcf-4c6a-a6b1-6ea368f61bf6">

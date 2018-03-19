@@ -25,13 +25,14 @@
         readonly Action<IntPtr, Zone> move;
         readonly IEnumerable<CommandKeyBinding> keyBindings;
         readonly LayoutManager layoutManager;
+        readonly Win32WindowFactory win32WindowFactory;
 
         public KeyboardArrowBehavior(IKeyboardEvents keyboardHook, ICollection<ScreenLayout> screenLayouts,
             [NotNull] LayoutManager layoutManager,
             IEnumerable<CommandKeyBinding> keyBindings,
             [NotNull] KeyboardMoveBehaviorSettings settings,
             [NotNull] IEnumerable<WindowGroup> windowGroups,
-            Action<IntPtr, Zone> move)
+            Action<IntPtr, Zone> move, [NotNull] Win32WindowFactory win32WindowFactory)
         {
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
             this.windowGroups = windowGroups ?? throw new ArgumentNullException(nameof(windowGroups));
@@ -39,6 +40,7 @@
             this.screenLayouts = screenLayouts ?? throw new ArgumentNullException(nameof(screenLayouts));
             this.layoutManager = layoutManager ?? throw new ArgumentNullException(nameof(layoutManager));
             this.move = move ?? throw new ArgumentNullException(nameof(move));
+            this.win32WindowFactory = win32WindowFactory ?? throw new ArgumentNullException(nameof(win32WindowFactory));
             this.keyBindings = (keyBindings ?? throw new ArgumentNullException(nameof(keyBindings)))
                 .Where(binding => Commands.All.Contains(binding.CommandName) && binding.Shortcut != null)
                 .ToArray();
@@ -59,7 +61,8 @@
                 return;
 
             var moveCommand = new MoveCurrentWindowInDirectionCommand(this.move, this.screenLayouts,
-                this.layoutManager, this.settings, this.windowGroups);
+                this.layoutManager, this.settings, this.windowGroups,
+                this.win32WindowFactory);
             args.Handled = moveCommand.CanExecute(direction);
 
             // avoid freezing the system

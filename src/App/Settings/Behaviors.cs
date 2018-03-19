@@ -14,6 +14,7 @@
     {
         public KeyboardMoveBehaviorSettings KeyboardMove { get; set; } = new KeyboardMoveBehaviorSettings();
         public MouseMoveBehaviorSettings MouseMove { get; set; } = new MouseMoveBehaviorSettings();
+        public GeneralBehaviorSettings General { get; set; } = new GeneralBehaviorSettings();
 
         public ObservableCollection<CommandKeyBinding> KeyBindings { get; set; } =
             new ObservableCollection<CommandKeyBinding>();
@@ -21,6 +22,7 @@
         public Behaviors Copy() => new Behaviors {
             KeyboardMove = this.KeyboardMove.Copy(),
             MouseMove = this.MouseMove.Copy(),
+            General = this.General.Copy(),
             KeyBindings = new ObservableCollection<CommandKeyBinding>(this.KeyBindings.Select(CopyableCommandKeyBinding.Copy)),
         };
 
