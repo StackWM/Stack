@@ -11,12 +11,14 @@
 
     class Win32Window : IAppWindow, IEquatable<Win32Window>
     {
+        readonly Lazy<bool> excludeFromMargin;
         public IntPtr Handle { get; }
         public bool SuppressSystemMargin { get; set; }
 
         public Win32Window(IntPtr handle, bool suppressSystemMargin) {
             this.Handle = handle;
             this.SuppressSystemMargin = suppressSystemMargin;
+            this.excludeFromMargin = new Lazy<bool>(this.GetExcludeFromMargin);
         }
 
         public async Task<Exception> Move(Rect targetBounds) {
@@ -26,7 +28,7 @@
                 ShowWindow(this.Handle, WindowShowStyle.SW_RESTORE);
             }
 
-            if (this.SuppressSystemMargin) {
+            if (this.SuppressSystemMargin && !this.excludeFromMargin.Value) {
                 RECT systemMargin = GetSystemMargin(this.Handle);
                 targetBounds.X -= systemMargin.left;
                 targetBounds.Y -= systemMargin.top;
@@ -87,6 +89,20 @@
             if (obj.GetType() != this.GetType())
                 return false;
             return this.Equals((Win32Window) obj);
+        }
+
+        bool GetExcludeFromMargin() {
+            GetWindowThreadProcessId(this.Handle, lpdwProcessId: out int processID);
+            if (processID == 0)
+                return false;
+            try {
+                return Process.GetProcessById(processID)?.ProcessName == "explorer";
+            } catch (ArgumentException) { } catch (InvalidOperationException) { }
+            catch (Exception e) {
+                Debug.WriteLine(e);
+                return false;
+            }
+            return false;
         }
 
         static RECT GetSystemMargin(IntPtr handle) {
