@@ -9,6 +9,7 @@
     using static PInvoke.User32;
     using Win32Exception = System.ComponentModel.Win32Exception;
 
+    [DebuggerDisplay("{" + nameof(Title) + "}")]
     class Win32Window : IAppWindow, IEquatable<Win32Window>
     {
         readonly Lazy<bool> excludeFromMargin;

@@ -6,8 +6,10 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using WindowsDesktop;
     using EventHook;
     using JetBrains.Annotations;
+    using LostTech.Stack.Utils;
     using LostTech.Stack.Zones;
 
     class LayoutManager : IDisposable
@@ -23,6 +25,9 @@
             this.windowFactory = windowFactory ?? throw new ArgumentNullException(nameof(windowFactory));
             ApplicationWatcher.OnApplicationWindowChange += this.OnApplicationWindowChange;
             this.taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+
+            if (VirtualDesktop.IsSupported)
+                this.InitVirtualDesktopSupport();
         }
 
         public Zone GetLocation([NotNull] IAppWindow window) =>
@@ -49,6 +54,7 @@
             var app = applicationEventArgs.ApplicationData;
             var window = this.windowFactory.Create(app.HWnd);
             if (applicationEventArgs.Event != ApplicationEvents.Launched) {
+                this.StartOnParentThread(() => this.RemoveFromSuspended(window));
                 bool wasTracked = this.locations.TryGetValue(window, out var existedAt);
                 if (wasTracked) {
                     this.locations.Remove(window);
@@ -61,6 +67,9 @@
             Debug.WriteLine($"Appeared: {app.AppTitle} from {app.AppName}, {app.AppPath}");
             // TODO: determine if window appeared in an existing zone, and if it needs to be moved
             this.locations.Add(window, null);
+            if (VirtualDesktop.IsSupported)
+                Debug.WriteLineIf(VirtualDesktop.FromHwnd(app.HWnd) != VirtualDesktop.Current,
+                    $"Window {app.AppTitle} appeared on inactive desktop");
 
 #if DEBUG
             this.DecideInitialZone(app)
@@ -83,6 +92,55 @@
             return Task.FromResult<Zone>(null);
         }
 
+        #region Virtual Desktop Support
+        void InitVirtualDesktopSupport() {
+            VirtualDesktop.CurrentChanged += this.VirtualDesktopOnCurrentChanged;
+        }
+        void DisposeVirtualDesktopSupport() {
+            VirtualDesktop.CurrentChanged -= this.VirtualDesktopOnCurrentChanged;
+        }
+        readonly Dictionary<VirtualDesktop, Dictionary<Zone, List<IAppWindow>>> suspended =
+            new Dictionary<VirtualDesktop, Dictionary<Zone, List<IAppWindow>>>();
+        void VirtualDesktopOnCurrentChanged(object sender, VirtualDesktopChangedEventArgs change) {
+            this.StartOnParentThread(() => {
+                var oldWindows = this.suspended.GetOrCreate(change.OldDesktop);
+                oldWindows.Clear();
+
+                var activeZones = this.locations.Values.Distinct();
+                foreach (Zone activeZone in activeZones) {
+                    var zoneSuspendList = oldWindows.GetOrCreate(activeZone);
+                    zoneSuspendList.Clear();
+
+                    foreach (IAppWindow appWindow in activeZone.Windows.ToArray()) {
+                        if (appWindow is Win32Window window) {
+                            if (!VirtualDesktop.IsPinnedWindow(window.Handle)) {
+                                zoneSuspendList.Add(appWindow);
+                                Debug.WriteLine($"suspended layout of: {appWindow.Title}");
+                                activeZone.Windows.Remove(appWindow);
+                            } else {
+                                Debug.WriteLine($"ignoring pinned window: {appWindow.Title}");
+                            }
+                        } else
+                            throw new NotSupportedException();
+                    }
+                }
+
+                if (this.suspended.TryGetValue(change.NewDesktop, out var newWindows)) {
+                    foreach (var zoneContent in newWindows)
+                        zoneContent.Key.Windows.AddRange(zoneContent.Value);
+                }
+            });
+        }
+
+        void RemoveFromSuspended(IAppWindow window) {
+            foreach (var desktopCollection in this.suspended.Values) {
+                foreach (var zoneCollection in desktopCollection.Values) {
+                    zoneCollection.Remove(window);
+                }
+            }
+        }
+        #endregion
+
         private Task<Zone> GetZoneByID(string layoutID) => this.StartOnParentThread(() => this.screenLayouts
                                 .SelectMany(layout => layout.Zones)
                                 .FirstOrDefault(zone => zone.Id != null && zone.Id.StartsWith(layoutID))
@@ -92,6 +150,8 @@
 
         public void Dispose() {
             ApplicationWatcher.OnApplicationWindowChange -= this.OnApplicationWindowChange;
+            if (VirtualDesktop.IsSupported)
+                this.DisposeVirtualDesktopSupport();
         }
     }
 }

@@ -27,6 +27,7 @@
         {
             this.InitializeComponent();
             this.Show();
+            // this also makes window to be visible on all virtual desktops
             this.SetIsListedInTaskSwitcher(false);
         }
 
