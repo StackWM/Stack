@@ -67,6 +67,7 @@
         public event EventHandler CanExecuteChanged;
 
         const double Epsilon = 2;
+        const double LargeValue = 1e9;
 
         bool MoveCurrentWindow(Vector direction)
         {
@@ -99,26 +100,64 @@
                 : sameCenter.SkipWhile(zone => !ReferenceEquals(zone, currentZone))
                     .FirstOrDefault(zone => !ReferenceEquals(zone, currentZone));
 
-            var strip = reducedWindowBounds;
-            var directionalInfinity = direction * 1e120;
-            strip.Inflate(Math.Abs(directionalInfinity.X), Math.Abs(directionalInfinity.Y));
+            Debug.WriteLineIf(next != null, "going to a zone with the same center");
 
+            var strip = reducedWindowBounds;
+            var directionalInfinity = direction * LargeValue;
+            if (directionalInfinity.X > 1)
+                strip.Width += LargeValue;
+            if (directionalInfinity.X < -1) {
+                strip.Width += LargeValue;
+                strip.X -= LargeValue;
+            }
+
+            if (directionalInfinity.Y > 1)
+                strip.Height += LargeValue;
+            if (directionalInfinity.Y < -1) {
+                strip.Height += LargeValue;
+                strip.Y -= LargeValue;
+            }
+
+            //next = next
+            //    // enumerate intersecting zones with the same directional coordinate,
+            //    // that follow current zone in the global zone order
+            //    ?? allZones.Where(zone =>
+            //        zone.GetPhysicalBounds().IntersectsWith(strip)
+            //        && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction)
+            //            .IsBetween(-Epsilon, Epsilon))
+            //    .SkipWhile(zone => !ReferenceEquals(zone, currentZone))
+            //    .FirstOrDefault(zone => !ReferenceEquals(zone, currentZone));
+
+            Debug.WriteLineIf(next != null, "going to a zone with the same directional coordinate");
+
+            next = next
+                   // if there are no zones with the same directional coordinate, continue along it
+                   ?? allZones.Where(zone =>
+                           zone.GetPhysicalBounds().IntersectsWith(strip)
+                           && !sameCenter.Contains(zone)
+                           && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction) > 0)
+                       .OrderBy(zone => DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction)
+                            * (windowCenter - zone.GetPhysicalBounds().Center()).Length
+                            * zone.GetPhysicalBounds().Area() / zone.GetPhysicalBounds().Intersection(strip).Area())
+                       .FirstOrDefault();
+
+#if DEBUG
             var targets = allZones.Where(zone =>
                     zone.GetPhysicalBounds().IntersectsWith(strip)
                     && !sameCenter.Contains(zone)
                     && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction) > 0)
                 .ToArray();
-            next = next
-                   // there are no zones with the same center
-                   ?? allZones.Where(zone =>
-                           zone.GetPhysicalBounds().IntersectsWith(strip)
-                           && !sameCenter.Contains(zone)
-                           && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction) > 0)
-                       .OrderBy(zone => DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction))
-                       .FirstOrDefault();
-
+            Debug.WriteLine("potential targets:");
+            foreach (var zone in targets) {
+                Debug.Write($"{zone.GetPhysicalBounds()}, ");
+            }
+            Debug.WriteLine("");
+#endif
             if (next != null)
                 this.move(windowHandle, next);
+            else
+                Debug.WriteLine($"nowhere to move {window.Title}");
+
             return true;
         }
 
