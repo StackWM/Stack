@@ -220,6 +220,9 @@
       <Component Id="PInvoke.UxTheme.dll" Guid="f8ede20b-baf4-4e75-926d-e195cbc618bc">
         <File Id="PInvoke.UxTheme.dll" Name="PInvoke.UxTheme.dll" Source="$(var.App_TargetDir)PInvoke.UxTheme.dll" />
       </Component>
+      <Component Id="VirtualDesktop.dll" Guid="d2514126-8399-48e3-8742-5e646e8fab48">
+        <File Id="VirtualDesktop.dll" Name="VirtualDesktop.dll" Source="$(var.App_TargetDir)VirtualDesktop.dll" />
+      </Component>
     </ComponentGroup>
     <ComponentGroup Id="Shortcuts" Directory="ApplicationProgramsFolder">
       <Component Id="Stack.exe.lnk.Component" Guid="c218d8d9-3dcf-4c6a-a6b1-6ea368f61bf6">

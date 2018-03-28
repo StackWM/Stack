@@ -227,6 +227,9 @@
     <Reference Include="ValueConverters, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\ValueConverters.1.0.7\lib\net45\ValueConverters.dll</HintPath>
     </Reference>
+    <Reference Include="VirtualDesktop, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\VirtualDesktop.1.0.3\lib\net46\VirtualDesktop.dll</HintPath>
+    </Reference>
     <Reference Include="Windows">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Windows Kits\10\UnionMetadata\Windows.winmd</HintPath>
       <Private>False</Private>
