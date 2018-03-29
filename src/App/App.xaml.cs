@@ -551,7 +551,7 @@
                 // windows must be visible before calling AdjustToClientArea,
                 // otherwise final position is unpredictable
                 foreach (Zone zone in layout.Zones) {
-                    zone.NonFatalErrorOccurred += this.NonCriticalErrorHandler;
+                    zone.ProblemOccurred += this.NonCriticalErrorHandler;
                     zone.Id = zone.Id ?? $"{zoneIndex++}";
                 }
                 this.screenLayouts.Add(layout);
@@ -562,7 +562,7 @@
                 ScreenLayout layout = this.screenLayouts.FirstOrDefault(l => l.Screen?.ID == screen.ID);
                 if (layout != null) {
                     foreach (Zone zone in layout.Zones)
-                        zone.NonFatalErrorOccurred -= this.NonCriticalErrorHandler;
+                        zone.ProblemOccurred -= this.NonCriticalErrorHandler;
                     layout.Closed -= this.OnLayoutClosed;
                     layout.Close();
                     this.screenLayouts.Remove(layout);

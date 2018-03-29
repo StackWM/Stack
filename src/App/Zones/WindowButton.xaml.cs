@@ -2,18 +2,21 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.IO;
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Data;
     using EventHook.Hooks;
+    using LostTech.Stack.Licensing;
     using LostTech.Stack.Models;
     using LostTech.Stack.ViewModels;
 
     /// <summary>
     /// Interaction logic for WindowButton.xaml
     /// </summary>
-    public partial class WindowButton : UserControl
+    public partial class WindowButton : UserControl, IObjectWithProblems
     {
         readonly Win32WindowFactory win32WindowFactory = new Win32WindowFactory();
 
@@ -30,7 +33,16 @@
         public AppWindowViewModel ViewModel => (AppWindowViewModel)this.DataContext;
         public IAppWindow Window => this.ViewModel?.Window;
 
-        void Window_OnClick(object sender, RoutedEventArgs e) => this.Window?.Activate();
+        void Window_OnClick(object sender, RoutedEventArgs e) {
+            if (App.IsUwp) {
+                this.Window?.Activate();
+                return;
+            }
+
+            ErrorEventArgs error = ExtraFeatures.PaidFeature("Tabs: Window Buttons");
+            this.problems.Add(error.GetException().Message);
+            this.ProblemOccurred?.Invoke(this, error);
+        }
 
         public bool IsForeground => (bool)this.GetValue(IsForegroundPropertyKey.DependencyProperty);
         public static readonly DependencyPropertyKey IsForegroundPropertyKey =
@@ -43,5 +55,9 @@
             if (this.win32WindowFactory.Create(windowEventArgs.Handle).Equals(this.Window))
                 this.titleBinding.UpdateTarget();
         }
+
+        readonly List<string> problems = new List<string>();
+        public IList<string> Problems => new ReadOnlyCollection<string>(this.problems);
+        public event EventHandler<ErrorEventArgs> ProblemOccurred;
     }
 }

@@ -57,7 +57,9 @@
                 }
             }
 
-            foreach (string zoneProblem in layout.FindChildren<Zone>().SelectMany(zone => zone.LoadProblems))
+            foreach (string zoneProblem in layout.FindChildren<Control>()
+                .OfType<IObjectWithProblems>()
+                .SelectMany(zone => zone.Problems))
                 this.problems.AppendLine($"{file.Name}: {zoneProblem}");
 
             Debug.WriteLine($"loaded layout {fileName} in {this.loadTimer.ElapsedMilliseconds}ms");

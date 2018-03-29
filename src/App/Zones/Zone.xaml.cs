@@ -13,7 +13,7 @@
     /// <summary>
     /// Interaction logic for Zone.xaml
     /// </summary>
-    public partial class Zone : UserControl
+    public partial class Zone : UserControl, IObjectWithProblems
     {
         public Zone() {
             this.ViewModel.Windows = this.Windows;
@@ -67,16 +67,16 @@
 
             var zone = d as Zone;
             ErrorEventArgs error = ExtraFeatures.PaidFeature("Zone Layouts");
-            zone?.NonFatalErrorOccurred?.Invoke(zone, error);
+            zone?.ProblemOccurred?.Invoke(zone, error);
             zone?.loadProblems.Add(error.GetException().Message);
             return DefaultItemsPanelTemplate;
         }
 
         readonly List<string> loadProblems = new List<string>();
-        public IEnumerable<string> LoadProblems => new ReadOnlyCollection<string>(this.loadProblems);
+        public IList<string> Problems => new ReadOnlyCollection<string>(this.loadProblems);
         public ObservableCollection<AppWindowViewModel> Windows { get; } = new ObservableCollection<AppWindowViewModel>();
 
-        public event EventHandler<ErrorEventArgs> NonFatalErrorOccurred;
+        public event EventHandler<ErrorEventArgs> ProblemOccurred;
 
         public string Id { get => this.ViewModel.Id; set => this.ViewModel.Id = value; }
         public ZoneViewModel ViewModel { get; } = new ZoneViewModel();
@@ -90,6 +90,6 @@
         }
 
         void Host_NonFatalErrorOccurred(object sender, ErrorEventArgs e) =>
-            this.NonFatalErrorOccurred?.Invoke(sender, e);
+            this.ProblemOccurred?.Invoke(sender, e);
     }
 }
