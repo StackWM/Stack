@@ -32,10 +32,12 @@
     using LostTech.Stack.Windows;
     using LostTech.Stack.Zones;
     using LostTech.Windows;
+    using MahApps.Metro.Controls;
     using Microsoft.HockeyApp;
     using PCLStorage;
     using PInvoke;
     using Application = System.Windows.Application;
+    using Control = System.Windows.Controls.Control;
     using DragAction = System.Windows.DragAction;
     using FileAccess = PCLStorage.FileAccess;
     using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
@@ -551,9 +553,12 @@
                 // windows must be visible before calling AdjustToClientArea,
                 // otherwise final position is unpredictable
                 foreach (Zone zone in layout.Zones) {
-                    zone.ProblemOccurred += this.NonCriticalErrorHandler;
                     zone.Id = zone.Id ?? $"{zoneIndex++}";
                 }
+
+                foreach (var troublemaker in layout.FindChildren<Control>().OfType<IObjectWithProblems>())
+                    troublemaker.ProblemOccurred += this.NonCriticalErrorHandler;
+
                 this.screenLayouts.Add(layout);
                 layout.SetLayout(await layoutTask);
             }
