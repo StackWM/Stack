@@ -416,8 +416,10 @@
         {
             if (@event.KeyData == Keys.Escape && this.dragOperation != null) {
                 @event.Handled = true;
+                var windowToReactivate = this.dragOperation.OriginalActiveWindow;
                 await this.StopDrag(this.dragOperation.Window);
-                SetForegroundWindow(this.dragOperation.OriginalActiveWindow);
+                Debug.Assert(this.dragOperation == null);
+                SetForegroundWindow(windowToReactivate);
                 return;
             }
         }
