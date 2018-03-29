@@ -14,8 +14,8 @@
     <Window.Resources>
         <ResourceDictionary Source="Themes/Generic.xaml"/>
     </Window.Resources>
-    <Grid>
+    <UniformGrid Rows="1">
         <Button VerticalAlignment="Top" HorizontalAlignment="Right">X</Button>
         <Button VerticalAlignment="Bottom" HorizontalAlignment="Left">Y</Button>
-    </Grid>
+    </UniformGrid>
 </Window>

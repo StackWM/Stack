@@ -50,6 +50,7 @@
         }
 
         public string Title => GetWindowText(this.Handle);
+        public bool IsMinimized => IsIconic(this.Handle);
 
         public Task<Exception> Activate() {
             this.EnsureNotMinimized();

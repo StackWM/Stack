@@ -311,6 +311,7 @@
     <Compile Include="ViewModels\LayoutSelectorViewModel.cs" />
     <Compile Include="ViewModels\ScreenLayoutViewModel.cs" />
     <Compile Include="ViewModels\SimpleViewModel.cs" />
+    <Compile Include="ViewModels\AppWindowViewModel.cs" />
     <Compile Include="ViewModels\ZoneViewModel.cs" />
     <Compile Include="Views\LayoutPreview.xaml.cs">
       <DependentUpon>LayoutPreview.xaml</DependentUpon>

@@ -10,6 +10,7 @@
     using EventHook;
     using JetBrains.Annotations;
     using LostTech.Stack.Utils;
+    using LostTech.Stack.ViewModels;
     using LostTech.Stack.Zones;
 
     class LayoutManager : IDisposable
@@ -42,10 +43,11 @@
             if (target == null)
                 throw new ArgumentNullException(nameof(target));
 
+            var appWindow = new AppWindowViewModel(window);
             if (this.locations.TryGetValue(window, out var previousZone) && previousZone != null)
-                previousZone.Windows.Remove(window);
+                previousZone.Windows.Remove(appWindow);
 
-            target.Windows.Insert(0, window);
+            target.Windows.Insert(0, appWindow);
             this.locations[window] = target;
         }
 
@@ -53,12 +55,13 @@
         {
             var app = applicationEventArgs.ApplicationData;
             var window = this.windowFactory.Create(app.HWnd);
+            var appWindow = new AppWindowViewModel(window);
             if (applicationEventArgs.Event != ApplicationEvents.Launched) {
-                this.StartOnParentThread(() => this.RemoveFromSuspended(window));
+                this.StartOnParentThread(() => this.RemoveFromSuspended(appWindow));
                 bool wasTracked = this.locations.TryGetValue(window, out var existedAt);
                 if (wasTracked) {
                     this.locations.Remove(window);
-                    this.StartOnParentThread(() => existedAt?.Windows.Remove(window));
+                    this.StartOnParentThread(() => existedAt?.Windows.Remove(appWindow));
                 }
                 Debug.WriteLine($"Disappeared: {app.AppTitle} traked: {wasTracked}");
                 return;
@@ -99,8 +102,8 @@
         void DisposeVirtualDesktopSupport() {
             VirtualDesktop.CurrentChanged -= this.VirtualDesktopOnCurrentChanged;
         }
-        readonly Dictionary<VirtualDesktop, Dictionary<Zone, List<IAppWindow>>> suspended =
-            new Dictionary<VirtualDesktop, Dictionary<Zone, List<IAppWindow>>>();
+        readonly Dictionary<VirtualDesktop, Dictionary<Zone, List<AppWindowViewModel>>> suspended =
+            new Dictionary<VirtualDesktop, Dictionary<Zone, List<AppWindowViewModel>>>();
         void VirtualDesktopOnCurrentChanged(object sender, VirtualDesktopChangedEventArgs change) {
             this.StartOnParentThread(() => {
                 var oldWindows = this.suspended.GetOrCreate(change.OldDesktop);
@@ -114,8 +117,8 @@
                     var zoneSuspendList = oldWindows.GetOrCreate(activeZone);
                     zoneSuspendList.Clear();
 
-                    foreach (IAppWindow appWindow in activeZone.Windows.ToArray()) {
-                        if (appWindow is Win32Window window) {
+                    foreach (AppWindowViewModel appWindow in activeZone.Windows.ToArray()) {
+                        if (appWindow.Window is Win32Window window) {
                             if (!VirtualDesktop.IsPinnedWindow(window.Handle)) {
                                 zoneSuspendList.Add(appWindow);
                                 Debug.WriteLine($"suspended layout of: {appWindow.Title}");
@@ -135,7 +138,7 @@
             });
         }
 
-        void RemoveFromSuspended(IAppWindow window) {
+        void RemoveFromSuspended(AppWindowViewModel window) {
             foreach (var desktopCollection in this.suspended.Values) {
                 foreach (var zoneCollection in desktopCollection.Values) {
                     zoneCollection.Remove(window);

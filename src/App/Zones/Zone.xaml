@@ -22,6 +22,7 @@
       <Style TargetType="ContentPresenter">
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="Visibility" Value="{Binding IsMinimized, Converter={StaticResource InvertedBoolToVisibilityConverter}}"/>
       </Style>
     </ItemsControl.ItemContainerStyle>
   </ItemsControl>

@@ -7,6 +7,7 @@
     using System.Windows;
     using System.Windows.Controls;
     using LostTech.Stack.Models;
+    using LostTech.Stack.ViewModels;
 
     sealed class WindowHost: Control
     {
@@ -18,13 +19,13 @@
             this.LayoutUpdated += delegate { this.AdjustWindow(); };
         }
 
-        public IAppWindow Window {
-            get => (IAppWindow)this.GetValue(WindowProperty);
+        public AppWindowViewModel Window {
+            get => (AppWindowViewModel)this.GetValue(WindowProperty);
             set => this.SetValue(WindowProperty, value);
         }
 
         public static readonly DependencyProperty WindowProperty =
-            DependencyProperty.Register(nameof(Window), typeof(IAppWindow), typeof(WindowHost),
+            DependencyProperty.Register(nameof(Window), typeof(AppWindowViewModel), typeof(WindowHost),
                 new PropertyMetadata(WindowChanged));
 
         static void WindowChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
@@ -32,7 +33,7 @@
         }
 
         void OnWindowChanged(DependencyPropertyChangedEventArgs change) {
-            if (!(change.NewValue is IAppWindow))
+            if (!(change.NewValue is AppWindowViewModel))
                 throw new ArgumentException();
 
             if (object.ReferenceEquals(change.NewValue, change.OldValue))
@@ -55,7 +56,7 @@
 
             this.lastRect = rect.Value;
 
-            IAppWindow windowToMove = this.Window;
+            IAppWindow windowToMove = this.Window.Window;
             Exception error = await windowToMove.Move(this.lastRect);
             if (error != null)
                 this.NonFatalErrorOccurred?.Invoke(this, new ErrorEventArgs(error));

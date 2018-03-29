@@ -10,5 +10,6 @@
         string Title { get; }
         Task<Exception> Activate();
         Task<Exception> BringToFront();
+        bool IsMinimized { get; }
     }
 }

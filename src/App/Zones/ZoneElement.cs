@@ -38,7 +38,7 @@
         }
 
         void ResetItems() {
-            IAppWindow @new = this.Content?.Windows?.FirstOrDefault();
+            IAppWindow @new = this.Content?.Windows?.FirstOrDefault()?.Window;
 
             if (this.content.Count == 0 && @new != null)
                 this.content.Add(this.Content);

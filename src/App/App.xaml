@@ -18,6 +18,7 @@
                                                           TrueValue="{x:Null}"
                                                           />
                     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                    <valueConverters:BoolToVisibilityConverter x:Key="InvertedBoolToVisibilityConverter" FalseValue="Visible" TrueValue="Collapsed"/>
                     <binding:UniformThicknessConverter x:Key="ThicknessConverter"/>
                     <binding:MinimumNumberToVisibilityConverter x:Key="MultipleItemsToVisibilityConverter" Minimum="2"/>
                 </ResourceDictionary>

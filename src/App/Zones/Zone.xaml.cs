@@ -74,7 +74,7 @@
 
         readonly List<string> loadProblems = new List<string>();
         public IEnumerable<string> LoadProblems => new ReadOnlyCollection<string>(this.loadProblems);
-        public ObservableCollection<IAppWindow> Windows { get; } = new ObservableCollection<IAppWindow>();
+        public ObservableCollection<AppWindowViewModel> Windows { get; } = new ObservableCollection<AppWindowViewModel>();
 
         public event EventHandler<ErrorEventArgs> NonFatalErrorOccurred;
 

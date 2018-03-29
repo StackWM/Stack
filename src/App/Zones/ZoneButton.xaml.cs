@@ -33,13 +33,13 @@
         readonly ForegroundTracker foregroundTracker;
 
         async void Zone_OnClick(object sender, RoutedEventArgs e) {
-            IAppWindow first = this.Zone?.Windows.FirstOrDefault();
+            AppWindowViewModel first = this.Zone?.Windows.FirstOrDefault();
             if (first == null)
                 return;
 
-            await first.Activate();
+            await first.Window.Activate();
 
-            await Task.WhenAll(this.Zone.Windows.Select(window => window.BringToFront()));
+            await Task.WhenAll(this.Zone.Windows.Select(window => window.Window.BringToFront()));
         }
     }
 }
