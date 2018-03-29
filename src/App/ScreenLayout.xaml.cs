@@ -21,7 +21,7 @@
     /// </summary>
     public partial class ScreenLayout
     {
-        HwndSource handle;
+        internal HwndSource handle;
 
         public ScreenLayout()
         {
@@ -51,7 +51,7 @@
             base.OnClosed(e);
         }
 
-        protected bool IsHandleInitialized => this.handle != null;
+        protected internal bool IsHandleInitialized => this.handle != null;
 
         private IntPtr OnWindowMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {

@@ -309,11 +309,14 @@
                 //screenLayout.TryEnableGlassEffect();
                 screenLayout.ViewModel.ShowHints = true;
                 screenLayout.Background = LayoutBackground;
-                screenLayout.Topmost = true;
                 screenLayout.Opacity = 0.7;
 
-                //if (screenLayout.handle != null)
-                //    this.win32WindowFactory.Create(screenLayout.handle.Handle).BringToFront();
+                // for some reason Topmost below is unreliable
+                // so we have to manually bring the grid up. See Bug #287
+                if (screenLayout.IsHandleInitialized)
+                    this.win32WindowFactory.Create(screenLayout.handle.Handle).BringToFront();
+
+                screenLayout.Topmost = true;
             }
         }
 
