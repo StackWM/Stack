@@ -9,6 +9,7 @@
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
@@ -301,15 +302,54 @@
 
         static readonly SolidColorBrush LayoutBackground = new SolidColorBrush(Color.FromArgb(
             a: 0x80, r: 0xFF, g: 0xFF, b: 0xFF));
-        void ShowLayoutGrid()
-        {
+
+        volatile bool disableDragHandler = false;
+        void ShowLayoutGrid() {
             foreach (ScreenLayout screenLayout in this.screenLayouts.Active()) {
                 //screenLayout.TryEnableGlassEffect();
                 screenLayout.ViewModel.ShowHints = true;
                 screenLayout.Background = LayoutBackground;
                 screenLayout.Topmost = true;
                 screenLayout.Opacity = 0.7;
+
+                //if (screenLayout.handle != null)
+                //    this.win32WindowFactory.Create(screenLayout.handle.Handle).BringToFront();
             }
+        }
+
+        async Task StealFocus() {
+            var first = this.screenLayouts.Active().FirstOrDefault();
+            if (first == null)
+                return;
+
+            await Task.Yield();
+
+            var layoutCenter = first.GetPhysicalBounds().Center().ToDrawingPoint();
+            this.disableDragHandler = true;
+            Debug.WriteLine("forcing focus; drag handler disabled");
+
+            SendMouseInput(MOUSEEVENTF.MOUSEEVENTF_MIDDLEDOWN, layoutCenter.X, layoutCenter.Y);
+            SendMouseInput(MOUSEEVENTF.MOUSEEVENTF_MIDDLEUP, layoutCenter.X, layoutCenter.Y);
+
+            await Task.Yield();
+
+            this.disableDragHandler = false;
+            Debug.WriteLine("reenabled drag handler");
+        }
+
+        static void SendMouseInput(User32.MOUSEEVENTF eventType, int x, int y) {
+            User32.SendInput(1, new[] {
+                new User32.INPUT {
+                    type = User32.InputType.INPUT_MOUSE,
+                    Inputs = new User32.INPUT.InputUnion {
+                        mi = new User32.MOUSEINPUT {
+                            dwFlags = eventType | User32.MOUSEEVENTF.MOUSEEVENTF_ABSOLUTE,
+                            dx = x,
+                            dy = y,
+                        }
+                    }
+                }
+            }, Marshal.SizeOf<User32.INPUT>());
         }
 
         void HideLayoutGrid() {
@@ -322,15 +362,16 @@
             }
         }
 
-        private void OnDragEnd(object sender, DragHookEventArgs @event)
-        {
+        async void OnDragEnd(object sender, DragHookEventArgs @event) {
+            if (this.disableDragHandler)
+                return;
             if (this.dragOperation == null)
                 return;
 
             var location = GetCursorPos();
             var dropPoint = location;
             var window = this.dragOperation.Window;
-            this.StopDrag(window);
+            await this.StopDrag(window);
 
             var screen = this.screenLayouts.Active()
                 .FirstOrDefault(layout => layout.GetPhysicalBounds().Contains(dropPoint));
@@ -371,33 +412,42 @@
             return new Point(cursorPos.x, cursorPos.y);
         }
 
-        private void GlobalKeyDown(object sender, KeyEventArgs @event)
+        async void GlobalKeyDown(object sender, KeyEventArgs @event)
         {
             if (@event.KeyData == Keys.Escape && this.dragOperation != null) {
                 @event.Handled = true;
-                this.StopDrag(this.dragOperation.Window);
+                await this.StopDrag(this.dragOperation.Window);
+                SetForegroundWindow(this.dragOperation.OriginalActiveWindow);
                 return;
             }
         }
 
-        void StopDrag(IntPtr window)
+        async Task StopDrag(IntPtr window)
         {
             if (this.dragOperation.CurrentZone != null) {
                 this.dragOperation.CurrentZone.IsDragMouseOver = false;
             }
+
+            // this allows Stack to bring dragged window to front
+            await this.StealFocus();
+
             this.HideLayoutGrid();
-            SetForegroundWindow(this.dragOperation.OriginalActiveWindow);
+
             this.dragOperation = null;
         }
 
         void OnDragStart(object sender, DragHookEventArgs @event)
         {
+            if (this.dragOperation != null || this.disableDragHandler)
+                return;
             this.dragOperation = this.DragStart();
             @event.Handled = this.dragOperation != null;
         }
 
-        void OnDragStartPreview(object sender, DragHookEventArgs args)
-        {
+        void OnDragStartPreview(object sender, DragHookEventArgs args) {
+            if (this.dragOperation != null || this.disableDragHandler)
+                return;
+
             args.Handled = this.DragStart() != null;
         }
 

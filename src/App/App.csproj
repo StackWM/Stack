@@ -304,6 +304,7 @@
     <Compile Include="Utils\GlassEffect.cs" />
     <Compile Include="Utils\ListInTaskSwitcher.cs" />
     <Compile Include="Utils\MathUtils.cs" />
+    <Compile Include="Utils\PointUtils.cs" />
     <Compile Include="Utils\RectExtensions.cs" />
     <Compile Include="Utils\VersionUtils.cs" />
     <Compile Include="ViewModels\DesignTimeWindow.cs" />
