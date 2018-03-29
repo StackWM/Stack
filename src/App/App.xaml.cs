@@ -233,7 +233,7 @@
         static async Task EnableHockeyApp()
         {
 #if DEBUG
-            HockeyClient.Current.Configure("be80a4a0381c4c37bc187d593ac460f9 ");
+            HockeyClient.Current.Configure("be80a4a0381c4c37bc187d593ac460f9");
             ((HockeyClient)HockeyClient.Current).OnHockeySDKInternalException += (sender, args) =>
             {
                 if (Debugger.IsAttached) { Debugger.Break(); }
