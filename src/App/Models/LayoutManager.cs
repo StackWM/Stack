@@ -108,6 +108,9 @@
 
                 var activeZones = this.locations.Values.Distinct();
                 foreach (Zone activeZone in activeZones) {
+                    if (activeZone == null)
+                        continue;
+                    
                     var zoneSuspendList = oldWindows.GetOrCreate(activeZone);
                     zoneSuspendList.Clear();
 
