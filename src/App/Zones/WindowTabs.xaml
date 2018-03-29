@@ -13,10 +13,18 @@
   <UserControl.Resources>
     <local:TabTemplateSelector x:Key="TabTemplateSelector">
       <local:TabTemplateSelector.WindowTemplate>
-        <DataTemplate><local:WindowButton/></DataTemplate>
+        <DataTemplate>
+          <Border BorderThickness="0,0,1,0" BorderBrush="#80FFFFFF">
+            <local:WindowButton/>
+          </Border>
+        </DataTemplate>
       </local:TabTemplateSelector.WindowTemplate>
       <local:TabTemplateSelector.ZoneTemplate>
-        <DataTemplate><local:ZoneButton/></DataTemplate>
+        <DataTemplate>
+          <Border BorderThickness="0,0,1,0" BorderBrush="#80FFFFFF">
+            <local:ZoneButton/>
+          </Border>
+        </DataTemplate>
       </local:TabTemplateSelector.ZoneTemplate>
     </local:TabTemplateSelector>
   </UserControl.Resources>
