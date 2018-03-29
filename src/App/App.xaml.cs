@@ -37,6 +37,7 @@
     using DragAction = System.Windows.DragAction;
     using FileAccess = PCLStorage.FileAccess;
     using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
+    using static System.FormattableString;
     using static PInvoke.User32;
     using MessageBox = System.Windows.MessageBox;
 
@@ -222,6 +223,13 @@
             }
         }
 
+        static readonly DateTimeOffset BootTime = DateTimeOffset.UtcNow;
+        static TimeSpan Uptime => DateTimeOffset.UtcNow - BootTime;
+#if DEBUG
+        const int HeartbeatIntervalMinutes = 30;
+#else
+        const int HeartbeatIntervalMinutes = 60*3;
+#endif
         static async Task EnableHockeyApp()
         {
 #if DEBUG
@@ -238,6 +246,20 @@
                 await HockeyClient.Current.SendCrashesAsync().ConfigureAwait(false);
             }
             catch (IOException e) when ((e.HResult ^ unchecked((int)0x8007_0000)) == (int) Win32ErrorCode.ERROR_NO_MORE_FILES) {}
+
+            var timer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(HeartbeatIntervalMinutes) };
+            timer.Tick += TelemetryHeartbeat;
+            timer.Start();
+            TelemetryHeartbeat(timer, EventArgs.Empty);
+        }
+
+        static void TelemetryHeartbeat(object sender, EventArgs e) {
+            HockeyClient.Current.TrackEvent("Heartbeat", new Dictionary<string, string> {
+                [nameof(HeartbeatIntervalMinutes)] = Invariant($"{HeartbeatIntervalMinutes}"),
+                [nameof(Expiration.IsDomainUser)] = Invariant($"{Expiration.IsDomainUser()}"),
+                [nameof(Version)] = Invariant($"{Version}"),
+                [nameof(Uptime)] = Invariant($"{Uptime}"),
+            });
         }
 
         static void EnableJitDebugging()
