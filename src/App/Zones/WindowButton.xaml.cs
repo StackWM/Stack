@@ -8,6 +8,7 @@
     using System.Windows.Data;
     using EventHook.Hooks;
     using LostTech.Stack.Models;
+    using LostTech.Stack.ViewModels;
 
     /// <summary>
     /// Interaction logic for WindowButton.xaml
@@ -26,7 +27,8 @@
             this.titleBinding = this.TitleText.GetBindingExpression(TextBlock.TextProperty);
         }
 
-        public IAppWindow Window => this.DataContext as IAppWindow;
+        public AppWindowViewModel ViewModel => (AppWindowViewModel)this.DataContext;
+        public IAppWindow Window => this.ViewModel?.Window;
 
         void Window_OnClick(object sender, RoutedEventArgs e) => this.Window?.Activate();
 

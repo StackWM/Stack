@@ -12,7 +12,7 @@
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container) {
             switch (item) {
-            case IAppWindow _:
+            case AppWindowViewModel _:
                 return this.WindowTemplate;
             case ZoneViewModel _:
                 return this.ZoneTemplate;
