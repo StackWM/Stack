@@ -25,7 +25,7 @@
     <PackageCertificateKeyFile>Store_StoreKey.pfx</PackageCertificateKeyFile>
     <EntryPointProjectUniqueName>..\App\App.csproj</EntryPointProjectUniqueName>
     <PackageCertificateThumbprint>7A9C98BDFEDEC4A68F85E0B6D417C02E2D243EF4</PackageCertificateThumbprint>
-    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>neutral</AppxBundlePlatforms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -48,6 +48,7 @@
     <Content Include="Assets\Square71x71Logo.scale-200.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <None Include="Package.xml" />
     <None Include="Store_StoreKey.pfx" />
     <None Include="Package.StoreAssociation.xml" />
   </ItemGroup>
