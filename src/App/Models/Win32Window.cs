@@ -37,6 +37,19 @@
             }
         }
 
+        public Rect Bounds {
+            get {
+                if (!Win32.GetWindowInfo(this.Handle, out var info))
+                    throw new Win32Exception();
+
+                var bounds = new Rect(info.rcWindow.left, info.rcWindow.top,
+                    info.rcWindow.right - info.rcWindow.left,
+                    info.rcWindow.bottom - info.rcWindow.top);
+
+                return bounds;
+            }
+        }
+
         public string Title => GetWindowText(this.Handle);
 
         public Task<Exception> Activate() {
