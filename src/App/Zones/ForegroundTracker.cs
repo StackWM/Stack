@@ -6,7 +6,7 @@
     using LostTech.Stack.Models;
     using PInvoke;
 
-    class ForegroundTracker
+    class ForegroundTracker: IDisposable
     {
         readonly FrameworkElement attachedTo;
         readonly Func<IAppWindow, bool> isForegroundLambda;
@@ -45,5 +45,7 @@
             this.attachedTo.DataContextChanged -= this.OnDataContextChanged;
             this.Hook.Dispose();
         }
+
+        public void Dispose() => this.Hook.Dispose();
     }
 }

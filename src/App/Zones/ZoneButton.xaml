@@ -7,6 +7,7 @@
              mc:Ignorable="d"
              x:Name="Root"
              MaxWidth="360" MinWidth="40"
+             Unloaded="ZoneButton_OnUnloaded"
              >
   <Button Padding="6,4" Click="Zone_OnClick"
           Background="{Binding Background, ElementName=Root}"

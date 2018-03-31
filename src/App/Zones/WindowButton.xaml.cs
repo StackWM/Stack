@@ -59,5 +59,9 @@
         readonly List<string> problems = new List<string>();
         public IList<string> Problems => new ReadOnlyCollection<string>(this.problems);
         public event EventHandler<ErrorEventArgs> ProblemOccurred;
+
+        void WindowButton_OnUnloaded(object sender, RoutedEventArgs e) {
+            this.foregroundTracker.Dispose();
+        }
     }
 }

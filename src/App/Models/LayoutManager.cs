@@ -44,8 +44,11 @@
                 throw new ArgumentNullException(nameof(target));
 
             var appWindow = new AppWindowViewModel(window);
-            if (this.locations.TryGetValue(window, out var previousZone) && previousZone != null)
+            if (this.locations.TryGetValue(window, out var previousZone) && previousZone != null) {
+                AppWindowViewModel existingWindow = previousZone.Windows.FirstOrDefault(w => w.Equals(appWindow));
+                existingWindow?.Dispose();
                 previousZone.Windows.Remove(appWindow);
+            }
 
             target.Windows.Insert(0, appWindow);
             this.locations[window] = target;
@@ -55,13 +58,16 @@
         {
             var app = applicationEventArgs.ApplicationData;
             var window = this.windowFactory.Create(app.HWnd);
-            var appWindow = new AppWindowViewModel(window);
             if (applicationEventArgs.Event != ApplicationEvents.Launched) {
-                this.StartOnParentThread(() => this.RemoveFromSuspended(appWindow));
+                this.StartOnParentThread(() => this.RemoveFromSuspended(window));
                 bool wasTracked = this.locations.TryGetValue(window, out var existedAt);
                 if (wasTracked) {
                     this.locations.Remove(window);
-                    this.StartOnParentThread(() => existedAt?.Windows.Remove(appWindow));
+                    this.StartOnParentThread(() => {
+                        var existing = existedAt?.Windows.FirstOrDefault(vm => vm.Window.Equals(window));
+                        existing?.Dispose();
+                        return existedAt?.Windows.Remove(existing);
+                    });
                 }
                 Debug.WriteLine($"Disappeared: {app.AppTitle} traked: {wasTracked}");
                 return;
@@ -138,10 +144,12 @@
             });
         }
 
-        void RemoveFromSuspended(AppWindowViewModel window) {
+        void RemoveFromSuspended(IAppWindow window) {
             foreach (var desktopCollection in this.suspended.Values) {
                 foreach (var zoneCollection in desktopCollection.Values) {
-                    zoneCollection.Remove(window);
+                    AppWindowViewModel existing = zoneCollection.FirstOrDefault(vm => vm.Window.Equals(window));
+                    existing?.Dispose();
+                    zoneCollection.Remove(existing);
                 }
             }
         }
