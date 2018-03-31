@@ -8,6 +8,7 @@
     class DesignTimeWindow : IAppWindow
     {
         public string Title { get; } = nameof(DesignTimeWindow);
+        public Rect Bounds => new Rect();
         public bool IsMinimized { get; } = false;
         public Task<Exception> Activate() => throw new NotSupportedException();
         public Task<Exception> BringToFront() => throw new NotSupportedException();

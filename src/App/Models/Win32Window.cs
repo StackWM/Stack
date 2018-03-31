@@ -49,6 +49,27 @@
             }
         }
 
+        public Rect Bounds {
+            get {
+                if (!Win32.GetWindowInfo(this.Handle, out var info))
+                    throw new Win32Exception();
+
+                var bounds = new Rect(info.rcWindow.left, info.rcWindow.top,
+                    info.rcWindow.right - info.rcWindow.left,
+                    info.rcWindow.bottom - info.rcWindow.top);
+
+                if (this.SuppressSystemMargin && !this.excludeFromMargin.Value) {
+                    RECT systemMargin = GetSystemMargin(this.Handle);
+                    bounds.X += systemMargin.left;
+                    bounds.Y += systemMargin.top;
+                    bounds.Width -= systemMargin.left + systemMargin.right;
+                    bounds.Height -= systemMargin.top + systemMargin.bottom;
+                }
+
+                return bounds;
+            }
+        }
+
         public string Title => GetWindowText(this.Handle);
         public bool IsMinimized => IsIconic(this.Handle);
 

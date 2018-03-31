@@ -72,13 +72,11 @@
         bool MoveCurrentWindow(Vector direction)
         {
             var windowHandle = User32.GetForegroundWindow();
-            if (!this.CanExecute(windowHandle) || !Win32.GetWindowInfo(windowHandle, out var info))
+            if (!this.CanExecute(windowHandle))
                 return false;
 
-            var windowBounds = new Rect(info.rcWindow.left, info.rcWindow.top,
-                info.rcWindow.right - info.rcWindow.left,
-                info.rcWindow.bottom - info.rcWindow.top);
-            var windowCenter = windowBounds.Center();
+            Win32Window window = this.win32WindowFactory.Create(windowHandle);
+            var windowCenter = window.Bounds.Center();
             var allZones = this.screenLayouts.Active().SelectMany(screen => screen.Zones)
                 .Where(zone => zone.Target == null || zone.Equals(zone.Target))
                 .ToArray();
@@ -91,8 +89,7 @@
             var sameCenter = allZones.Where(zone => zone.GetPhysicalBounds().Center()
                 .Equals(windowCenter, epsilon: Epsilon)).ToArray();
 
-            var reducedWindowBounds = windowBounds.Inflated(-1,-1);
-            Win32Window window = this.win32WindowFactory.Create(windowHandle);
+            var reducedWindowBounds = window.Bounds.Inflated(-1,-1);
             var currentZone = this.layoutManager.GetLocation(window);
 
             var next = currentZone == null
