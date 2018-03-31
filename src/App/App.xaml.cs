@@ -270,6 +270,7 @@
                 [nameof(Expiration.IsDomainUser)] = Invariant($"{Expiration.IsDomainUser()}"),
                 [nameof(Version)] = Invariant($"{Version}"),
                 [nameof(Uptime)] = Invariant($"{Uptime}"),
+                [nameof(IsUwp)] = Invariant($"{IsUwp}"),
             });
         }
 
