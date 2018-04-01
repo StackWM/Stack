@@ -1,10 +1,11 @@
 ﻿namespace LostTech.Stack.Models
 {
     using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
@@ -16,9 +17,8 @@
     using PCLStorage;
     using FileAccess = PCLStorage.FileAccess;
 
-    public class LayoutLoader
+    public class LayoutLoader: IObjectWithProblems
     {
-        readonly StringBuilder problems = new StringBuilder();
         readonly IFolder layoutDirectory;
         readonly Stopwatch loadTimer = new Stopwatch();
 
@@ -52,21 +52,31 @@
                 try {
                     layout = (FrameworkElement)XamlReader.Load(xmlReader);
                 } catch (XamlParseException e) {
-                    this.problems.AppendLine($"{file.Name}: {e.Message}");
+                    this.problems.Add($"{file.Name}: {e.Message}");
+                    this.ProblemOccurred?.Invoke(this, new ErrorEventArgs(e));
                     return MakeDefaultLayout();
                 }
             }
 
             foreach (string zoneProblem in layout.FindChildren<Control>()
                 .OfType<IObjectWithProblems>()
-                .SelectMany(zone => zone.Problems))
-                this.problems.AppendLine($"{file.Name}: {zoneProblem}");
+                .SelectMany(zone => zone.Problems)) {
+                this.problems.Add($"{file.Name}: {zoneProblem}");
+                this.ReportProblem(fileName, zoneProblem);
+            }
 
             Debug.WriteLine($"loaded layout {fileName} in {this.loadTimer.ElapsedMilliseconds}ms");
             return layout;
         }
 
-        public string Problems => this.problems.ToString();
+        void ReportProblem(string fileName, string message) {
+            var problem = new LayoutLoadException(fileName, message);
+            this.ProblemOccurred?.Invoke(this, new ErrorEventArgs(problem));
+        }
+
+        readonly List<string> problems = new List<string>();
+        public IList<string> Problems => new ReadOnlyCollection<string>(this.problems);
+        public event EventHandler<ErrorEventArgs> ProblemOccurred;
 
         public static FrameworkElement MakeDefaultLayout() => new Grid {
             Children = {

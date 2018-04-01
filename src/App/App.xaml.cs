@@ -428,7 +428,7 @@
 
         void NonCriticalErrorHandler(object sender, ErrorEventArgs error) {
             this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
-            this.trayIcon.BalloonTipTitle = "Can't move";
+            this.trayIcon.BalloonTipTitle = "Stack";
             this.trayIcon.BalloonTipText = error.GetException().Message;
             this.trayIcon.ShowBalloonTip(1000);
         }
@@ -674,9 +674,15 @@
             settings.LayoutMap.Map.CollectionChanged += this.MapOnCollectionChanged;
 
             this.trayIcon = (await TrayIcon.StartTrayIcon(this.layoutsFolder, this.layoutsDirectory, settings, this.screenProvider, this.SettingsWindow)).Icon;
-            if (this.layoutLoader.Problems.Length > 0) {
+            this.trayIcon.BalloonTipClicked += (sender, args) => MessageBox.Show(this.trayIcon.BalloonTipText,
+                this.trayIcon.BalloonTipTitle,
+                MessageBoxButton.OK,
+                this.trayIcon.BalloonTipIcon == ToolTipIcon.Error
+                    ? MessageBoxImage.Error
+                    : MessageBoxImage.Information);
+            if (this.layoutLoader.Problems.Count > 0) {
                 this.trayIcon.BalloonTipTitle = "Some layouts were not loaded";
-                this.trayIcon.BalloonTipText = this.layoutLoader.Problems;
+                this.trayIcon.BalloonTipText = string.Join("\n", this.layoutLoader.Problems);
                 this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
                 this.trayIcon.ShowBalloonTip(30);
             }
@@ -715,7 +721,9 @@
                 var layoutToUpdate = this.screenLayouts.FirstOrDefault(
                     layout => layout.Screen?.ID == newRecord.Key
                     || layout.Screen != null && ScreenLayouts.GetDesignation(layout.Screen) == newRecord.Key);
+                this.layoutLoader.ProblemOccurred += this.NonCriticalErrorHandler;
                 layoutToUpdate?.SetLayout(await this.GetLayoutForScreen(layoutToUpdate.Screen, this.stackSettings, this.layoutsFolder));
+                this.layoutLoader.ProblemOccurred -= this.NonCriticalErrorHandler;
                 break;
             default:
                 return;
