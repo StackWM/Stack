@@ -592,7 +592,9 @@
                     foreach (Zone zone in layout.Zones)
                         zone.ProblemOccurred -= this.NonCriticalErrorHandler;
                     layout.Closed -= this.OnLayoutClosed;
-                    layout.Close();
+                    try {
+                        layout.Close();
+                    } catch (InvalidOperationException) { }
                     this.screenLayouts.Remove(layout);
                 }
             }
