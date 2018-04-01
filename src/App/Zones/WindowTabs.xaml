@@ -28,7 +28,7 @@
       </local:TabTemplateSelector.ZoneTemplate>
     </local:TabTemplateSelector>
   </UserControl.Resources>
-  <ItemsControl x:Name="Items"
+  <ItemsControl x:Name="TabsControl"
                 ItemTemplateSelector="{StaticResource TabTemplateSelector}"
                 ItemsSource="{Binding ItemsSource, ElementName=Root}"
   >
@@ -43,11 +43,11 @@
         <Style.Triggers>
           <DataTrigger Binding="{Binding VisibilityCondition, ElementName=Root}"
                        Value="{x:Static local:WindowTabs+VisibilityConditions.OneItem}">
-            <Setter Property="Visibility" Value="{Binding HasItems, ElementName=Items, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Setter Property="Visibility" Value="{Binding HasItems, ElementName=TabsControl, Converter={StaticResource BooleanToVisibilityConverter}}"/>
           </DataTrigger>
           <DataTrigger Binding="{Binding VisibilityCondition, ElementName=Root}"
                        Value="{x:Static local:WindowTabs+VisibilityConditions.MultipleItems}">
-            <Setter Property="Visibility" Value="{Binding Items.Count, ElementName=Items, Converter={StaticResource MultipleItemsToVisibilityConverter}}"/>
+            <Setter Property="Visibility" Value="{Binding Items.Count, ElementName=TabsControl, Converter={StaticResource MultipleItemsToVisibilityConverter}}"/>
           </DataTrigger>
         </Style.Triggers>
       </Style>

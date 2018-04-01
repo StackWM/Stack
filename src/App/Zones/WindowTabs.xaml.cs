@@ -21,6 +21,8 @@
             this.InitializeComponent();
         }
 
+        public ICollection Items => this.TabsControl.Items;
+
         public ICollection ItemsSource {
             get => (ICollection)this.GetValue(ItemsSourceProperty);
             set => this.SetValue(ItemsSourceProperty, value);
