@@ -21,7 +21,7 @@
             this.InitializeComponent();
 
             this.foregroundTracker = new ForegroundTracker(this,
-                window => this.Zone?.Windows?.Any(window.Equals) == true,
+                window => this.Zone?.Windows?.Any(vm => window.Equals(vm.Window)) == true,
                 IsForegroundPropertyKey);
         }
 
