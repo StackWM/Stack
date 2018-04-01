@@ -500,7 +500,9 @@
                     foreach (Zone zone in layout.Zones)
                         zone.NonFatalErrorOccurred -= this.NonCriticalErrorHandler;
                     layout.Closed -= this.OnLayoutClosed;
-                    layout.Close();
+                    try {
+                        layout.Close();
+                    } catch (InvalidOperationException) { }
                     this.screenLayouts.Remove(layout);
                 }
             }
