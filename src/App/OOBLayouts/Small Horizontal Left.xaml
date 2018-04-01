@@ -10,43 +10,88 @@
     d:DesignWidth="1024"
     d:DesignHeight="576"
 >
-    <!-- ===================================================================== -->
-    <!-- ! This file is overwritten after every update. Please, modify a copy! -->
-    <!-- ===================================================================== -->
-    <Grid.Resources>
-        <ResourceDictionary>
-            <sys:Double x:Key="GripSize">80</sys:Double>
-            <sys:Double x:Key="GripFontSize">40</sys:Double>
-        </ResourceDictionary>
-    </Grid.Resources>
+  <!-- ===================================================================== -->
+  <!-- ! This file is overwritten after every update. Please, modify a copy! -->
+  <!-- ===================================================================== -->
+  <Grid.Resources>
+    <ResourceDictionary>
+      <sys:Double x:Key="GripSize">80</sys:Double>
+      <sys:Double x:Key="GripFontSize">40</sys:Double>
+      <CompositeCollection x:Key="SideContents" x:Name="SideContents">
+        <zones:ZoneElement Content="{Binding ViewModel, Source={x:Reference SideStack}}"/>
+        <CollectionContainer Collection="{Binding Windows, Source={x:Reference SideSingle}}"/>
+      </CompositeCollection>
+    </ResourceDictionary>
+  </Grid.Resources>
+
+  <Grid.ColumnDefinitions>
+    <ColumnDefinition>
+      <ColumnDefinition.Style>
+        <Style>
+          <Setter Property="ColumnDefinition.Width" Value="1*"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding Items.Count, ElementName=SideTabs}" Value="0">
+              <Setter Property="ColumnDefinition.Width" Value="0"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </ColumnDefinition.Style>
+    </ColumnDefinition>
     
-    <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="1*"/>
-        <ColumnDefinition Width="2*"/>
-    </Grid.ColumnDefinitions>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <ColumnDefinition Width="2*"/>
+  </Grid.ColumnDefinitions>
 
-        <zones:Zone x:Name="Side" Grid.Row="0" Grid.RowSpan="2"/>
+  <Grid Grid.Column="1">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
 
-        <zones:Zone Grid.Row="0"/>
-        <zones:Zone Grid.Row="1"/>
-        <Border Grid.RowSpan="2" Height="{StaticResource GripSize}" Background="#44F"
-                zones:Layout.IsHint="True">
+    <zones:WindowTabs ItemsSource="{Binding Windows, Source={x:Reference Main}}"/>
+    <zones:Zone x:Name="Main" Grid.Row="1" />
+  </Grid>
+
+  <Grid Grid.Column="0">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <zones:WindowTabs x:Name="SideTabs" ItemsSource="{x:Reference SideContents}"/>
+
+    <Grid Grid.Row="1">
+      <zones:Zone x:Name="SideSingle" Id="Side"/>
+      <zones:Zone x:Name="SideStack" Grid.Row="0" Id="SideStack">
+        <zones:Zone.Layout>
+          <ItemsPanelTemplate>
+            <UniformGrid Columns="1"/>
+          </ItemsPanelTemplate>
+        </zones:Zone.Layout>
+      </zones:Zone>
+
+      <!-- Canvas is visible even though its container is collapsed -->
+      <Canvas x:Name="DropOverlay"
+              HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+              zones:Layout.IsHint="True">
+        <zones:Zone Target="{Binding ElementName=SideStack}" MinWidth="160"
+                    Width="{Binding ActualWidth, ElementName=DropOverlay}"
+                    Height="{Binding ActualHeight, ElementName=DropOverlay}"/>
+
+        <Grid MinWidth="160"
+              Width="{Binding ActualWidth, ElementName=DropOverlay}"
+              Height="{Binding ActualHeight, ElementName=DropOverlay}"
+              HorizontalAlignment="Stretch">
+          <Border Height="160" Width="160" Background="#44F">
             <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                       RenderTransformOrigin="0.5,0.5"
-                   FontFamily="Segoe UI Symbol" Foreground="White" Text="" FontSize="{StaticResource GripFontSize}">
-                <TextBlock.RenderTransform>
-                    <RotateTransform Angle="90"/>
-                </TextBlock.RenderTransform>
-            </TextBlock>
-        </Border>
-        <zones:Zone Grid.RowSpan="2" Height="{StaticResource GripSize}" Target="{Binding ElementName=Side}"/>
-    </Grid>
+                       FontFamily="Segoe UI Symbol" Foreground="White" Text="" FontSize="80"/>
+          </Border>
 
-    <zones:Zone Grid.Column="1"/>
+          <zones:Zone HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Height="160" Width="160"
+                      Target="{Binding ElementName=SideSingle}"/>
+        </Grid>
+      </Canvas>
+    </Grid>
+  </Grid>
 </Grid>
