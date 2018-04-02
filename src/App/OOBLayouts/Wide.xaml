@@ -38,6 +38,12 @@
             <DataTrigger Binding="{Binding Items.Count, ElementName=LeftSideTabs}" Value="0">
               <Setter Property="ColumnDefinition.Width" Value="0"/>
             </DataTrigger>
+            <DataTrigger Binding="{Binding IsDragMouseOver, ElementName=LeftSideSingle}" Value="True">
+              <Setter Property="ColumnDefinition.Width" Value="1*"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsDragMouseOver, ElementName=LeftSideStack}" Value="True">
+              <Setter Property="ColumnDefinition.Width" Value="1*"/>
+            </DataTrigger>
           </Style.Triggers>
         </Style>
       </ColumnDefinition.Style>
@@ -53,6 +59,12 @@
             <DataTrigger Binding="{Binding Items.Count, ElementName=RightSideTabs}" Value="0">
               <Setter Property="ColumnDefinition.Width" Value="0"/>
             </DataTrigger>
+            <DataTrigger Binding="{Binding IsDragMouseOver, ElementName=RightSideSingle}" Value="True">
+              <Setter Property="ColumnDefinition.Width" Value="1*"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsDragMouseOver, ElementName=RightSideStack}" Value="True">
+              <Setter Property="ColumnDefinition.Width" Value="1*"/>
+            </DataTrigger>
           </Style.Triggers>
         </Style>
       </ColumnDefinition.Style>
@@ -61,25 +73,13 @@
 
   <Grid Grid.Column="1">
     <Grid.RowDefinitions>
-      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="{Binding ActualHeight, ElementName=CentralTabs}"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
 
-    <zones:WindowTabs>
-      <zones:WindowTabs.ItemsSource>
-        <CompositeCollection>
-          <CollectionContainer Collection="{Binding Windows, Source={x:Reference Main}}"/>
-          <CollectionContainer Collection="{Binding Windows, Source={x:Reference Center}}"/>
-        </CompositeCollection>
-      </zones:WindowTabs.ItemsSource>
-    </zones:WindowTabs>
+    <zones:WindowTabs x:Name="CentralTabs" ItemsSource="{Binding Windows, Source={x:Reference Main}}"/>
 
     <zones:Zone x:Name="Main" Grid.Row="1" />
-
-    <zones:Zone x:Name="Center" Grid.Row="1"
-                HorizontalAlignment="Center"
-                Width="{Binding ActualWidth, ElementName=Root, Converter={StaticResource PercentageConverter}, ConverterParameter=50}"
-    />
   </Grid>
 
   <Grid Grid.Column="0">
@@ -118,8 +118,8 @@
                        FontFamily="Segoe UI Symbol" Foreground="White" Text="" FontSize="80"/>
           </Border>
 
-          <zones:Zone HorizontalAlignment="Center" VerticalAlignment="Center"
-                      Height="160" Width="160"
+          <zones:Zone VerticalAlignment="Center"
+                      Height="160"
                       Target="{Binding ElementName=LeftSideSingle}"/>
         </Grid>
       </Canvas>
@@ -163,8 +163,8 @@
                        FontFamily="Segoe UI Symbol" Foreground="White" Text="" FontSize="80"/>
           </Border>
 
-          <zones:Zone HorizontalAlignment="Center" VerticalAlignment="Center"
-                      Height="160" Width="160"
+          <zones:Zone VerticalAlignment="Center"
+                      Height="160"
                       Target="{Binding ElementName=RightSideSingle}"/>
         </Grid>
       </Canvas>
