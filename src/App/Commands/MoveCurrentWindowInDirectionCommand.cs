@@ -128,15 +128,25 @@
 
             Debug.WriteLineIf(next != null, "going to a zone with the same directional coordinate");
 
+            double GetRank(Zone zone) {
+                double intersectionPercentage =
+                    zone.GetPhysicalBounds().Area().AtLeast(1)
+                    / zone.GetPhysicalBounds().Intersection(strip).Area().AtLeast(1);
+
+                double centerTravelDistance = (windowCenter - zone.GetPhysicalBounds().Center()).Length;
+
+                return DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction)
+                       * centerTravelDistance
+                       * intersectionPercentage;
+            }
+
             next = next
                    // if there are no zones with the same directional coordinate, continue along it
                    ?? allZones.Where(zone =>
                            zone.GetPhysicalBounds().IntersectsWith(strip)
                            && !sameCenter.Contains(zone)
                            && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction) > 0)
-                       .OrderBy(zone => DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction)
-                            * (windowCenter - zone.GetPhysicalBounds().Center()).Length
-                            * zone.GetPhysicalBounds().Area() / zone.GetPhysicalBounds().Intersection(strip).Area())
+                       .OrderBy(GetRank)
                        .FirstOrDefault();
 
 #if DEBUG
@@ -147,7 +157,7 @@
                 .ToArray();
             Debug.WriteLine("potential targets:");
             foreach (var zone in targets) {
-                Debug.Write($"{zone.GetPhysicalBounds()}, ");
+                Debug.Write($"[{GetRank(zone)}]{zone.GetPhysicalBounds()},");
             }
             Debug.WriteLine("");
 #endif
