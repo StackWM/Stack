@@ -245,6 +245,7 @@
     <Compile Include="DataBinding\Binder.cs" />
     <Compile Include="DataBinding\CopyableObservableCollection.cs" />
     <Compile Include="DataBinding\MinimumNumberToVisibilityConverter.cs" />
+    <Compile Include="DataBinding\PercentageConverter.cs" />
     <Compile Include="DataBinding\PropertyHelper.cs" />
     <Compile Include="DataBinding\TransformObservableCollection.cs" />
     <Compile Include="DataBinding\UniformThicknessConverter.cs" />
@@ -387,6 +388,10 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="OOBLayouts\V 3 Part.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OOBLayouts\Wide.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>

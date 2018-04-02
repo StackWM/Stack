@@ -21,6 +21,7 @@
                     <valueConverters:BoolToVisibilityConverter x:Key="InvertedBoolToVisibilityConverter" FalseValue="Visible" TrueValue="Collapsed"/>
                     <binding:UniformThicknessConverter x:Key="ThicknessConverter"/>
                     <binding:MinimumNumberToVisibilityConverter x:Key="MultipleItemsToVisibilityConverter" Minimum="2"/>
+                    <binding:PercentageConverter x:Key="PercentageConverter"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
