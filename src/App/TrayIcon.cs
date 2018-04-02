@@ -53,9 +53,11 @@
                 .Font = new Font(contextMenu.Font, FontStyle.Bold);
             trayIcon.Icon.DoubleClick += delegate { settingsWindow.Show(); };
 
-            contextMenu.Items.Add("About", image: null, onClick: (_, __) => trayIcon.aboutWindow.Show());
-            contextMenu.Items.Add("Feedback...", image: null,
-                onClick: (_, __) => Process.Start("http://bit.ly/2o7Rxvr"));
+            contextMenu.Items.Add(trayIcon.CreateHelpMenu());
+            ToolStripMenuItem feedback = new DesktopBridge.Helpers().IsRunningAsUwp()
+                ? Link(text: "Leave Feedback / Rate", url: "ms-windows-store:REVIEW?PFN=LostTechLLC.Zones_kdyhxf5sz30e2")
+                : Link(text: "Feedback...", url: "http://bit.ly/2o7Rxvr");
+            contextMenu.Items.Add(feedback);
 
             var keyboardMovement = new ToolStripMenuItem("Override Win key + arrows") {
                 Checked = stackSettings.Behaviors.KeyboardMove.Enabled,
@@ -104,6 +106,17 @@
 
             return trayIcon;
         }
+
+        ToolStripMenuItem CreateHelpMenu() {
+            var help = new ToolStripMenuItem("Help", image: null) {DisplayStyle = ToolStripItemDisplayStyle.Text};
+            help.DropDownItems.Add(Link("Telegram Community","https://t.me/joinchat/HCVquw4yDSmwxky5pxxKZw"));
+            help.DropDownItems.Add(Link("Questions", "https://github.com/losttech/Stack.Extensibility/issues?utf8=%E2%9C%93&q=label%3Aquestion+"));
+            help.DropDownItems.Add("About", image: null, onClick: (_, __) => this.aboutWindow.Show());
+            return help;
+        }
+
+        static ToolStripMenuItem Link(string text, string url) => 
+            new ToolStripMenuItem(text, image: null, onClick: (_,__) => Process.Start(url));
 
         void CreateLayoutsMenu(ObservableDirectory layoutsDirectory, ToolStrip contextMenu)
         {
