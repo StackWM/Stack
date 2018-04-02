@@ -642,7 +642,7 @@
                                                ?? this.GetSuggestedLayout(screen);
                         if (defaultOption == "Small Horizontal Left.xaml"
                          || defaultOption == "Small Horizontal Right.xaml")
-                            defaultOption = "OOB Small Horizontal.xaml";
+                            defaultOption = "OOB Horizontal.xaml";
                         defaultOption = Path.GetFileNameWithoutExtension(defaultOption);
                         settings.LayoutMap.SetPreferredLayout(screen, fileName: $"{defaultOption}.xaml");
                         var selectorViewModel = new LayoutSelectorViewModel {
@@ -713,9 +713,9 @@
             bool isWide = screen.WorkingArea.Width > 2.1 * screen.WorkingArea.Height;
 
             if (!isWide && !isBig)
-                return "OOB Small Horizontal";
+                return "OOB Horizontal";
             if (isWide && isMiddle)
-                return "OOB Wide";
+                return "OOB Horizontal";
 
             string leftOrRight = isOnTheRight ? "Right" : "Left";
             string kind = isWide ? "Wide" :"Large Horizontal";

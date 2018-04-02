@@ -73,11 +73,11 @@
 
   <Grid Grid.Column="1">
     <Grid.RowDefinitions>
-      <RowDefinition Height="{Binding ActualHeight, ElementName=CentralTabs}"/>
+      <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
 
-    <zones:WindowTabs x:Name="CentralTabs" ItemsSource="{Binding Windows, Source={x:Reference Main}}"/>
+    <zones:WindowTabs ItemsSource="{Binding Windows, Source={x:Reference Main}}"/>
 
     <zones:Zone x:Name="Main" Grid.Row="1" />
   </Grid>
