@@ -209,7 +209,7 @@
 
         static async Task WriteSampleLayoutTo(IFile layoutFile)
         {
-            string sampleResourceName = App.OutOfBoxLayoutsResourcePrefix + "Small Horizontal.xaml";
+            string sampleResourceName = App.OutOfBoxLayoutsResourcePrefix + "OOB Small Horizontal.xaml";
             var resourceContainer = App.GetResourceContainer();
             using (var sampleStream = resourceContainer.GetManifestResourceStream(sampleResourceName))
             using (var layoutStream = await layoutFile.OpenAsync(FileAccess.ReadAndWrite).ConfigureAwait(false)) {
