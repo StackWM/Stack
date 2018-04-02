@@ -10,77 +10,108 @@
     d:DesignWidth="2100"
     d:DesignHeight="900"
 >
-    <!-- ===================================================================== -->
-    <!-- ! This file is overwritten after every update. Please, modify a copy! -->
-    <!-- ===================================================================== -->
-    <Grid.Resources>
-        <ResourceDictionary>
-            <sys:Double x:Key="GripSize">200</sys:Double>
-            <sys:Double x:Key="GripFontSize">100</sys:Double>
-        </ResourceDictionary>
-    </Grid.Resources>
-    
-    <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="1*"/>
-        <ColumnDefinition Width="3*"/>
-    </Grid.ColumnDefinitions>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+  <!-- ===================================================================== -->
+  <!-- ! This file is overwritten after every update. Please, modify a copy! -->
+  <!-- ===================================================================== -->
+  <Grid.Resources>
+    <ResourceDictionary>
+      <sys:Double x:Key="GripSize">200</sys:Double>
+      <sys:Double x:Key="GripFontSize">100</sys:Double>
+    </ResourceDictionary>
+  </Grid.Resources>
 
-        <zones:Zone x:Name="Side" Grid.Row="0" Grid.RowSpan="2"/>
+  <Grid.ColumnDefinitions>
+    <ColumnDefinition Width="1*"/>
+    <ColumnDefinition Width="3*"/>
+  </Grid.ColumnDefinitions>
+  <Grid Grid.Column="0">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
 
-        <zones:Zone Grid.Row="0"/>
-        <zones:Zone Grid.Row="1"/>
-        <Border Grid.RowSpan="2" Height="{StaticResource GripSize}" Background="#44F"
-                zones:Layout.IsHint="True">
-            <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                   FontFamily="Segoe UI Symbol" Foreground="White" Text="⇕" FontSize="{StaticResource GripFontSize}"/>
-        </Border>
-        <zones:Zone Grid.RowSpan="2" Height="{StaticResource GripSize}" Target="{Binding ElementName=Side}"/>
-    </Grid>
+    <zones:WindowTabs>
+      <zones:WindowTabs.ItemsSource>
+        <CompositeCollection>
+          <zones:ZoneElement Content="{Binding ViewModel, Source={x:Reference SideStack}}"/>
+          <CollectionContainer Collection="{Binding Windows, Source={x:Reference SideSingle}}"/>
+        </CompositeCollection>
+      </zones:WindowTabs.ItemsSource>
+    </zones:WindowTabs>
 
-    <zones:Zone x:Name="Main" Grid.Column="1"/>
+    <Grid Grid.Row="1">
+      <zones:Zone x:Name="SideSingle" Id="Side" />
+      <zones:Zone x:Name="SideStack" Id="Side Stack">
+        <zones:Zone.Layout>
+          <ItemsPanelTemplate>
+            <UniformGrid Columns="1"/>
+          </ItemsPanelTemplate>
+        </zones:Zone.Layout>
+      </zones:Zone>
 
-    <Grid Grid.Column="1">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="9*"/>
-            <ColumnDefinition Width="6*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <zones:Zone x:Name="LeftMain" Grid.Column="0" Grid.RowSpan="2"/>
-        <zones:Zone x:Name="RightMain" Grid.Column="1" Grid.RowSpan="2"/>
-        <zones:Zone x:Name="TopMain" Grid.Row="0" Grid.ColumnSpan="2"/>
-        <zones:Zone x:Name="BottomMain" Grid.Row="1" Grid.ColumnSpan="2"/>
-
-        <zones:Zone Grid.Column="0" Grid.Row="0"/>
-        <zones:Zone Grid.Column="1" Grid.Row="0"/>
-        <zones:Zone Grid.Column="0" Grid.Row="1"/>
-        <zones:Zone Grid.Column="1" Grid.Row="1"/>
-
-        <zones:Zone Grid.Column="0" Grid.RowSpan="2"
-                    Margin="{Binding Source={StaticResource GripSize}, Converter={StaticResource ThicknessConverter}}"
-                    Target="{Binding ElementName=LeftMain}"/>
-        <zones:Zone Grid.Column="1" Grid.RowSpan="2"
-                    Margin="{Binding Source={StaticResource GripSize}, Converter={StaticResource ThicknessConverter}}"
-                    Target="{Binding ElementName=RightMain}"/>
-    </Grid>
-
-    <Border Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
-            zones:Layout.IsHint="True"
-            Width="360" Height="360" Background="#44F">
+      <Border HorizontalAlignment="Center" VerticalAlignment="Center"
+                Width="160" Height="160" Background="#44F" zones:Layout.IsHint="True">
         <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                   FontFamily="Segoe UI Symbol" Foreground="White" Text="" FontSize="180"/>
+                     FontFamily="Segoe UI Symbol" Foreground="White" Text="" FontSize="80"/>
+      </Border>
+      <zones:Zone HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Width="160" Height="160"
+                    Target="{Binding ElementName=SideSingle}"/>
+    </Grid>
+  </Grid>
+
+  <Grid Grid.Column="1">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="6*"/>
+      <ColumnDefinition Width="9*"/>
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <zones:WindowTabs>
+      <zones:WindowTabs.ItemsSource>
+        <CompositeCollection>
+          <CollectionContainer Collection="{Binding Windows, Source={x:Reference Main}}"/>
+          <CollectionContainer Collection="{Binding Windows, Source={x:Reference LeftMain}}"/>
+          <CollectionContainer Collection="{Binding Windows, Source={x:Reference RightMain}}"/>
+          <CollectionContainer Collection="{Binding Windows, Source={x:Reference TopMain}}"/>
+          <CollectionContainer Collection="{Binding Windows, Source={x:Reference BottomMain}}"/>
+        </CompositeCollection>
+      </zones:WindowTabs.ItemsSource>
+    </zones:WindowTabs>
+
+    <zones:Zone x:Name="Main" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2"/>
+
+    <zones:Zone x:Name="LeftMain" Grid.Column="0" Grid.RowSpan="2" Grid.Row="1"/>
+    <zones:Zone x:Name="RightMain" Grid.Column="1" Grid.RowSpan="2" Grid.Row="1"/>
+    <zones:Zone x:Name="TopMain" Grid.Row="1" Grid.ColumnSpan="2"/>
+    <zones:Zone x:Name="BottomMain" Grid.Row="2" Grid.ColumnSpan="2"/>
+
+    <zones:Zone Grid.Column="0" Grid.Row="1"/>
+    <zones:Zone Grid.Column="1" Grid.Row="1"/>
+    <zones:Zone Grid.Column="0" Grid.Row="2"/>
+    <zones:Zone Grid.Column="1" Grid.Row="2"/>
+
+    <zones:Zone Grid.Column="0" Grid.RowSpan="2" Grid.Row="1"
+                    Margin="{Binding Source={StaticResource GripSize}, Converter={StaticResource ThicknessConverter}}"
+                    Target="{Binding ElementName=LeftMain}"/>
+    <zones:Zone Grid.Column="1" Grid.RowSpan="2" Grid.Row="1"
+                    Margin="{Binding Source={StaticResource GripSize}, Converter={StaticResource ThicknessConverter}}"
+                    Target="{Binding ElementName=RightMain}"/>
+
+    <Border Grid.ColumnSpan="2" Grid.RowSpan="2" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+            zones:Layout.IsHint="True"
+            Width="360" Height="360" Background="#44F">
+      <!-- Find more symbols from Segoe UI Symbol in Character Map app -->
+      <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                 FontFamily="Segoe UI Symbol" Foreground="White" Text="" FontSize="180"/>
     </Border>
-    <zones:Zone Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+    <zones:Zone Grid.ColumnSpan="2" Grid.RowSpan="2" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
                 Width="360" Height="360"
                 Target="{Binding ElementName=Main}"/>
+  </Grid>
 </Grid>
