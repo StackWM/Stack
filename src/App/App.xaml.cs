@@ -706,12 +706,16 @@
                                .Where(IsValidScreen)
                                .OrderBy(s => s.WorkingArea.Left)
                                .Select(s => s.ID).ToArray();
+            bool isMiddle = Array.FindIndex(screens, screenID => screenID == screen.ID)
+                .IsBetween(1, screens.Length - 2);
             bool isOnTheRight = screens.Length > 1 && screens.Last() == screen.ID;
             bool isBig = screen.TransformFromDevice.Transform((Vector)screen.WorkingArea.Size).X > 2000;
             bool isWide = screen.WorkingArea.Width > 2.1 * screen.WorkingArea.Height;
 
             if (!isWide && !isBig)
                 return "Small Horizontal";
+            if (isWide && isMiddle)
+                return "Wide";
 
             string leftOrRight = isOnTheRight ? "Right" : "Left";
             string kind = isWide ? "Wide" :"Large Horizontal";
