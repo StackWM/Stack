@@ -76,6 +76,9 @@ namespace LostTech.Stack.Settings
             int currentIndex = this.GetPreferredLayoutIndex(screen);
             if (currentIndex < 0)
                 return true;
+            string value = this.Map[currentIndex].Value;
+            if (value == "Small Horizontal Right.xaml" || value == "Small Horizontal Left.xaml")
+                return true;
             string key = this.Map[currentIndex].Key;
             return int.TryParse(key, NumberStyles.Integer, CultureInfo.InvariantCulture, out int _);
         }

@@ -640,6 +640,9 @@
                     {
                         string defaultOption = settings.LayoutMap.GetPreferredLayout(screen)
                                                ?? this.GetSuggestedLayout(screen);
+                        if (defaultOption == "Small Horizontal Left.xaml"
+                         || defaultOption == "Small Horizontal Right.xaml")
+                            defaultOption = "Small Horizontal.xaml";
                         defaultOption = Path.GetFileNameWithoutExtension(defaultOption);
                         settings.LayoutMap.SetPreferredLayout(screen, fileName: $"{defaultOption}.xaml");
                         var selectorViewModel = new LayoutSelectorViewModel {
@@ -706,8 +709,12 @@
             bool isOnTheRight = screens.Length > 1 && screens.Last() == screen.ID;
             bool isBig = screen.TransformFromDevice.Transform((Vector)screen.WorkingArea.Size).X > 2000;
             bool isWide = screen.WorkingArea.Width > 2.1 * screen.WorkingArea.Height;
+
+            if (!isWide && !isBig)
+                return "Small Horizontal";
+
             string leftOrRight = isOnTheRight ? "Right" : "Left";
-            string kind = isWide ? "Wide" : isBig ? "Large Horizontal" : "Small Horizontal";
+            string kind = isWide ? "Wide" :"Large Horizontal";
             return $"{kind} {leftOrRight}";
         }
 
