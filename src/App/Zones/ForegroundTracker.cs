@@ -2,6 +2,7 @@
 {
     using System;
     using System.Windows;
+    using System.Windows.Threading;
     using EventHook.Hooks;
     using LostTech.Stack.Models;
     using PInvoke;
@@ -46,6 +47,12 @@
             this.Hook.Dispose();
         }
 
-        public void Dispose() => this.Hook.Dispose();
+        public void Dispose() {
+            this.Hook.Dispose();
+            this.attachedTo.DataContextChanged -= this.OnDataContextChanged;
+            Dispatcher dispatcher = this.attachedTo.Dispatcher;
+            if (dispatcher != null)
+                dispatcher.ShutdownStarted -= this.DispatcherOnShutdownStarted;
+        }
     }
 }

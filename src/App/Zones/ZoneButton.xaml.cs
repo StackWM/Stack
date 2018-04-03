@@ -14,7 +14,7 @@
     /// <summary>
     /// Interaction logic for ZoneButton.xaml
     /// </summary>
-    public partial class ZoneButton: IObjectWithProblems
+    public partial class ZoneButton: IObjectWithProblems, IDisposable
     {
         public ZoneButton()
         {
@@ -59,5 +59,14 @@
         void ZoneButton_OnUnloaded(object sender, RoutedEventArgs e) {
             this.foregroundTracker.Dispose();
         }
+
+        protected override void OnVisualParentChanged(DependencyObject oldParent) {
+            base.OnVisualParentChanged(oldParent);
+
+            if (this.VisualParent == null)
+                this.Dispose();
+        }
+
+        public void Dispose() => this.foregroundTracker.Dispose();
     }
 }

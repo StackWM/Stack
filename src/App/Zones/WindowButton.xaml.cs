@@ -16,7 +16,7 @@
     /// <summary>
     /// Interaction logic for WindowButton.xaml
     /// </summary>
-    public partial class WindowButton : UserControl, IObjectWithProblems
+    public partial class WindowButton : UserControl, IObjectWithProblems, IDisposable
     {
         readonly Win32WindowFactory win32WindowFactory = new Win32WindowFactory();
 
@@ -61,7 +61,16 @@
         public event EventHandler<ErrorEventArgs> ProblemOccurred;
 
         void WindowButton_OnUnloaded(object sender, RoutedEventArgs e) {
-            this.foregroundTracker.Dispose();
+            this.Dispose();
         }
+
+        protected override void OnVisualParentChanged(DependencyObject oldParent) {
+            base.OnVisualParentChanged(oldParent);
+
+            if (this.VisualParent == null)
+                this.Dispose();
+        }
+
+        public void Dispose() => this.foregroundTracker.Dispose();
     }
 }
