@@ -6,6 +6,7 @@
     xmlns:zones="clr-namespace:LostTech.Stack.Zones;assembly=Stack"
     xmlns:system="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d"
+    zones:Layout.Version="2"
     Width="1024" Height="576"
     d:DesignWidth="1024"
     d:DesignHeight="576"

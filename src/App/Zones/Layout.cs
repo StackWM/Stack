@@ -29,5 +29,11 @@
                 BindingOperations.ClearBinding(element, UIElement.VisibilityProperty);
             }
         }
+
+        public static int GetVersion(DependencyObject obj) => (int)obj.GetValue(VersionProperty);
+        public static void SetVersion(DependencyObject obj, int value) => obj.SetValue(VersionProperty, value);
+        public static readonly DependencyProperty VersionProperty =
+            DependencyProperty.RegisterAttached("Version", typeof(int), typeof(Layout),
+                new PropertyMetadata(defaultValue: 1));
     }
 }
