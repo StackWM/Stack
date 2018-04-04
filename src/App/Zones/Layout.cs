@@ -35,5 +35,10 @@
         public static readonly DependencyProperty VersionProperty =
             DependencyProperty.RegisterAttached("Version", typeof(int), typeof(Layout),
                 new PropertyMetadata(defaultValue: 1));
+
+        internal static string GetSource(DependencyObject obj) => (string)obj.GetValue(SourceProperty);
+        internal static void SetSource(DependencyObject obj, string value) => obj.SetValue(SourceProperty, value);
+        static readonly DependencyProperty SourceProperty =
+            DependencyProperty.RegisterAttached("Source", typeof(string), typeof(Layout));
     }
 }

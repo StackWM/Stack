@@ -17,10 +17,14 @@
     using System.Windows.Interop;
     using System.Windows.Media;
     using System.Windows.Threading;
+    using System.Xml;
+    using DesktopNotifications;
     using EventHook;
+    using global::Windows.UI.Notifications;
     using Gma.System.MouseKeyHook;
     using LostTech.App;
     using LostTech.Stack.Behavior;
+    using LostTech.Stack.Compat;
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.Models;
     using LostTech.Stack.Extensibility.Filters;
@@ -34,6 +38,7 @@
     using LostTech.Windows;
     using MahApps.Metro.Controls;
     using Microsoft.HockeyApp;
+    using Microsoft.Toolkit.Uwp.Notifications;
     using PCLStorage;
     using PInvoke;
     using Application = System.Windows.Application;
@@ -44,6 +49,7 @@
     using static System.FormattableString;
     using static PInvoke.User32;
     using MessageBox = System.Windows.MessageBox;
+    using XmlDocument = global::Windows.Data.Xml.Dom.XmlDocument;
 
     /// <summary>
     /// Interaction logic for App.xaml
@@ -55,6 +61,7 @@
         ICollection<ScreenLayout> screenLayouts;
         NotifyIcon trayIcon;
         IFolder localSettingsFolder, roamingSettingsFolder;
+        public const int LatestLayoutVersion = 2;
 
         readonly Window winApiHandler = new Window {
             Opacity = 0,
@@ -106,6 +113,8 @@
                     IsEnabled = true,
                 };
                 this.updateTimer.Tick += (_, __) => this.BeginCheckForUpdates();
+            } else {
+                DesktopNotificationManagerCompat.RegisterActivator<UrlNotificationActivator>();
             }
 
             if (await Expiration.HasExpired()) {
@@ -426,6 +435,28 @@
             this.layoutManager.Move(window, zone);
         }
 
+        void ShowWarning(string title, string message, Uri navigateTo, TimeSpan? duration = null) {
+            var content = new ToastContent {
+                Launch = navigateTo.ToString(),
+
+                Header = title == null ? null : new ToastHeader(title, title, navigateTo.ToString()),
+
+                Visual = new ToastVisual {
+                    BindingGeneric = new ToastBindingGeneric {
+                        Children = { new AdaptiveText{Text = message} },
+                    }
+                }
+            };
+
+            var contentXml = new XmlDocument();
+            contentXml.LoadXml(content.GetContent());
+            var toast = new ToastNotification(contentXml) {
+                // DTO + null == null
+                ExpirationTime = DateTimeOffset.Now + duration,
+            };
+            DesktopNotificationManagerCompat.CreateToastNotifier().Show(toast);
+        }
+
         void NonCriticalErrorHandler(object sender, ErrorEventArgs error) {
             this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
             this.trayIcon.BalloonTipTitle = "Stack";
@@ -557,14 +588,14 @@
 
             var screens = this.screenProvider.Screens;
             FrameworkElement[] layouts = await Task.WhenAll(screens
-                .Select(screen => this.GetLayoutForScreen(screen, settings, this.layoutsFolder))
+                .Select(screen => this.GetLayoutForScreen(screen, settings))
                 .ToArray());
             this.screenLayouts = new ObservableCollection<ScreenLayout>();
             int zoneIndex = 0;
 
             async Task AddLayoutForScreen(Win32Screen screen)
             {
-                var layoutTask = this.GetLayoutForScreen(screen, settings, this.layoutsFolder);
+                var layoutTask = this.GetLayoutForScreen(screen, settings);
                 var layout = new ScreenLayout {
                     ViewModel = new ScreenLayoutViewModel{Screen = screen},
                     Title = $"{screen.ID}: {ScreenLayouts.GetDesignation(screen)}"
@@ -583,7 +614,15 @@
                     troublemaker.ProblemOccurred += this.NonCriticalErrorHandler;
 
                 this.screenLayouts.Add(layout);
-                layout.SetLayout(await layoutTask);
+                FrameworkElement layoutElement = await layoutTask;
+                int version = Layout.GetVersion(layoutElement);
+                if (version < LatestLayoutVersion) {
+                    // TODO: remember warning state per layout
+                    this.ShowWarning(title: "Outdated layout", 
+                        message: $"Layout {Layout.GetSource(layoutElement)} is outdated. Upgrade it to v2.",
+                        navigateTo: new Uri("https://www.allanswered.com/post/kgnoz/how-do-i-upgrade-my-layouts-to-v2/"));
+                }
+                layout.SetLayout(layoutElement);
             }
 
             void RemoveLayoutForScreen(Win32Screen screen) {
@@ -606,7 +645,7 @@
                 changeGroupTask = delay;
                 await delay;
                 if (delay.Equals(changeGroupTask))
-                    layout.SetLayout(await this.GetLayoutForScreen(layout.Screen, settings, this.layoutsFolder));
+                    layout.SetLayout(await this.GetLayoutForScreen(layout.Screen, settings));
                 else
                     Debug.WriteLine("grouped updates!");
             }
@@ -733,7 +772,7 @@
                     layout => layout.Screen?.ID == newRecord.Key
                     || layout.Screen != null && ScreenLayouts.GetDesignation(layout.Screen) == newRecord.Key);
                 this.layoutLoader.ProblemOccurred += this.NonCriticalErrorHandler;
-                layoutToUpdate?.SetLayout(await this.GetLayoutForScreen(layoutToUpdate.Screen, this.stackSettings, this.layoutsFolder));
+                layoutToUpdate?.SetLayout(await this.GetLayoutForScreen(layoutToUpdate.Screen, this.stackSettings));
                 this.layoutLoader.ProblemOccurred -= this.NonCriticalErrorHandler;
                 break;
             default:
@@ -770,11 +809,13 @@
         }
 
         internal static Assembly GetResourceContainer() => Assembly.GetExecutingAssembly();
-        async Task<FrameworkElement> GetLayoutForScreen(Win32Screen screen, StackSettings settings, IFolder layoutsDirectory)
+        async Task<FrameworkElement> GetLayoutForScreen(Win32Screen screen, StackSettings settings)
         {
-            string layout = settings.LayoutMap.GetPreferredLayout(screen)
+            string layoutFileName = settings.LayoutMap.GetPreferredLayout(screen)
                           ?? $"{this.GetSuggestedLayout(screen)}.xaml";
-            return await this.layoutLoader.LoadLayoutOrDefault(layout);
+            FrameworkElement layout = await this.layoutLoader.LoadLayoutOrDefault(layoutFileName);
+            Layout.SetSource(layout, layoutFileName);
+            return layout;
         }
 
         private void BindHandlers(StackSettings settings)
