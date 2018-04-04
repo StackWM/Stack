@@ -1,5 +1,6 @@
 ﻿namespace LostTech.Stack.Zones
 {
+    using System.Diagnostics;
     using System.Windows;
     using System.Windows.Data;
     using LostTech.Stack.ViewModels;
@@ -30,7 +31,11 @@
             }
         }
 
-        public static int GetVersion(DependencyObject obj) => (int)obj.GetValue(VersionProperty);
+        public static int GetVersion(DependencyObject obj) {
+            Debug.Assert(!(obj is ScreenLayout));
+            return (int)obj.GetValue(VersionProperty);
+        }
+
         public static void SetVersion(DependencyObject obj, int value) => obj.SetValue(VersionProperty, value);
         public static readonly DependencyProperty VersionProperty =
             DependencyProperty.RegisterAttached("Version", typeof(int), typeof(Layout),

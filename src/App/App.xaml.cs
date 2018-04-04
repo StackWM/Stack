@@ -339,7 +339,7 @@
         volatile bool disableDragHandler = false;
         void ShowLayoutGrid() {
             foreach (ScreenLayout screenLayout in this.screenLayouts.Active()) {
-                if (Layout.GetVersion(screenLayout) < Layout.Version.Min.PermanentlyVisible)
+                if (Layout.GetVersion(screenLayout.Layout) < Layout.Version.Min.PermanentlyVisible)
                     screenLayout.Show();
                 //screenLayout.TryEnableGlassEffect();
                 screenLayout.ViewModel.ShowHints = true;
@@ -392,7 +392,7 @@
 
         void HideLayoutGrid() {
             foreach (var screenLayout in this.screenLayouts) {
-                if (Layout.GetVersion(screenLayout) < Layout.Version.Min.PermanentlyVisible)
+                if (Layout.GetVersion(screenLayout.Layout) < Layout.Version.Min.PermanentlyVisible)
                     screenLayout.Hide();
                 screenLayout.Topmost = false;
                 screenLayout.ViewModel.ShowHints = false;
@@ -650,9 +650,14 @@
                 Task delay = Task.Delay(millisecondsDelay: 15);
                 changeGroupTask = delay;
                 await delay;
-                if (delay.Equals(changeGroupTask))
-                    layout.SetLayout(await this.GetLayoutForScreen(layout.Screen, settings));
-                else
+                if (delay.Equals(changeGroupTask)) {
+                    FrameworkElement element = await this.GetLayoutForScreen(layout.Screen, settings);
+                    layout.SetLayout(element);
+                    if (Layout.GetVersion(element) < Layout.Version.Min.PermanentlyVisible)
+                        layout.Hide();
+                    else
+                        layout.Show();
+                } else
                     Debug.WriteLine("grouped updates!");
             }
 
@@ -778,7 +783,13 @@
                     layout => layout.Screen?.ID == newRecord.Key
                     || layout.Screen != null && ScreenLayouts.GetDesignation(layout.Screen) == newRecord.Key);
                 this.layoutLoader.ProblemOccurred += this.NonCriticalErrorHandler;
-                layoutToUpdate?.SetLayout(await this.GetLayoutForScreen(layoutToUpdate.Screen, this.stackSettings));
+                FrameworkElement element = await this.GetLayoutForScreen(layoutToUpdate.Screen, this.stackSettings);
+                layoutToUpdate?.SetLayout(element);
+                if (Layout.GetVersion(element) < Layout.Version.Min.PermanentlyVisible)
+                    layoutToUpdate?.Hide();
+                else
+                    layoutToUpdate?.Show();
+                
                 this.layoutLoader.ProblemOccurred -= this.NonCriticalErrorHandler;
                 break;
             default:

@@ -36,6 +36,8 @@
             this.Content = layout;
         }
 
+        public FrameworkElement Layout => this.Content as FrameworkElement;
+
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
