@@ -61,7 +61,6 @@
         ICollection<ScreenLayout> screenLayouts;
         NotifyIcon trayIcon;
         IFolder localSettingsFolder, roamingSettingsFolder;
-        public const int LatestLayoutVersion = 2;
 
         readonly Window winApiHandler = new Window {
             Opacity = 0,
@@ -340,6 +339,8 @@
         volatile bool disableDragHandler = false;
         void ShowLayoutGrid() {
             foreach (ScreenLayout screenLayout in this.screenLayouts.Active()) {
+                if (Layout.GetVersion(screenLayout) < Layout.Version.Min.PermanentlyVisible)
+                    screenLayout.Show();
                 //screenLayout.TryEnableGlassEffect();
                 screenLayout.ViewModel.ShowHints = true;
                 screenLayout.Background = LayoutBackground;
@@ -391,6 +392,8 @@
 
         void HideLayoutGrid() {
             foreach (var screenLayout in this.screenLayouts) {
+                if (Layout.GetVersion(screenLayout) < Layout.Version.Min.PermanentlyVisible)
+                    screenLayout.Hide();
                 screenLayout.Topmost = false;
                 screenLayout.ViewModel.ShowHints = false;
                 screenLayout.Background = Brushes.Transparent;
@@ -616,12 +619,15 @@
                 this.screenLayouts.Add(layout);
                 FrameworkElement layoutElement = await layoutTask;
                 int version = Layout.GetVersion(layoutElement);
-                if (version < LatestLayoutVersion) {
+                if (version < Layout.Version.Current) {
                     // TODO: remember warning state per layout
                     this.ShowWarning(title: "Outdated layout", 
                         message: $"Layout {Layout.GetSource(layoutElement)} is outdated. Upgrade it to v2.",
                         navigateTo: new Uri("https://www.allanswered.com/post/kgnoz/how-do-i-upgrade-my-layouts-to-v2/"));
                 }
+                if (version < Layout.Version.Min.PermanentlyVisible)
+                    layout.Hide();
+
                 layout.SetLayout(layoutElement);
             }
 

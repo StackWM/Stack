@@ -40,5 +40,15 @@
         internal static void SetSource(DependencyObject obj, string value) => obj.SetValue(SourceProperty, value);
         static readonly DependencyProperty SourceProperty =
             DependencyProperty.RegisterAttached("Source", typeof(string), typeof(Layout));
+
+        public class Version
+        {
+            public const int Current = 2;
+
+            public class Min
+            {
+                public const int PermanentlyVisible = 2;
+            }
+        }
     }
 }
