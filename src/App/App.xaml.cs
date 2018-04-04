@@ -15,6 +15,7 @@
     using System.Windows.Forms;
     using System.Windows.Interop;
     using System.Windows.Threading;
+    using DesktopNotifications;
     using EventHook;
     using Gma.System.MouseKeyHook;
     using LostTech.App;
@@ -31,6 +32,7 @@
     using LostTech.Stack.Zones;
     using LostTech.Windows;
     using Microsoft.HockeyApp;
+    using Microsoft.Toolkit.Uwp.Notifications;
     using PCLStorage;
     using PInvoke;
     using Application = System.Windows.Application;
@@ -40,6 +42,7 @@
     using static System.FormattableString;
     using static PInvoke.User32;
     using MessageBox = System.Windows.MessageBox;
+    using global::Windows.UI.Notifications;
 
     /// <summary>
     /// Interaction logic for App.xaml
@@ -145,6 +148,11 @@
                 }
                 termsWindow.Close();
                 settings.Notifications.AcceptedTerms = LicenseTermsAcceptance.GetTermsAndConditionsVersion();
+            } else if (settings.Notifications.WhatsNewVersionSeen != Version.Major) {
+                this.ShowNotification(title: "What's New in Stack V2", 
+                    message: "You have received a major Stack update. See what's new",
+                    navigateTo: new Uri("https://losttech.software/stack-whatsnew.html"));
+                settings.Notifications.WhatsNewVersionSeen = Version.Major;
             }
 
             if (!this.winApiHandler.IsLoaded) {
@@ -346,6 +354,28 @@
         {
             var window = new Win32Window(windowHandle);
             this.layoutManager.Move(window, zone);
+        }
+
+        void ShowNotification(string title, string message, Uri navigateTo, TimeSpan? duration = null) {
+            var content = new ToastContent {
+                Launch = navigateTo.ToString(),
+
+                Header = title == null ? null : new ToastHeader(title, title, navigateTo.ToString()),
+
+                Visual = new ToastVisual {
+                    BindingGeneric = new ToastBindingGeneric {
+                        Children = { new AdaptiveText{Text = message} },
+                    }
+                }
+            };
+
+            var contentXml = new global::Windows.Data.Xml.Dom.XmlDocument();
+            contentXml.LoadXml(content.GetContent());
+            var toast = new ToastNotification(contentXml) {
+                // DTO + null == null
+                ExpirationTime = DateTimeOffset.Now + duration,
+            };
+            DesktopNotificationManagerCompat.CreateToastNotifier().Show(toast);
         }
 
         void NonCriticalErrorHandler(object sender, ErrorEventArgs error) {
