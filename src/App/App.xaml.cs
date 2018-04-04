@@ -17,7 +17,6 @@
     using System.Windows.Interop;
     using System.Windows.Media;
     using System.Windows.Threading;
-    using System.Xml;
     using DesktopNotifications;
     using EventHook;
     using global::Windows.UI.Notifications;
@@ -164,6 +163,11 @@
                 }
                 termsWindow.Close();
                 settings.Notifications.AcceptedTerms = LicenseTermsAcceptance.GetTermsAndConditionsVersion();
+            } else if (settings.Notifications.WhatsNewVersionSeen != Version.Major) {
+                this.ShowNotification(title: "What's New in Stack V2", 
+                    message: "You have received a major Stack update. See what's new",
+                    navigateTo: new Uri("https://losttech.software/stack-whatsnew.html"));
+                settings.Notifications.WhatsNewVersionSeen = Version.Major;
             }
 
             if (!this.winApiHandler.IsLoaded) {
@@ -438,7 +442,7 @@
             this.layoutManager.Move(window, zone);
         }
 
-        void ShowWarning(string title, string message, Uri navigateTo, TimeSpan? duration = null) {
+        void ShowNotification(string title, string message, Uri navigateTo, TimeSpan? duration = null) {
             var content = new ToastContent {
                 Launch = navigateTo.ToString(),
 
@@ -621,7 +625,7 @@
                 int version = Layout.GetVersion(layoutElement);
                 if (version < Layout.Version.Current) {
                     // TODO: remember warning state per layout
-                    this.ShowWarning(title: "Outdated layout", 
+                    this.ShowNotification(title: $"Outdated layout {Layout.GetSource(layoutElement)}", 
                         message: $"Layout {Layout.GetSource(layoutElement)} is outdated. Upgrade it to v2.",
                         navigateTo: new Uri("https://www.allanswered.com/post/kgnoz/how-do-i-upgrade-my-layouts-to-v2/"));
                 }
