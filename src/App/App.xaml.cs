@@ -167,8 +167,8 @@
                 this.ShowNotification(title: "What's New in Stack V2", 
                     message: "You have received a major Stack update. See what's new",
                     navigateTo: new Uri("https://losttech.software/stack-whatsnew.html"));
-                settings.Notifications.WhatsNewVersionSeen = Version.Major;
             }
+            settings.Notifications.WhatsNewVersionSeen = Version.Major;
 
             if (!this.winApiHandler.IsLoaded) {
                 if (termsVersionMismatch)
