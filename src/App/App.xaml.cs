@@ -148,7 +148,9 @@
                 }
                 termsWindow.Close();
                 settings.Notifications.AcceptedTerms = LicenseTermsAcceptance.GetTermsAndConditionsVersion();
-            } else if (settings.Notifications.WhatsNewVersionSeen != Version.Major) {
+            }
+
+            if (settings.Notifications.WhatsNewVersionSeen != Version.Major) {
                 this.ShowNotification(title: "What's New in Stack V2", 
                     message: "You have received a major Stack update. See what's new",
                     navigateTo: new Uri("https://losttech.software/stack-whatsnew.html"));
