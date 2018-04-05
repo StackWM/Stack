@@ -16,14 +16,12 @@
     using LostTech.Stack.Zones;
     using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 
-    class KeyboardArrowBehavior : IDisposable
+    sealed class KeyboardArrowBehavior : GlobalHotkeyBehaviorBase
     {
         readonly KeyboardMoveBehaviorSettings settings;
         readonly IEnumerable<WindowGroup> windowGroups;
-        readonly IKeyboardEvents hook;
         readonly ICollection<ScreenLayout> screenLayouts;
         readonly Action<IntPtr, Zone> move;
-        readonly IEnumerable<CommandKeyBinding> keyBindings;
         readonly LayoutManager layoutManager;
         readonly Win32WindowFactory win32WindowFactory;
 
@@ -33,42 +31,41 @@
             [NotNull] KeyboardMoveBehaviorSettings settings,
             [NotNull] IEnumerable<WindowGroup> windowGroups,
             Action<IntPtr, Zone> move, [NotNull] Win32WindowFactory win32WindowFactory)
+        : base(keyboardHook, keyBindings)
         {
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
             this.windowGroups = windowGroups ?? throw new ArgumentNullException(nameof(windowGroups));
-            this.hook = keyboardHook ?? throw new ArgumentNullException(nameof(keyboardHook));
             this.screenLayouts = screenLayouts ?? throw new ArgumentNullException(nameof(screenLayouts));
             this.layoutManager = layoutManager ?? throw new ArgumentNullException(nameof(layoutManager));
             this.move = move ?? throw new ArgumentNullException(nameof(move));
             this.win32WindowFactory = win32WindowFactory ?? throw new ArgumentNullException(nameof(win32WindowFactory));
-            this.keyBindings = (keyBindings ?? throw new ArgumentNullException(nameof(keyBindings)))
-                .Where(binding => Commands.All.Contains(binding.CommandName) && binding.Shortcut != null)
-                .ToArray();
-
-            this.hook.KeyDown += this.OnKeyDown;
         }
 
-        async void OnKeyDown(object sender, KeyEventArgs args)
-        {
-            ModifierKeys modifiers = GetKeyboardModifiers();
-            Key key = KeyInterop.KeyFromVirtualKey((int)args.KeyData);
-            var stroke = new KeyStroke(key, modifiers);
-            CommandKeyBinding binding = this.keyBindings.FirstOrDefault(b => b.Shortcut.Equals(stroke));
-            if (binding == null)
-                return;
+        protected override bool CanExecute(string commandName) => this.GetCommandIfExecutable(commandName) != null;
+        protected override async Task ExecuteCommand(string commandName) {
+            MoveCurrentWindowInDirectionCommand moveCommand = this.GetCommandIfExecutable(commandName);
 
-            if (!Directions.TryGetValue(binding.CommandName, out var direction))
-                return;
+            // avoid freezing the system
+            await Task.Yield();
+            moveCommand.Execute(Directions[commandName]);
+        }
+
+        MoveCurrentWindowInDirectionCommand GetCommandIfExecutable(string commandName) {
+            if (!this.settings.Enabled)
+                return null;
+
+            if (!Directions.TryGetValue(commandName, out var direction))
+                return null;
 
             var moveCommand = new MoveCurrentWindowInDirectionCommand(this.move, this.screenLayouts,
                 this.layoutManager, this.settings, this.windowGroups,
                 this.win32WindowFactory);
-            args.Handled = moveCommand.CanExecute(direction);
-
-            // avoid freezing the system
-            await Task.Yield();
-            moveCommand.Execute(direction);
+            if (!moveCommand.CanExecute(direction))
+                return moveCommand;
+            return moveCommand;
         }
+
+        protected override bool IsCommandSupported(string commandName) => Commands.All.Contains(commandName);
 
         static readonly SortedList<string, Vector> Directions = new SortedList<string, Vector>
         {
@@ -77,12 +74,6 @@
             [Commands.MoveUp] = new Vector(0, -1),
             [Commands.MoveDown] = new Vector(0, 1),
         };
-        static ModifierKeys GetKeyboardModifiers()
-            => Keyboard.Modifiers | (IsWinDown() ? ModifierKeys.Windows : ModifierKeys.None);
-
-        static bool IsWinDown() => Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin);
-
-        public void Dispose() { this.hook.KeyDown -= this.OnKeyDown; }
 
         public static class Commands
         {

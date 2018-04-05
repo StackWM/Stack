@@ -243,6 +243,8 @@
     <Compile Include="About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Behavior\GlobalHotkeyBehaviorBase.cs" />
+    <Compile Include="Behavior\HotkeyBehavior.cs" />
     <Compile Include="Behavior\KeyboardArrowBehavior.cs" />
     <Compile Include="Commands\MoveCurrentWindowInDirectionCommand.cs" />
     <Compile Include="Compat\DesktopNotificationManagerCompat.cs" />
@@ -310,6 +312,7 @@
     <Compile Include="Utils\RectExtensions.cs" />
     <Compile Include="Utils\VersionUtils.cs" />
     <Compile Include="ViewModels\DesignTimeWindow.cs" />
+    <Compile Include="ViewModels\ILayoutsViewModel.cs" />
     <Compile Include="ViewModels\LayoutSelectorViewModel.cs" />
     <Compile Include="ViewModels\ScreenLayoutViewModel.cs" />
     <Compile Include="ViewModels\SimpleViewModel.cs" />

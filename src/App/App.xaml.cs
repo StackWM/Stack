@@ -21,6 +21,7 @@
     using EventHook;
     using global::Windows.UI.Notifications;
     using Gma.System.MouseKeyHook;
+    using JetBrains.Annotations;
     using LostTech.App;
     using LostTech.Stack.Behavior;
     using LostTech.Stack.Compat;
@@ -53,11 +54,12 @@
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App : Application, ILayoutsViewModel
     {
         IKeyboardMouseEvents hook;
         WindowDragOperation dragOperation;
         ICollection<ScreenLayout> screenLayouts;
+        IEnumerable<ScreenLayout> ILayoutsViewModel.ScreenLayouts => this.screenLayouts;
         NotifyIcon trayIcon;
         IFolder localSettingsFolder, roamingSettingsFolder;
 
@@ -76,6 +78,7 @@
         bool applicationWatcherStarted;
         StackSettings stackSettings;
         KeyboardArrowBehavior keyboardArrowBehavior;
+        HotkeyBehavior hotkeyBehavior;
         LayoutManager layoutManager;
         DispatcherTimer updateTimer;
         readonly IScreenProvider screenProvider = new Win32ScreenProvider();
@@ -506,14 +509,16 @@
 
         void OnDragStart(object sender, DragHookEventArgs @event)
         {
-            if (this.dragOperation != null || this.disableDragHandler)
+            if (!this.stackSettings.Behaviors.MouseMove.Enabled
+             || this.dragOperation != null || this.disableDragHandler)
                 return;
             this.dragOperation = this.DragStart();
             @event.Handled = this.dragOperation != null;
         }
 
         void OnDragStartPreview(object sender, DragHookEventArgs args) {
-            if (this.dragOperation != null || this.disableDragHandler)
+            if (!this.stackSettings.Behaviors.MouseMove.Enabled 
+             || this.dragOperation != null || this.disableDragHandler)
                 return;
 
             args.Handled = this.DragStart() != null;
@@ -557,6 +562,7 @@
             this.dragHook?.Dispose();
             this.dragHook = null;
             this.keyboardArrowBehavior?.Dispose();
+            this.hotkeyBehavior?.Dispose();
             this.trayIcon?.Dispose();
 
             LostTech.App.Settings settings = this.localSettings;
@@ -786,19 +792,27 @@
                 var layoutToUpdate = this.screenLayouts.FirstOrDefault(
                     layout => layout.Screen?.ID == newRecord.Key
                     || layout.Screen != null && ScreenLayouts.GetDesignation(layout.Screen) == newRecord.Key);
-                this.layoutLoader.ProblemOccurred += this.NonCriticalErrorHandler;
-                FrameworkElement element = await this.GetLayoutForScreen(layoutToUpdate.Screen, this.stackSettings);
-                layoutToUpdate?.SetLayout(element);
-                if (Layout.GetVersion(element) < Layout.Version.Min.PermanentlyVisible)
-                    layoutToUpdate?.Hide();
-                else
-                    layoutToUpdate?.Show();
-                
-                this.layoutLoader.ProblemOccurred -= this.NonCriticalErrorHandler;
+                if (layoutToUpdate != null)
+                    await this.ReloadLayout(layoutToUpdate);
                 break;
             default:
                 return;
             }
+        }
+        
+        public async Task ReloadLayout([NotNull] ScreenLayout screenLayout) {
+            if (screenLayout == null)
+                throw new ArgumentNullException(nameof(screenLayout));
+
+            this.layoutLoader.ProblemOccurred += this.NonCriticalErrorHandler;
+            FrameworkElement element = await this.GetLayoutForScreen(screenLayout.Screen, this.stackSettings);
+            screenLayout.SetLayout(element);
+            if (Layout.GetVersion(element) < Layout.Version.Min.PermanentlyVisible)
+                screenLayout.Hide();
+            else
+                screenLayout.Show();
+
+            this.layoutLoader.ProblemOccurred -= this.NonCriticalErrorHandler;
         }
 
         void OnLayoutClosed(object sender, EventArgs args) { this.BeginShutdown(); }
@@ -845,21 +859,20 @@
 
             this.layoutManager = new LayoutManager(this.screenLayouts, this.win32WindowFactory);
 
-            if (settings.Behaviors.KeyboardMove.Enabled)
-                this.keyboardArrowBehavior = new KeyboardArrowBehavior(
-                    this.hook, this.screenLayouts, this.layoutManager, settings.Behaviors.KeyBindings,
-                    settings.Behaviors.KeyboardMove,
-                    settings.WindowGroups,
-                    this.Move, this.win32WindowFactory);
+            this.keyboardArrowBehavior = new KeyboardArrowBehavior(
+                this.hook, this.screenLayouts, this.layoutManager, settings.Behaviors.KeyBindings,
+                settings.Behaviors.KeyboardMove,
+                settings.WindowGroups,
+                this.Move, this.win32WindowFactory);
 
-            if (settings.Behaviors.MouseMove.Enabled) {
-                this.dragHook = new DragHook(MouseButtons.Middle, this.hook);
-                this.dragHook.DragStartPreview += this.OnDragStartPreview;
-                this.dragHook.DragStart += this.OnDragStart;
-                this.dragHook.DragEnd += this.OnDragEnd;
-                this.dragHook.DragMove += this.OnDragMove;
-                this.hook.KeyDown += this.GlobalKeyDown;
-            }
+            this.hotkeyBehavior = new HotkeyBehavior(this.hook, settings.Behaviors.KeyBindings, this);
+
+            this.dragHook = new DragHook(MouseButtons.Middle, this.hook);
+            this.dragHook.DragStartPreview += this.OnDragStartPreview;
+            this.dragHook.DragStart += this.OnDragStart;
+            this.dragHook.DragEnd += this.OnDragEnd;
+            this.dragHook.DragMove += this.OnDragMove;
+            this.hook.KeyDown += this.GlobalKeyDown;
         }
 
         public static DirectoryInfo AppData {

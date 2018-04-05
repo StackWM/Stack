@@ -41,6 +41,8 @@
             new CommandKeyBinding(KeyboardArrowBehavior.Commands.MoveDown, new KeyStroke(Key.Down, M.Windows)),
             new CommandKeyBinding(KeyboardArrowBehavior.Commands.MoveLeft, new KeyStroke(Key.Left, M.Windows)),
             new CommandKeyBinding(KeyboardArrowBehavior.Commands.MoveRight, new KeyStroke(Key.Right, M.Windows)),
+
+            new CommandKeyBinding(HotkeyBehavior.Commands.ReloadLayouts, new KeyStroke(Key.R, M.Windows | M.Control)),
         };
     }
 }
