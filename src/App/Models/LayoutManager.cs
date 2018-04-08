@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading;
@@ -12,6 +13,7 @@
     using LostTech.Stack.Utils;
     using LostTech.Stack.ViewModels;
     using LostTech.Stack.Zones;
+    using Microsoft.HockeyApp;
 
     class LayoutManager : IDisposable
     {
@@ -110,8 +112,8 @@
         }
         readonly Dictionary<VirtualDesktop, Dictionary<Zone, List<AppWindowViewModel>>> suspended =
             new Dictionary<VirtualDesktop, Dictionary<Zone, List<AppWindowViewModel>>>();
-        void VirtualDesktopOnCurrentChanged(object sender, VirtualDesktopChangedEventArgs change) {
-            this.StartOnParentThread(() => {
+        async void VirtualDesktopOnCurrentChanged(object sender, VirtualDesktopChangedEventArgs change) {
+            await this.StartOnParentThread(() => {
                 var oldWindows = this.suspended.GetOrCreate(change.OldDesktop);
                 oldWindows.Clear();
 
@@ -125,7 +127,7 @@
 
                     foreach (AppWindowViewModel appWindow in activeZone.Windows.ToArray()) {
                         if (appWindow.Window is Win32Window window) {
-                            if (!VirtualDesktop.IsPinnedWindow(window.Handle)) {
+                            if (!IsPinnedWindow(window.Handle)) {
                                 zoneSuspendList.Add(appWindow);
                                 Debug.WriteLine($"suspended layout of: {appWindow.Title}");
                                 activeZone.Windows.Remove(appWindow);
@@ -141,7 +143,19 @@
                     foreach (var zoneContent in newWindows)
                         zoneContent.Key.Windows.AddRange(zoneContent.Value);
                 }
-            });
+            }).ConfigureAwait(false);
+        }
+
+        static bool IsPinnedWindow(IntPtr hwnd) {
+            try {
+                return VirtualDesktop.IsPinnedWindow(hwnd);
+            } catch (Win32Exception e) {
+                HockeyClient.Current.TrackException(e);
+                return false;
+            } catch (ArgumentException e) {
+                HockeyClient.Current.TrackException(e);
+                return false;
+            }
         }
 
         void RemoveFromSuspended(IAppWindow window) {
@@ -159,7 +173,7 @@
                                 .SelectMany(layout => layout.Zones)
                                 .FirstOrDefault(zone => zone.Id != null && zone.Id.StartsWith(layoutID))
                         );
-        void StartOnParentThread(Action action) => Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.None, this.taskScheduler);
+        Task StartOnParentThread(Action action) => Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.None, this.taskScheduler);
         Task<T> StartOnParentThread<T>(Func<T> action) => Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.None, this.taskScheduler);
 
         public void Dispose() {
