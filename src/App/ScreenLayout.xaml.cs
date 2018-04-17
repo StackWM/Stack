@@ -158,6 +158,28 @@
             }
         }
 
+        public bool TryShow() {
+            if (!this.IsHandleInitialized)
+                return false;
+            try {
+                this.Show();
+                return true;
+            } catch (InvalidOperationException) {
+                return false;
+            }
+        }
+
+        public bool TryHide() {
+            if (!this.IsHandleInitialized)
+                return false;
+            try {
+                this.Hide();
+                return true;
+            } catch (InvalidOperationException) {
+                return false;
+            }
+        }
+
         public IEnumerable<Zone> Zones => this.FindChildren<Zone>();
 
         internal Zone GetZone(Point dropPoint)

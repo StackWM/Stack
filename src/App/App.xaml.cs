@@ -665,10 +665,11 @@
                 if (delay.Equals(changeGroupTask)) {
                     FrameworkElement element = await this.GetLayoutForScreen(layout.Screen, settings);
                     layout.SetLayout(element);
-                    if (Layout.GetVersion(element) < Layout.Version.Min.PermanentlyVisible)
-                        layout.Hide();
-                    else
-                        layout.Show();
+                    if (layout.IsHandleInitialized)
+                        if (Layout.GetVersion(element) < Layout.Version.Min.PermanentlyVisible)
+                            layout.TryHide();
+                        else
+                            layout.TryShow();
                 } else
                     Debug.WriteLine("grouped updates!");
             }
