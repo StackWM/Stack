@@ -109,6 +109,7 @@
 
         ToolStripMenuItem CreateHelpMenu() {
             var help = new ToolStripMenuItem("Help", image: null) {DisplayStyle = ToolStripItemDisplayStyle.Text};
+            help.DropDownItems.Add(Link("Blog", "http://stack.blogs.losttech.software/"));
             help.DropDownItems.Add(Link("Telegram Community","https://t.me/joinchat/HCVquw4yDSmwxky5pxxKZw"));
             help.DropDownItems.Add(Link("Ask a Question", "https://www.allanswered.com/community/s/stack-wm/"));
             help.DropDownItems.Add(Link("What's New", "https://losttech.software/stack-whatsnew.html"));
