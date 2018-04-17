@@ -3,6 +3,7 @@
     using System;
     using System.DirectoryServices;
     using System.DirectoryServices.ActiveDirectory;
+    using System.Security.Authentication;
     using System.Threading.Tasks;
     using System.Windows;
 
@@ -49,6 +50,8 @@
             } catch (ActiveDirectoryOperationException) {
                 return true;
             } catch (DirectoryServicesCOMException) {
+                return true;
+            } catch (AuthenticationException) {
                 return true;
             }
         }
