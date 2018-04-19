@@ -61,7 +61,12 @@
             var app = applicationEventArgs.ApplicationData;
             var window = this.windowFactory.Create(app.HWnd);
             if (applicationEventArgs.Event != ApplicationEvents.Launched) {
-                this.StartOnParentThread(() => this.RemoveFromSuspended(window));
+                this.StartOnParentThread(() => this.RemoveFromSuspended(window))
+                    .ContinueWith(t => {
+                        if (t.IsFaulted)
+                            foreach (var exception in t.Exception.InnerExceptions)
+                                HockeyClient.Current.TrackException(exception);
+                        });
                 bool wasTracked = this.locations.TryGetValue(window, out var existedAt);
                 if (wasTracked) {
                     this.locations.Remove(window);
@@ -163,7 +168,8 @@
                 foreach (var zoneCollection in desktopCollection.Values) {
                     AppWindowViewModel existing = zoneCollection.FirstOrDefault(vm => vm.Window.Equals(window));
                     existing?.Dispose();
-                    zoneCollection.Remove(existing);
+                    if (existing != null)
+                        zoneCollection.Remove(existing);
                 }
             }
         }
