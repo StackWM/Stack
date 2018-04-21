@@ -1,0 +1,3 @@
+[submodule "External/VirtualDesktop"]
+	path = External/VirtualDesktop
+	url = https://github.com/losttech/VirtualDesktop.git

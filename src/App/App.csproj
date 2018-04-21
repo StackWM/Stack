@@ -225,9 +225,6 @@
     <Reference Include="ValueConverters, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\ValueConverters.1.0.7\lib\net45\ValueConverters.dll</HintPath>
     </Reference>
-    <Reference Include="VirtualDesktop, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\VirtualDesktop.2.0.0-beta3\lib\net46\VirtualDesktop.dll</HintPath>
-    </Reference>
     <Reference Include="Windows">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Windows Kits\10\UnionMetadata\Windows.winmd</HintPath>
     </Reference>
@@ -537,6 +534,10 @@
     <ProjectReference Include="..\..\..\..\OSS\MouseKeyHook\MouseKeyHook\MouseKeyHook.csproj">
       <Project>{f52aa97e-180a-40ed-8f2b-09080171d6c7}</Project>
       <Name>MouseKeyHook</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\VirtualDesktop\source\VirtualDesktop\VirtualDesktop.csproj">
+      <Project>{ab848ecd-76aa-41c0-b63d-86a8591b25aa}</Project>
+      <Name>VirtualDesktop</Name>
     </ProjectReference>
     <ProjectReference Include="..\Screen\Screen.csproj">
       <Project>{adea0e3b-e6af-403b-b293-f3bc88f426ba}</Project>
