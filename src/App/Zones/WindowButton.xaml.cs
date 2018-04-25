@@ -30,7 +30,7 @@
             this.titleBinding = this.TitleText.GetBindingExpression(TextBlock.TextProperty);
         }
 
-        public AppWindowViewModel ViewModel => (AppWindowViewModel)this.DataContext;
+        public AppWindowViewModel ViewModel => this.DataContext as AppWindowViewModel;
         public IAppWindow Window => this.ViewModel?.Window;
 
         void Window_OnClick(object sender, RoutedEventArgs e) {
