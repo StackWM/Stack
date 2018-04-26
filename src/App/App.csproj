@@ -339,6 +339,7 @@
     <Compile Include="Win32.cs" />
     <Compile Include="WindowDragOperation.cs" />
     <Compile Include="Windows\DragHook.cs" />
+    <Compile Include="Windows\WindowDesktopHook.cs" />
     <Compile Include="Zones\ForegroundTracker.cs" />
     <Compile Include="Zones\Layout.cs" />
     <Compile Include="Zones\TabTemplateSelector.cs" />

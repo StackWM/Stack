@@ -46,6 +46,8 @@
                 throw new ArgumentNullException(nameof(target));
 
             var appWindow = new AppWindowViewModel(window);
+            appWindow.PropertyChanged += this.AppWindowOnPropertyChanged;
+
             if (this.locations.TryGetValue(window, out var previousZone) && previousZone != null) {
                 AppWindowViewModel existingWindow = previousZone.Windows.FirstOrDefault(w => w.Equals(appWindow));
                 existingWindow?.Dispose();
@@ -56,12 +58,42 @@
             this.locations[window] = target;
         }
 
+        void AppWindowOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            var window = (AppWindowViewModel)sender;
+            var underlyingWindow = (Win32Window)window.Window;
+            VirtualDesktop newDesktop = window.Desktop;
+            switch (e.PropertyName) {
+            case nameof(AppWindowViewModel.Desktop) when VirtualDesktop.IsSupported:
+                bool nowVisible = IsPinnedWindow(underlyingWindow.Handle) || newDesktop?.Id == VirtualDesktop.Current?.Id;
+                this.locations.TryGetValue(underlyingWindow, out var currentZone);
+                if (nowVisible) {
+                    if (currentZone != null)
+                        // great - nothing to do!
+                        break;
+
+                    // window moved to the current desktop from somewhere
+                    var suspendedInZone = this.RemoveFromSuspended(underlyingWindow, dispose: false);
+                    if (suspendedInZone != null) {
+                        suspendedInZone.Windows.Add(window);
+                        this.locations[underlyingWindow] = suspendedInZone;
+                    }
+                } else if (currentZone != null && newDesktop != null) {
+                    // window is moved to another desktop, same zone
+                    currentZone.Windows.Remove(window);
+                    var targetList = this.suspended.GetOrCreate(newDesktop).GetOrCreate(currentZone);
+                    if (!targetList.Contains(window))
+                        targetList.Add(window);
+                }
+                break;
+            }
+        }
+
         void OnApplicationWindowChange(object sender, ApplicationEventArgs applicationEventArgs)
         {
             var app = applicationEventArgs.ApplicationData;
             var window = this.windowFactory.Create(app.HWnd);
             if (applicationEventArgs.Event != ApplicationEvents.Launched) {
-                this.StartOnParentThread(() => this.RemoveFromSuspended(window))
+                this.StartOnParentThread(() => this.RemoveFromSuspended(window, dispose: true))
                     .ContinueWith(t => {
                         if (t.IsFaulted)
                             foreach (var exception in t.Exception.InnerExceptions)
@@ -163,15 +195,19 @@
             }
         }
 
-        void RemoveFromSuspended(IAppWindow window) {
+        Zone RemoveFromSuspended(IAppWindow window, bool dispose) {
+            Zone zone = null;
             foreach (var desktopCollection in this.suspended.Values) {
-                foreach (var zoneCollection in desktopCollection.Values) {
-                    AppWindowViewModel existing = zoneCollection.FirstOrDefault(vm => vm.Window.Equals(window));
-                    existing?.Dispose();
+                foreach (var zoneCollection in desktopCollection) {
+                    AppWindowViewModel existing = zoneCollection.Value.FirstOrDefault(vm => vm.Window.Equals(window));
+                    if (dispose)
+                        existing?.Dispose();
                     if (existing != null)
-                        zoneCollection.Remove(existing);
+                        zoneCollection.Value.Remove(existing);
+                    zone = zoneCollection.Key;
                 }
             }
+            return zone;
         }
         #endregion
 
