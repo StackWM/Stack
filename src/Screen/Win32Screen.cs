@@ -128,6 +128,9 @@
         public override string ToString() => Invariant($"{this.ID} ({this.WorkingArea.Width}x{this.WorkingArea.Height})");
         public bool IsPrimary => this.displayDevice.StateFlags.HasFlag(DisplayDeviceStateFlags.PrimaryDevice);
 
+        /// <summary>
+        /// This is non-WPF area. One needs to use <see cref="TransformFromDevice"/> to get WPF compatible one.
+        /// </summary>
         public Rect WorkingArea => this.GetWorkingArea();
 
         Rect GetWorkingArea()

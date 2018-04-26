@@ -49,6 +49,9 @@
             }
         }
 
+        /// <summary>
+        /// Non-WPF coordinates
+        /// </summary>
         public Rect Bounds {
             get {
                 if (!Win32.GetWindowInfo(this.Handle, out var info))
