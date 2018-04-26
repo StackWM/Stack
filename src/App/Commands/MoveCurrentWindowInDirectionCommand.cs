@@ -52,6 +52,11 @@
             if (User32.IsIconic(window))
                 return false;
 
+            var win32Window = this.win32WindowFactory.Create(window);
+            if (win32Window.Equals(this.win32WindowFactory.Desktop)
+                || win32Window.Equals(this.win32WindowFactory.Shell))
+                return false;
+
             if (this.settings.WindowGroupIgnoreList.Contains(this.windowGroups, window)) {
                 Debug.WriteLine("won't move: ignore list");
                 return false;
