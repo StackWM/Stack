@@ -76,6 +76,8 @@
         ObservableDirectory layoutsDirectory;
         IFolder layoutsFolder;
         LayoutLoader layoutLoader;
+        LayoutMappingViewModel layoutMapping;
+        readonly Win32WindowFactory win32WindowFactory = new Win32WindowFactory();
         MigrateToStoreVersion storeVersionMigration;
 
         static readonly bool IsUwp = new DesktopBridge.Helpers().IsRunningAsUwp();
@@ -457,12 +459,15 @@
         {
             //var point = new POINT { x = (int)location.X, y = (int)location.Y };
             User32.GetCursorPos(out var point);
-            var desktop = GetDesktopWindow();
-            var child = ChildWindowFromPointEx(desktop, point, ChildWindowFromPointExFlags.CWP_SKIPINVISIBLE);
+            var child = WindowFromPoint(point);
+            child = GetAncestor(child, GetAncestorFlags.GA_ROOT);
+            if (child == IntPtr.Zero)
+                return null;
+            var win32Window = this.win32WindowFactory.Create(child);
+            if (win32Window.Equals(this.win32WindowFactory.Desktop)
+                || win32Window.Equals(this.win32WindowFactory.Shell))
+                return null;
             try {
-                if (child == IntPtr.Zero)
-                    return null;
-
                 if (this.stackSettings.Behaviors.MouseMove.WindowGroupIgnoreList.Contains(
                         this.stackSettings.WindowGroups, child))
                     return null;
@@ -522,15 +527,19 @@
             this.layoutsDirectory = new ObservableDirectory(this.layoutsFolder.Path);
 
             var screens = this.screenProvider.Screens;
-            FrameworkElement[] layouts = await Task.WhenAll(screens
-                .Select(screen => this.GetLayoutForScreen(screen, settings, this.layoutsFolder))
-                .ToArray());
+            var layoutNameCollection = new TransformObservableCollection<string, ObservableFile,
+                ReadOnlyObservableCollection<ObservableFile>>(
+                this.layoutsDirectory.Files,
+                file => Path.GetFileNameWithoutExtension(file.FullName));
+            this.layoutMapping = new LayoutMappingViewModel(settings.LayoutMap,
+                layoutNameCollection, this.layoutLoader, this.screenProvider);
+
             this.screenLayouts = new ObservableCollection<ScreenLayout>();
             int zoneIndex = 0;
 
             async Task AddLayoutForScreen(Win32Screen screen)
             {
-                var layoutTask = this.GetLayoutForScreen(screen, settings, this.layoutsFolder);
+                var layoutTask = this.GetLayoutForScreen(screen);
                 var layout = new ScreenLayout {
                     Opacity = 0.7,
                     ViewModel = new ScreenLayoutViewModel{Screen = screen},
@@ -573,8 +582,7 @@
                 await delay;
                 if (delay.Equals(changeGroupTask))
                     try {
-                        await layout.SetLayout(await this.GetLayoutForScreen(layout.Screen,
-                            settings, this.layoutsFolder));
+                        await this.ReloadLayout(layout);
                     } catch (OperationCanceledException) { }
             }
 
@@ -583,7 +591,7 @@
                 switch (e.PropertyName) {
                 case nameof(Win32Screen.WorkingArea):
                 case nameof(Win32Screen.IsActive):
-                    if (!IsValidScreen(screen))
+                    if (!ScreenExtensions.IsValidScreen(screen))
                         RemoveLayoutForScreen(screen);
                     else {
                         var layout = this.screenLayouts.FirstOrDefault(l => l.Screen.ID == screen.ID);
@@ -601,31 +609,11 @@
 
             var layoutLaunches = new List<Task>();
             foreach (Win32Screen screen in screens) {
-                if (IsValidScreen(screen)) {
+                if (ScreenExtensions.IsValidScreen(screen)) {
                     layoutLaunches.Add(AddLayoutForScreen(screen));
 
                     if (settings.LayoutMap.NeedsUpdate(screen))
-                    {
-                        string defaultOption = settings.LayoutMap.GetPreferredLayout(screen)
-                                               ?? this.GetSuggestedLayout(screen);
-                        defaultOption = Path.GetFileNameWithoutExtension(defaultOption);
-                        settings.LayoutMap.SetPreferredLayout(screen, fileName: $"{defaultOption}.xaml");
-                        var selectorViewModel = new LayoutSelectorViewModel {
-                            Layouts = layoutsCollection,
-                            Screen = screen,
-                            ScreenName = ScreenLayouts.GetDesignation(screen),
-                            Selected = defaultOption,
-                            Settings = settings.LayoutMap,
-                        };
-                        var selector = new ScreenLayoutSelector {
-                            LayoutLoader = this.layoutLoader,
-                            DataContext = selectorViewModel,
-                        };
-                        selector.Show();
-                        selector.FitToMargin(screen);
-                        selector.UpdateLayout();
-                        selector.ScrollToSelection();
-                    }
+                        this.layoutMapping.ShowLayoutSelector(screen);
                 }
                 screen.PropertyChanged += ScreenPropertyChanged;
             }
@@ -633,7 +621,7 @@
             await Task.WhenAll(layoutLaunches);
 
             screens.OnChange<Win32Screen>(onAdd: async s => {
-                if (IsValidScreen(s))
+                if (ScreenExtensions.IsValidScreen(s))
                     await AddLayoutForScreen(s);
                 s.PropertyChanged += ScreenPropertyChanged;
             }, onRemove: s => {
@@ -643,24 +631,6 @@
 
             settings.LayoutMap.Map.CollectionChanged += this.MapOnCollectionChanged;
         }
-
-        string GetSuggestedLayout(Win32Screen screen) {
-            if (!screen.WorkingArea.IsHorizontal())
-                return "V Top+Rest";
-
-            string[] screens = this.screenProvider.Screens
-                               .Where(IsValidScreen)
-                               .OrderBy(s => s.WorkingArea.Left)
-                               .Select(s => s.ID).ToArray();
-            bool isOnTheRight = screens.Length > 1 && screens.Last() == screen.ID;
-            bool isBig = screen.TransformFromDevice.Transform(screen.WorkingArea.Size.AsWPFVector()).X > 2000;
-            bool isWide = screen.WorkingArea.Width > 2.1 * screen.WorkingArea.Height;
-            string leftOrRight = isOnTheRight ? "Right" : "Left";
-            string kind = isWide ? "Wide" : isBig ? "Large Horizontal" : "Small Horizontal";
-            return $"{kind} {leftOrRight}";
-        }
-
-        static bool IsValidScreen(Win32Screen screen) => screen.IsActive && screen.WorkingArea.Width > 1 && screen.WorkingArea.Height > 1;
 
         async void MapOnCollectionChanged(object o, NotifyCollectionChangedEventArgs change) {
             switch (change.Action) {
@@ -683,7 +653,7 @@
                 throw new ArgumentNullException(nameof(screenLayout));
 
             string initialProblem = this.layoutLoader.Problems;
-            FrameworkElement element = await this.GetLayoutForScreen(screenLayout.Screen, this.stackSettings, this.layoutsFolder);
+            FrameworkElement element = await this.GetLayoutForScreen(screenLayout.Screen);
             await screenLayout.SetLayout(element);
             if (this.layoutLoader.Problems != initialProblem)
                 this.NonCriticalErrorHandler(this, new ErrorEventArgs(new Exception(message: this.layoutLoader.Problems.Substring(initialProblem.Length))));
@@ -718,11 +688,11 @@
         }
 
         internal static Assembly GetResourceContainer() => Assembly.GetExecutingAssembly();
-        async Task<FrameworkElement> GetLayoutForScreen(Win32Screen screen, StackSettings settings, IFolder layoutsDirectory)
+        async Task<FrameworkElement> GetLayoutForScreen(Win32Screen screen)
         {
-            string layout = settings.LayoutMap.GetPreferredLayout(screen)
-                          ?? $"{this.GetSuggestedLayout(screen)}.xaml";
-            return await this.layoutLoader.LoadLayoutOrDefault(layout);
+            string layoutFileName = this.layoutMapping.GetPreferredLayoutFileName(screen);
+            FrameworkElement layout = await this.layoutLoader.LoadLayoutOrDefault(layoutFileName);
+            return layout;
         }
 
         private void BindHandlers(StackSettings settings)
@@ -737,7 +707,7 @@
                 settings.WindowGroups,
                 this.Move);
 
-            this.hotkeyBehavior = new HotkeyBehavior(this.hook, settings.Behaviors.KeyBindings, this);
+            this.hotkeyBehavior = new HotkeyBehavior(this.hook, settings.Behaviors.KeyBindings, this, this.screenProvider, this.layoutMapping);
 
             this.dragHook = new DragHook(settings.Behaviors.MouseMove.DragButton, this.hook);
             settings.Behaviors.MouseMove.OnChange(s => s.DragButton, newButton => this.dragHook.SetButton(newButton));
