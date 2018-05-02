@@ -57,6 +57,10 @@
                 || win32Window.Equals(this.win32WindowFactory.Shell))
                 return false;
 
+            var bounds = win32Window.Bounds;
+            if (bounds.IsEmpty || bounds.Inflated(-1, -1).IsEmpty)
+                return false;
+
             if (this.settings.WindowGroupIgnoreList.Contains(this.windowGroups, window)) {
                 Debug.WriteLine("won't move: ignore list");
                 return false;
@@ -95,6 +99,9 @@
                 .Equals(windowCenter, epsilon: Epsilon)).ToArray();
 
             var reducedWindowBounds = window.Bounds.Inflated(-1,-1);
+            if (reducedWindowBounds.IsEmpty)
+                return false;
+
             var currentZone = this.layoutManager.GetLocation(window);
 
             var next = currentZone == null
