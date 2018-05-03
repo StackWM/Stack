@@ -409,6 +409,8 @@
                 screenLayout.Background = Brushes.Transparent;
                 screenLayout.Opacity = 1;
                 //screenLayout.TryDisableGlassEffect();
+                if (screenLayout.IsHandleInitialized)
+                    this.win32WindowFactory.Create(screenLayout.handle.Handle).SendToBottom();
             }
         }
 
