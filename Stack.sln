@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kit.WPF45", "..\..\OSS\Hock
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualDesktop", "External\VirtualDesktop\source\VirtualDesktop\VirtualDesktop.csproj", "{AB848ECD-76AA-41C0-B63D-86A8591B25AA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Widgets", "..\Stack.Widgets\src\Widgets.csproj", "{3EC9D641-4E5F-4331-9E3C-211D87BA4930}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -183,6 +185,18 @@ Global
 		{AB848ECD-76AA-41C0-B63D-86A8591B25AA}.Release|x64.Build.0 = Release|x64
 		{AB848ECD-76AA-41C0-B63D-86A8591B25AA}.Release|x86.ActiveCfg = Release|x86
 		{AB848ECD-76AA-41C0-B63D-86A8591B25AA}.Release|x86.Build.0 = Release|x86
+		{3EC9D641-4E5F-4331-9E3C-211D87BA4930}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EC9D641-4E5F-4331-9E3C-211D87BA4930}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EC9D641-4E5F-4331-9E3C-211D87BA4930}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3EC9D641-4E5F-4331-9E3C-211D87BA4930}.Debug|x64.Build.0 = Debug|Any CPU
+		{3EC9D641-4E5F-4331-9E3C-211D87BA4930}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3EC9D641-4E5F-4331-9E3C-211D87BA4930}.Debug|x86.Build.0 = Debug|Any CPU
+		{3EC9D641-4E5F-4331-9E3C-211D87BA4930}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EC9D641-4E5F-4331-9E3C-211D87BA4930}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EC9D641-4E5F-4331-9E3C-211D87BA4930}.Release|x64.ActiveCfg = Release|Any CPU
+		{3EC9D641-4E5F-4331-9E3C-211D87BA4930}.Release|x64.Build.0 = Release|Any CPU
+		{3EC9D641-4E5F-4331-9E3C-211D87BA4930}.Release|x86.ActiveCfg = Release|Any CPU
+		{3EC9D641-4E5F-4331-9E3C-211D87BA4930}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -194,6 +208,7 @@ Global
 		{14123A8E-6D6B-4362-B001-35B8C2505EED} = {30516558-7C3B-4FE9-BDA4-8343329FA665}
 		{C9612531-2077-4662-B8A4-092E06D5069B} = {30516558-7C3B-4FE9-BDA4-8343329FA665}
 		{AB848ECD-76AA-41C0-B63D-86A8591B25AA} = {30516558-7C3B-4FE9-BDA4-8343329FA665}
+		{3EC9D641-4E5F-4331-9E3C-211D87BA4930} = {30516558-7C3B-4FE9-BDA4-8343329FA665}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F54A1371-0D5C-4D9D-8930-6B78A7F725A5}
