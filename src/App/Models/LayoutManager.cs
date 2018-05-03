@@ -5,6 +5,7 @@
     using System.ComponentModel;
     using System.Diagnostics;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
     using WindowsDesktop;
@@ -88,17 +89,19 @@
             }
         }
 
+        void ReportTaskException(Task task) {
+            if (task.IsFaulted)
+                foreach (var exception in task.Exception.InnerExceptions)
+                    HockeyClient.Current.TrackException(exception);
+        }
+
         void OnApplicationWindowChange(object sender, ApplicationEventArgs applicationEventArgs)
         {
             var app = applicationEventArgs.ApplicationData;
             var window = this.windowFactory.Create(app.HWnd);
             if (applicationEventArgs.Event != ApplicationEvents.Launched) {
                 this.StartOnParentThread(() => this.RemoveFromSuspended(window, dispose: true))
-                    .ContinueWith(t => {
-                        if (t.IsFaulted)
-                            foreach (var exception in t.Exception.InnerExceptions)
-                                HockeyClient.Current.TrackException(exception);
-                        });
+                    .ContinueWith(this.ReportTaskException);
                 bool wasTracked = this.locations.TryGetValue(window, out var existedAt);
                 if (wasTracked) {
                     this.locations.Remove(window);
@@ -106,7 +109,7 @@
                         var existing = existedAt?.Windows.FirstOrDefault(vm => vm.Window.Equals(window));
                         existing?.Dispose();
                         return existedAt?.Windows.Remove(existing);
-                    });
+                    }).ContinueWith(this.ReportTaskException);
                 }
                 Debug.WriteLine($"Disappeared: {app.AppTitle} traked: {wasTracked}");
                 return;
@@ -121,9 +124,14 @@
 
 #if DEBUG
             this.DecideInitialZone(app)
-                .ContinueWith(zone => {
-                    if (zone.Result != null) {
-                        this.Move(window, zone.Result);
+                .ContinueWith(zoneTask => {
+                    if (zoneTask.IsFaulted) {
+                        this.ReportTaskException(zoneTask);
+                        return;
+                    }
+
+                    if (zoneTask.Result != null) {
+                        this.Move(window, zoneTask.Result);
                         Debug.WriteLine("Did it!");
                     }
                 }, this.taskScheduler);
@@ -186,6 +194,9 @@
         static bool IsPinnedWindow(IntPtr hwnd) {
             try {
                 return VirtualDesktop.IsPinnedWindow(hwnd);
+            } catch (COMException e) {
+                HockeyClient.Current.TrackException(e);
+                return false;
             } catch (Win32Exception e) {
                 HockeyClient.Current.TrackException(e);
                 return false;
