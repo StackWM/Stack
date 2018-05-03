@@ -92,6 +92,16 @@
             return Task.FromResult(issue);
         }
 
+        public Task<Exception> SendToBottom() {
+            this.EnsureNotMinimized();
+            Exception issue = null;
+            if (!SetWindowPos(this.Handle, HWND_BOTTOM, 0, 0, 0, 0,
+                SetWindowPosFlags.SWP_NOMOVE | SetWindowPosFlags.SWP_NOACTIVATE |
+                SetWindowPosFlags.SWP_NOSIZE))
+                issue = new Win32Exception();
+            return Task.FromResult(issue);
+        }
+
         Exception EnsureNotMinimized() {
             if (!IsIconic(this.Handle))
                 return null;
@@ -162,6 +172,7 @@
         [DllImport("User32.dll")]
         static extern bool IsIconic(IntPtr hwnd);
 
+        static readonly IntPtr HWND_BOTTOM = new IntPtr(1);
         static readonly IntPtr HWND_TOP = IntPtr.Zero;
         static readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
     }
