@@ -1,3 +1,21 @@
 [submodule "External/VirtualDesktop"]
 	path = External/VirtualDesktop
 	url = https://github.com/losttech/VirtualDesktop.git
+[submodule "External/EventHook"]
+	path = External/EventHook
+	url = https://github.com/losttech/Windows-User-Action-Hook.git
+[submodule "External/HockeySDK"]
+	path = External/HockeySDK
+	url = https://github.com/losttech/HockeySDK-Windows.git
+[submodule "External/ObservableFileSystem"]
+	path = External/ObservableFileSystem
+	url = https://github.com/losttech/ObservableFileSystem.git
+[submodule "Extras/Widgets"]
+	path = Extras/Widgets
+	url = https://github.com/losttech/Stack.Widgets.git
+[submodule "External/KeySettings"]
+	path = External/KeySettings
+	url = https://github.com/losttech/KeySettings.git
+[submodule "External/MouseKeyHook"]
+	path = External/MouseKeyHook
+	url = https://github.com/losttech/globalmousekeyhook.git

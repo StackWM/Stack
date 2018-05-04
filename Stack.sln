@@ -12,28 +12,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{37EB
 		samples\000.xaml = samples\000.xaml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseKeyHook", "..\..\OSS\MouseKeyHook\MouseKeyHook\MouseKeyHook.csproj", "{F52AA97E-180A-40ED-8F2B-09080171D6C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseKeyHook", "External\MouseKeyHook\MouseKeyHook\MouseKeyHook.csproj", "{F52AA97E-180A-40ED-8F2B-09080171D6C7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repo", "Repo", "{55FC7D5D-8916-4720-B14D-464B3FEDE46D}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		.gitmodules = .gitmodules
 	EndProjectSection
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Stack.Setup", "src\Setup\Stack.Setup.wixproj", "{1A3D79A3-8EA3-4FC4-B78B-3E73A2998782}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deps", "Deps", "{30516558-7C3B-4FE9-BDA4-8343329FA665}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObservableFileSystem", "..\..\App\ObservableFileSystem\src\ObservableFileSystem.csproj", "{B8AD0753-625F-41E0-A90D-05D587CF0780}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObservableFileSystem", "External\ObservableFileSystem\src\ObservableFileSystem.csproj", "{B8AD0753-625F-41E0-A90D-05D587CF0780}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF", "..\..\App\KeySettings\src\WPF\WPF.csproj", "{F0F57D7C-F2AA-4046-9692-E30D896E8515}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF", "External\KeySettings\src\WPF\WPF.csproj", "{F0F57D7C-F2AA-4046-9692-E30D896E8515}"
 EndProject
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "Store", "src\Store\Store.wapproj", "{D853CFB3-C797-4950-B8F7-806D2770C4C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventHook", "..\..\OSS\EventHook\EventHook\EventHook.csproj", "{3847A7F4-3F6B-4626-AF4C-8FDFBA6165F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventHook", "External\EventHook\EventHook\EventHook.csproj", "{3847A7F4-3F6B-4626-AF4C-8FDFBA6165F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kit.Core45", "..\..\OSS\HockeySDK-Windows\Src\Kit.Core45\Kit.Core45.csproj", "{14123A8E-6D6B-4362-B001-35B8C2505EED}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kit.Core45", "External\HockeySDK\Src\Kit.Core45\Kit.Core45.csproj", "{14123A8E-6D6B-4362-B001-35B8C2505EED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kit.WPF45", "..\..\OSS\HockeySDK-Windows\Src\Kit.WPF45\Kit.WPF45.csproj", "{C9612531-2077-4662-B8A4-092E06D5069B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kit.WPF45", "External\HockeySDK\Src\Kit.WPF45\Kit.WPF45.csproj", "{C9612531-2077-4662-B8A4-092E06D5069B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualDesktop", "External\VirtualDesktop\source\VirtualDesktop\VirtualDesktop.csproj", "{AB848ECD-76AA-41C0-B63D-86A8591B25AA}"
 EndProject
