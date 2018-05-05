@@ -62,10 +62,10 @@
         void AppWindowOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
             var window = (AppWindowViewModel)sender;
             var underlyingWindow = (Win32Window)window.Window;
-            VirtualDesktop newDesktop = window.Desktop;
+            Guid? newDesktop = window.DesktopID;
             switch (e.PropertyName) {
-            case nameof(AppWindowViewModel.Desktop) when VirtualDesktop.IsSupported:
-                bool nowVisible = IsPinnedWindow(underlyingWindow.Handle) || newDesktop?.Id == VirtualDesktop.Current?.Id;
+            case nameof(AppWindowViewModel.DesktopID) when VirtualDesktop.IsSupported:
+                bool nowVisible = IsPinnedWindow(underlyingWindow.Handle) || VirtualDesktopHelper.IsCurrentVirtualDesktop(underlyingWindow.Handle);
                 this.locations.TryGetValue(underlyingWindow, out var currentZone);
                 if (nowVisible) {
                     if (currentZone != null)
@@ -119,7 +119,7 @@
             // TODO: determine if window appeared in an existing zone, and if it needs to be moved
             this.locations.Add(window, null);
             if (VirtualDesktop.IsSupported)
-                Debug.WriteLineIf(VirtualDesktop.FromHwnd(app.HWnd) != VirtualDesktop.Current,
+                Debug.WriteLineIf(!VirtualDesktopHelper.IsCurrentVirtualDesktop(app.HWnd),
                     $"Window {app.AppTitle} appeared on inactive desktop");
 
 #if DEBUG
@@ -155,11 +155,11 @@
         void DisposeVirtualDesktopSupport() {
             VirtualDesktop.CurrentChanged -= this.VirtualDesktopOnCurrentChanged;
         }
-        readonly Dictionary<VirtualDesktop, Dictionary<Zone, List<AppWindowViewModel>>> suspended =
-            new Dictionary<VirtualDesktop, Dictionary<Zone, List<AppWindowViewModel>>>();
+        readonly Dictionary<Guid?, Dictionary<Zone, List<AppWindowViewModel>>> suspended =
+            new Dictionary<Guid?, Dictionary<Zone, List<AppWindowViewModel>>>();
         async void VirtualDesktopOnCurrentChanged(object sender, VirtualDesktopChangedEventArgs change) {
             await this.StartOnParentThread(() => {
-                var oldWindows = this.suspended.GetOrCreate(change.OldDesktop);
+                var oldWindows = this.suspended.GetOrCreate(change.OldDesktop?.Id);
                 oldWindows.Clear();
 
                 var activeZones = this.locations.Values.Distinct();
@@ -184,7 +184,7 @@
                     }
                 }
 
-                if (this.suspended.TryGetValue(change.NewDesktop, out var newWindows)) {
+                if (this.suspended.TryGetValue(change.NewDesktop?.Id, out var newWindows)) {
                     foreach (var zoneContent in newWindows)
                         zoneContent.Key.Windows.AddRange(zoneContent.Value);
                 }

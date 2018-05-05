@@ -73,7 +73,9 @@
 
         public bool Execute(Vector direction) => this.MoveCurrentWindow(direction);
 
+#pragma warning disable CS0169
         public event EventHandler CanExecuteChanged;
+#pragma warning restore CS0169
 
         const double Epsilon = 2;
         const double LargeValue = 1e9;
