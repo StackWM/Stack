@@ -202,7 +202,7 @@
             if (WindowsDesktop.VirtualDesktop.IsPresent && !WindowsDesktop.VirtualDesktop.IsSupported) {
                 HockeyClient.Current.TrackException(WindowsDesktop.VirtualDesktop.InitializationException);
                 this.NonCriticalErrorHandler(this, new ErrorEventArgs(new Exception(
-                    message: "Your OS has Virtual Desktops, but this version of API is not supported. You might notice Stack behaveing weird when using Virtual Desktops.",
+                    message: "Your OS has Virtual Desktops, but this version of API is not supported. You might notice Stack behaving weird when using Virtual Desktops.",
                     innerException: WindowsDesktop.VirtualDesktop.InitializationException)));
             }
 
