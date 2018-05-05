@@ -309,6 +309,8 @@
     <Compile Include="Utils\RectExtensions.cs" />
     <Compile Include="Utils\ScreenExtensions.cs" />
     <Compile Include="Utils\VersionUtils.cs" />
+    <Compile Include="Utils\Warning.cs" />
+    <Compile Include="Utils\WindowUtils.cs" />
     <Compile Include="ViewModels\DesignTimeWindow.cs" />
     <Compile Include="ViewModels\ILayoutMappingViewModel.cs" />
     <Compile Include="ViewModels\ILayoutsViewModel.cs" />
