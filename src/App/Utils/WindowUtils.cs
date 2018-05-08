@@ -5,7 +5,6 @@
     using System.Windows.Interop;
     using JetBrains.Annotations;
     using LostTech.Stack.Models;
-    using Microsoft.HockeyApp;
 
     static class WindowUtils
     {

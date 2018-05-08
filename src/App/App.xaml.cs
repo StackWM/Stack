@@ -296,6 +296,13 @@
             timer.Tick += TelemetryHeartbeat;
             timer.Start();
             TelemetryHeartbeat(timer, EventArgs.Empty);
+
+            TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
+        }
+
+        static void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e) {
+            foreach (Exception exception in e.Exception.Flatten().InnerExceptions)
+                HockeyClient.Current.TrackException(exception);
         }
 
         static void TelemetryHeartbeat(object sender, EventArgs e) {
