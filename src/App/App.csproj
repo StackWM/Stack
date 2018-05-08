@@ -60,8 +60,8 @@
     <Reference Include="LostTech.App.DataBinding, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LostTech.App.DataBinding.0.1.0\lib\netstandard1.0\LostTech.App.DataBinding.dll</HintPath>
     </Reference>
-    <Reference Include="LostTech.App.Settings, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LostTech.App.Settings.0.2.0-b2017072001\lib\netstandard1.4\LostTech.App.Settings.dll</HintPath>
+    <Reference Include="LostTech.App.Settings, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LostTech.App.Settings.0.3.0-b2018050804\lib\netstandard1.4\LostTech.App.Settings.dll</HintPath>
     </Reference>
     <Reference Include="LostTech.App.XmlSettings, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LostTech.App.XmlSettings.0.1.0-b2017071801\lib\netstandard1.4\LostTech.App.XmlSettings.dll</HintPath>
@@ -118,8 +118,8 @@
     <Reference Include="Prism, Version=7.0.0.396, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Prism.Core.7.0.0.396\lib\net45\Prism.dll</HintPath>
     </Reference>
-    <Reference Include="RecursiveChangeNotifier, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\RecursiveChangeNotifier.0.3.0-b2017050701\lib\netstandard1.0\RecursiveChangeNotifier.dll</HintPath>
+    <Reference Include="RecursiveChangeNotifier, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\RecursiveChangeNotifier.0.4.0-b3\lib\netstandard1.0\RecursiveChangeNotifier.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.AppContext, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
