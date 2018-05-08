@@ -138,6 +138,7 @@
 #endif
         }
 
+#if DEBUG
         Task<Zone> DecideInitialZone(WindowData window) {
             if (window.AppTitle == "Windows PowerShell")
                 return this.GetZoneByID("Tools");
@@ -147,6 +148,7 @@
 
             return Task.FromResult<Zone>(null);
         }
+#endif
 
         #region Virtual Desktop Support
         void InitVirtualDesktopSupport() {
@@ -206,7 +208,8 @@
             }
         }
 
-        Zone RemoveFromSuspended(IAppWindow window, bool dispose) {
+        [CanBeNull]
+        Zone RemoveFromSuspended([CanBeNull] IAppWindow window, bool dispose) {
             Zone zone = null;
             foreach (var desktopCollection in this.suspended.Values) {
                 foreach (var zoneCollection in desktopCollection) {
@@ -220,7 +223,7 @@
             }
             return zone;
         }
-        #endregion
+#endregion
 
         private Task<Zone> GetZoneByID(string layoutID) => this.StartOnParentThread(() => this.screenLayouts
                                 .SelectMany(layout => layout.Zones)
