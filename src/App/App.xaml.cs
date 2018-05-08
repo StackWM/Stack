@@ -490,7 +490,20 @@
                 // DTO + null == null
                 ExpirationTime = DateTimeOffset.Now + duration,
             };
-            DesktopNotificationManagerCompat.CreateToastNotifier().Show(toast);
+            try {
+                DesktopNotificationManagerCompat.CreateToastNotifier().Show(toast);
+            } catch (Exception e) {
+                string retrying = this.trayIcon != null ? "retrying" : "no retry";
+                e.ReportAsWarning(prefix: $"Notification failed, {retrying}: ");
+
+                if (this.trayIcon == null)
+                    return;
+
+                this.trayIcon.BalloonTipIcon = ToolTipIcon.None;
+                this.trayIcon.BalloonTipTitle = title;
+                this.trayIcon.BalloonTipText = message;
+                this.trayIcon.ShowBalloonTip(1000);
+            }
         }
 
         void NonCriticalErrorHandler(object sender, ErrorEventArgs error) {
