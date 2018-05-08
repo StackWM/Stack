@@ -65,7 +65,7 @@
             Guid? newDesktop = window.DesktopID;
             switch (e.PropertyName) {
             case nameof(AppWindowViewModel.DesktopID) when VirtualDesktop.IsSupported:
-                bool nowVisible = IsPinnedWindow(underlyingWindow.Handle) || VirtualDesktopHelper.IsCurrentVirtualDesktop(underlyingWindow.Handle);
+                bool nowVisible = IsPinnedWindow(underlyingWindow.Handle) || IsOnCurrentDesktop(underlyingWindow.Handle);
                 this.locations.TryGetValue(underlyingWindow, out var currentZone);
                 if (nowVisible) {
                     if (currentZone != null)
@@ -119,7 +119,7 @@
             // TODO: determine if window appeared in an existing zone, and if it needs to be moved
             this.locations.Add(window, null);
             if (VirtualDesktop.IsSupported)
-                Debug.WriteLineIf(!VirtualDesktopHelper.IsCurrentVirtualDesktop(app.HWnd),
+                Debug.WriteLineIf(!IsOnCurrentDesktop(app.HWnd),
                     $"Window {app.AppTitle} appeared on inactive desktop");
 
 #if DEBUG
@@ -205,6 +205,21 @@
             } catch (ArgumentException e) {
                 e.ReportAsWarning();
                 return false;
+            }
+        }
+
+        static bool IsOnCurrentDesktop(IntPtr hwnd) {
+            try {
+                return VirtualDesktopHelper.IsCurrentVirtualDesktop(hwnd);
+            } catch (COMException e) {
+                e.ReportAsWarning();
+                return true;
+            } catch (Win32Exception e) {
+                e.ReportAsWarning();
+                return true;
+            } catch (ArgumentException e) {
+                e.ReportAsWarning();
+                return true;
             }
         }
 
