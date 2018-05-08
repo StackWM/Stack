@@ -195,13 +195,13 @@
             try {
                 return VirtualDesktop.IsPinnedWindow(hwnd);
             } catch (COMException e) {
-                HockeyClient.Current.TrackException(e);
+                e.ReportAsWarning();
                 return false;
             } catch (Win32Exception e) {
-                HockeyClient.Current.TrackException(e);
+                e.ReportAsWarning();
                 return false;
             } catch (ArgumentException e) {
-                HockeyClient.Current.TrackException(e);
+                e.ReportAsWarning();
                 return false;
             }
         }

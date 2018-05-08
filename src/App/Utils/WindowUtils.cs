@@ -28,7 +28,7 @@
             try {
                 return new WindowInteropHelper(window).Handle;
             } catch(Exception e) {
-                HockeyClient.Current.TrackException(new Warning($"Can't get window handle: {e.Message}", e));
+                e.ReportAsWarning(prefix: "Warning: Can't get window handle: ");
                 return IntPtr.Zero;
             }
         }
