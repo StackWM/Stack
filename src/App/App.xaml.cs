@@ -190,6 +190,22 @@
 
             await this.StartLayout(settings);
 
+            this.trayIcon = await this.StartTrayIcon(settings);
+
+            if (this.layoutLoader.Problems.Count > 0) {
+                this.trayIcon.BalloonTipTitle = "Some layouts were not loaded";
+                this.trayIcon.BalloonTipText = string.Join("\n", this.layoutLoader.Problems);
+                this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
+                this.trayIcon.ShowBalloonTip(30);
+            }
+
+            if (WindowsDesktop.VirtualDesktop.IsPresent && !WindowsDesktop.VirtualDesktop.IsSupported) {
+                WindowsDesktop.VirtualDesktop.InitializationException.ReportAsWarning();
+                this.NonCriticalErrorHandler(this, new ErrorEventArgs(new Exception(
+                    message: "Your OS has Virtual Desktops, but this version of API is not supported. You might notice Stack behaving weird when using Virtual Desktops.",
+                    innerException: WindowsDesktop.VirtualDesktop.InitializationException)));
+            }
+
             // this must be the last, so that mouse won't lag while we are loading
             this.BindHandlers(settings);
         }
@@ -280,6 +296,13 @@
             timer.Tick += TelemetryHeartbeat;
             timer.Start();
             TelemetryHeartbeat(timer, EventArgs.Empty);
+
+            TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
+        }
+
+        static void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e) {
+            foreach (Exception exception in e.Exception.Flatten().InnerExceptions)
+                HockeyClient.Current.TrackException(exception);
         }
 
         static void TelemetryHeartbeat(object sender, EventArgs e) {
@@ -469,7 +492,20 @@
                 // DTO + null == null
                 ExpirationTime = DateTimeOffset.Now + duration,
             };
-            DesktopNotificationManagerCompat.CreateToastNotifier().Show(toast);
+            try {
+                DesktopNotificationManagerCompat.CreateToastNotifier().Show(toast);
+            } catch (Exception e) {
+                string retrying = this.trayIcon != null ? "retrying" : "no retry";
+                e.ReportAsWarning(prefix: $"Notification failed, {retrying}: ");
+
+                if (this.trayIcon == null)
+                    return;
+
+                this.trayIcon.BalloonTipIcon = ToolTipIcon.None;
+                this.trayIcon.BalloonTipTitle = title;
+                this.trayIcon.BalloonTipText = message;
+                this.trayIcon.ShowBalloonTip(1000);
+            }
         }
 
         void NonCriticalErrorHandler(object sender, ErrorEventArgs error) {
@@ -724,27 +760,26 @@
             });
 
             settings.LayoutMap.Map.CollectionChanged += this.MapOnCollectionChanged;
+        }
 
-            this.trayIcon = (await TrayIcon.StartTrayIcon(this.layoutsFolder, this.layoutsDirectory, settings, this.screenProvider, this.SettingsWindow)).Icon;
-            this.trayIcon.BalloonTipClicked += (sender, args) => MessageBox.Show(this.trayIcon.BalloonTipText,
-                this.trayIcon.BalloonTipTitle,
+        async Task<NotifyIcon> StartTrayIcon(StackSettings settings) {
+            var trayIcon = (await TrayIcon.StartTrayIcon(this.layoutsFolder, this.layoutsDirectory, settings, this.screenProvider, this.SettingsWindow)).Icon;
+            trayIcon.BalloonTipClicked += (sender, args) => MessageBox.Show(this.trayIcon.BalloonTipText,
+                trayIcon.BalloonTipTitle,
                 MessageBoxButton.OK,
-                this.trayIcon.BalloonTipIcon == ToolTipIcon.Error
+                trayIcon.BalloonTipIcon == ToolTipIcon.Error
                     ? MessageBoxImage.Error
                     : MessageBoxImage.Information);
-            if (this.layoutLoader.Problems.Count > 0) {
-                this.trayIcon.BalloonTipTitle = "Some layouts were not loaded";
-                this.trayIcon.BalloonTipText = string.Join("\n", this.layoutLoader.Problems);
-                this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
-                this.trayIcon.ShowBalloonTip(30);
-            }
+            
             if (!settings.Notifications.IamInTrayDone) {
                 settings.Notifications.IamInTrayDone = true;
-                this.trayIcon.BalloonTipTitle = "Stack";
-                this.trayIcon.BalloonTipText = "You can now move windows around using middle mouse button or Win+Arrow";
-                this.trayIcon.BalloonTipIcon = ToolTipIcon.Info;
-                this.trayIcon.ShowBalloonTip(30);
+                trayIcon.BalloonTipTitle = "Stack";
+                trayIcon.BalloonTipText = "You can now move windows around using middle mouse button or Win+Arrow";
+                trayIcon.BalloonTipIcon = ToolTipIcon.Info;
+                trayIcon.ShowBalloonTip(30);
             }
+
+            return trayIcon;
         }
 
         async void MapOnCollectionChanged(object o, NotifyCollectionChangedEventArgs change) {

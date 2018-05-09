@@ -14,7 +14,9 @@
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.Models;
     using LostTech.Stack.Settings;
+    using LostTech.Stack.Utils;
     using LostTech.Windows;
+    using Microsoft.HockeyApp;
     using Microsoft.VisualBasic;
     using PCLStorage;
     using Application = System.Windows.Application;
@@ -49,9 +51,15 @@
                 Visible = true,
             }, stackSettings, layoutsFolder);
 
-            contextMenu.Items.Add("Settings", image: null, onClick: (_, __) => settingsWindow.Show())
+            contextMenu.Items.Add("Settings", image: null, onClick: (_, __) => {
+                settingsWindow.Show();
+                settingsWindow.TryGetNativeWindow()?.BringToFront().ReportAsWarning();
+            })
                 .Font = new Font(contextMenu.Font, FontStyle.Bold);
-            trayIcon.Icon.DoubleClick += delegate { settingsWindow.Show(); };
+            trayIcon.Icon.DoubleClick += delegate {
+                settingsWindow.Show();
+                settingsWindow.TryGetNativeWindow()?.BringToFront().ReportAsWarning();
+            };
 
             contextMenu.Items.Add(trayIcon.CreateHelpMenu());
             ToolStripMenuItem feedback = new DesktopBridge.Helpers().IsRunningAsUwp()
@@ -97,6 +105,10 @@
                 onClick: (_, __) => throw new Exception("Requested from context menu")) {
                 DisplayStyle = ToolStripItemDisplayStyle.Text,
             });
+            contextMenu.Items.Add(new ToolStripMenuItem("D: Report", image: null,
+                onClick: (_, __) => HockeyClient.Current.TrackException(new Exception("Requested report from context menu"))) {
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+            });
 #endif
 
             contextMenu.Items.Add(new ToolStripMenuItem("Exit", image: null,
@@ -113,7 +125,10 @@
             help.DropDownItems.Add(Link("Telegram Community","https://t.me/joinchat/HCVquw4yDSmwxky5pxxKZw"));
             help.DropDownItems.Add(Link("Ask a Question", "https://www.allanswered.com/community/s/stack-wm/"));
             help.DropDownItems.Add(Link("What's New", "https://losttech.software/stack-whatsnew.html"));
-            help.DropDownItems.Add("About", image: null, onClick: (_, __) => this.aboutWindow.Show());
+            help.DropDownItems.Add("About", image: null, onClick: (_, __) => {
+                this.aboutWindow.Show();
+                this.aboutWindow.TryGetNativeWindow()?.BringToFront().ReportAsWarning();
+            });
             return help;
         }
 

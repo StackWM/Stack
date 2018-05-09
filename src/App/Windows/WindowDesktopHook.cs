@@ -15,12 +15,12 @@
         readonly DispatcherTimer timer;
         readonly bool ownsTimer;
         readonly IntPtr windowHandle;
-        VirtualDesktop desktop;
+        Guid? desktop;
 
-        public VirtualDesktop Desktop {
+        public Guid? DesktopID {
             get => this.desktop;
             private set {
-                if (value?.Id == this.desktop?.Id)
+                if (value == this.desktop)
                     return;
 
                 this.desktop = value;
@@ -33,7 +33,7 @@
         int strikes;
         void TimerOnTick(object sender, EventArgs _) {
             try {
-                this.Desktop = VirtualDesktop.FromHwnd(this.windowHandle);
+                this.DesktopID = VirtualDesktop.IdFromHwnd(this.windowHandle);
                 this.strikes = 0;
             } catch (Win32Exception e) {
                 HockeyClient.Current.TrackException(e);

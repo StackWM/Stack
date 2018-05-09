@@ -60,8 +60,8 @@
     <Reference Include="LostTech.App.DataBinding, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LostTech.App.DataBinding.0.1.0\lib\netstandard1.0\LostTech.App.DataBinding.dll</HintPath>
     </Reference>
-    <Reference Include="LostTech.App.Settings, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LostTech.App.Settings.0.2.0-b2017072001\lib\netstandard1.4\LostTech.App.Settings.dll</HintPath>
+    <Reference Include="LostTech.App.Settings, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LostTech.App.Settings.0.3.0-b2018050804\lib\netstandard1.4\LostTech.App.Settings.dll</HintPath>
     </Reference>
     <Reference Include="LostTech.App.XmlSettings, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LostTech.App.XmlSettings.0.1.0-b2017071801\lib\netstandard1.4\LostTech.App.XmlSettings.dll</HintPath>
@@ -72,8 +72,8 @@
     <Reference Include="LostTech.Stack.Extensibility, Version=0.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LostTech.Stack.Extensibility.0.1.1\lib\net462\LostTech.Stack.Extensibility.dll</HintPath>
     </Reference>
-    <Reference Include="MahApps.Metro, Version=1.6.1.4, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MahApps.Metro.1.6.1\lib\net45\MahApps.Metro.dll</HintPath>
+    <Reference Include="MahApps.Metro, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MahApps.Metro.1.6.2\lib\net46\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Toolkit.Uwp.Notifications, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Toolkit.Uwp.Notifications.2.2.0\lib\netstandard1.4\Microsoft.Toolkit.Uwp.Notifications.dll</HintPath>
@@ -98,28 +98,28 @@
       <HintPath>..\..\packages\PCLStorage.Desktop.1.0.4-b2017032802\lib\net45\PCLStorage.Desktop.dll</HintPath>
     </Reference>
     <Reference Include="PInvoke.DwmApi, Version=0.5.0.0, Culture=neutral, PublicKeyToken=9e300f9f87f04a7a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PInvoke.DwmApi.0.5.134\lib\net45\PInvoke.DwmApi.dll</HintPath>
+      <HintPath>..\..\packages\PInvoke.DwmApi.0.5.147\lib\net45\PInvoke.DwmApi.dll</HintPath>
     </Reference>
     <Reference Include="PInvoke.Kernel32, Version=0.5.0.0, Culture=neutral, PublicKeyToken=9e300f9f87f04a7a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PInvoke.Kernel32.0.5.134\lib\net45\PInvoke.Kernel32.dll</HintPath>
+      <HintPath>..\..\packages\PInvoke.Kernel32.0.5.147\lib\net45\PInvoke.Kernel32.dll</HintPath>
     </Reference>
     <Reference Include="PInvoke.User32, Version=0.5.0.0, Culture=neutral, PublicKeyToken=9e300f9f87f04a7a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PInvoke.User32.0.5.134\lib\net45\PInvoke.User32.dll</HintPath>
+      <HintPath>..\..\packages\PInvoke.User32.0.5.147\lib\net45\PInvoke.User32.dll</HintPath>
     </Reference>
     <Reference Include="PInvoke.UxTheme, Version=0.5.0.0, Culture=neutral, PublicKeyToken=9e300f9f87f04a7a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PInvoke.UxTheme.0.5.134\lib\net45\PInvoke.UxTheme.dll</HintPath>
+      <HintPath>..\..\packages\PInvoke.UxTheme.0.5.147\lib\net45\PInvoke.UxTheme.dll</HintPath>
     </Reference>
     <Reference Include="PInvoke.Windows.Core, Version=0.5.0.0, Culture=neutral, PublicKeyToken=9e300f9f87f04a7a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PInvoke.Windows.Core.0.5.134\lib\net35\PInvoke.Windows.Core.dll</HintPath>
+      <HintPath>..\..\packages\PInvoke.Windows.Core.0.5.147\lib\net35\PInvoke.Windows.Core.dll</HintPath>
     </Reference>
     <Reference Include="PInvoke.Windows.ShellScalingApi, Version=0.5.0.0, Culture=neutral, PublicKeyToken=9e300f9f87f04a7a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PInvoke.Windows.ShellScalingApi.0.5.134\lib\net45\PInvoke.Windows.ShellScalingApi.dll</HintPath>
+      <HintPath>..\..\packages\PInvoke.Windows.ShellScalingApi.0.5.147\lib\net45\PInvoke.Windows.ShellScalingApi.dll</HintPath>
     </Reference>
     <Reference Include="Prism, Version=7.0.0.396, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Prism.Core.7.0.0.396\lib\net45\Prism.dll</HintPath>
     </Reference>
-    <Reference Include="RecursiveChangeNotifier, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\RecursiveChangeNotifier.0.3.0-b2017050701\lib\netstandard1.0\RecursiveChangeNotifier.dll</HintPath>
+    <Reference Include="RecursiveChangeNotifier, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\RecursiveChangeNotifier.0.4.0-b3\lib\netstandard1.0\RecursiveChangeNotifier.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.AppContext, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -309,6 +309,8 @@
     <Compile Include="Utils\RectExtensions.cs" />
     <Compile Include="Utils\ScreenExtensions.cs" />
     <Compile Include="Utils\VersionUtils.cs" />
+    <Compile Include="Utils\Warning.cs" />
+    <Compile Include="Utils\WindowUtils.cs" />
     <Compile Include="ViewModels\DesignTimeWindow.cs" />
     <Compile Include="ViewModels\ILayoutMappingViewModel.cs" />
     <Compile Include="ViewModels\ILayoutsViewModel.cs" />
@@ -515,27 +517,27 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\App\KeySettings\src\WPF\WPF.csproj">
+    <ProjectReference Include="..\..\External\KeySettings\src\WPF\WPF.csproj">
       <Project>{f0f57d7c-f2aa-4046-9692-e30d896e8515}</Project>
       <Name>WPF</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\App\ObservableFileSystem\src\ObservableFileSystem.csproj">
+    <ProjectReference Include="..\..\External\ObservableFileSystem\src\ObservableFileSystem.csproj">
       <Project>{b8ad0753-625f-41e0-a90d-05d587cf0780}</Project>
       <Name>ObservableFileSystem</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\OSS\EventHook\EventHook\EventHook.csproj">
+    <ProjectReference Include="..\..\External\EventHook\EventHook\EventHook.csproj">
       <Project>{3847a7f4-3f6b-4626-af4c-8fdfba6165f2}</Project>
       <Name>EventHook</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\OSS\HockeySDK-Windows\Src\Kit.Core45\Kit.Core45.csproj">
+    <ProjectReference Include="..\..\External\HockeySDK\Src\Kit.Core45\Kit.Core45.csproj">
       <Project>{14123a8e-6d6b-4362-b001-35b8c2505eed}</Project>
       <Name>Kit.Core45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\OSS\HockeySDK-Windows\Src\Kit.WPF45\Kit.WPF45.csproj">
+    <ProjectReference Include="..\..\External\HockeySDK\Src\Kit.WPF45\Kit.WPF45.csproj">
       <Project>{c9612531-2077-4662-b8a4-092e06d5069b}</Project>
       <Name>Kit.WPF45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\OSS\MouseKeyHook\MouseKeyHook\MouseKeyHook.csproj">
+    <ProjectReference Include="..\..\External\MouseKeyHook\MouseKeyHook\MouseKeyHook.csproj">
       <Project>{f52aa97e-180a-40ed-8f2b-09080171d6c7}</Project>
       <Name>MouseKeyHook</Name>
     </ProjectReference>
@@ -568,11 +570,11 @@
     <Resource Include="StackTaskbarIcon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\packages\NETStandard.Library.2.0.2\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\..\packages\NETStandard.Library.2.0.2\build\netstandard2.0\NETStandard.Library.targets')" />
+  <Import Project="..\..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\NETStandard.Library.2.0.2\build\netstandard2.0\NETStandard.Library.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\NETStandard.Library.2.0.2\build\netstandard2.0\NETStandard.Library.targets'))" />
+    <Error Condition="!Exists('..\..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets'))" />
   </Target>
 </Project>

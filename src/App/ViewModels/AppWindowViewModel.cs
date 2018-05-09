@@ -28,7 +28,7 @@
 
         public string Title => this.Window.Title;
         public bool IsMinimized => this.Window.IsMinimized;
-        public VirtualDesktop Desktop => this.desktopHook?.Desktop;
+        public Guid? DesktopID => this.desktopHook?.DesktopID;
 
         void HookOnMinimizeChanged(object sender, WindowEventArgs windowEventArgs) {
             if (Win32WindowFactory.Create(windowEventArgs.Handle).Equals(this.Window))
@@ -36,8 +36,8 @@
         }
 
         void DesktopHookPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            if (e.PropertyName == nameof(this.desktopHook.Desktop))
-                this.OnPropertyChanged(nameof(this.Desktop));
+            if (e.PropertyName == nameof(this.desktopHook.DesktopID))
+                this.OnPropertyChanged(nameof(this.DesktopID));
         }
 
         public void Dispose() {

@@ -5,6 +5,7 @@
     using System.ComponentModel;
     using System.Diagnostics;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
     using WindowsDesktop;
@@ -61,10 +62,10 @@
         void AppWindowOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
             var window = (AppWindowViewModel)sender;
             var underlyingWindow = (Win32Window)window.Window;
-            VirtualDesktop newDesktop = window.Desktop;
+            Guid? newDesktop = window.DesktopID;
             switch (e.PropertyName) {
-            case nameof(AppWindowViewModel.Desktop) when VirtualDesktop.IsSupported:
-                bool nowVisible = IsPinnedWindow(underlyingWindow.Handle) || newDesktop?.Id == VirtualDesktop.Current?.Id;
+            case nameof(AppWindowViewModel.DesktopID) when VirtualDesktop.IsSupported:
+                bool nowVisible = IsPinnedWindow(underlyingWindow.Handle) || IsOnCurrentDesktop(underlyingWindow.Handle);
                 this.locations.TryGetValue(underlyingWindow, out var currentZone);
                 if (nowVisible) {
                     if (currentZone != null)
@@ -88,17 +89,19 @@
             }
         }
 
+        void ReportTaskException(Task task) {
+            if (task.IsFaulted)
+                foreach (var exception in task.Exception.InnerExceptions)
+                    HockeyClient.Current.TrackException(exception);
+        }
+
         void OnApplicationWindowChange(object sender, ApplicationEventArgs applicationEventArgs)
         {
             var app = applicationEventArgs.ApplicationData;
             var window = this.windowFactory.Create(app.HWnd);
             if (applicationEventArgs.Event != ApplicationEvents.Launched) {
                 this.StartOnParentThread(() => this.RemoveFromSuspended(window, dispose: true))
-                    .ContinueWith(t => {
-                        if (t.IsFaulted)
-                            foreach (var exception in t.Exception.InnerExceptions)
-                                HockeyClient.Current.TrackException(exception);
-                        });
+                    .ContinueWith(this.ReportTaskException);
                 bool wasTracked = this.locations.TryGetValue(window, out var existedAt);
                 if (wasTracked) {
                     this.locations.Remove(window);
@@ -106,7 +109,7 @@
                         var existing = existedAt?.Windows.FirstOrDefault(vm => vm.Window.Equals(window));
                         existing?.Dispose();
                         return existedAt?.Windows.Remove(existing);
-                    });
+                    }).ContinueWith(this.ReportTaskException);
                 }
                 Debug.WriteLine($"Disappeared: {app.AppTitle} traked: {wasTracked}");
                 return;
@@ -116,20 +119,26 @@
             // TODO: determine if window appeared in an existing zone, and if it needs to be moved
             this.locations.Add(window, null);
             if (VirtualDesktop.IsSupported)
-                Debug.WriteLineIf(VirtualDesktop.FromHwnd(app.HWnd) != VirtualDesktop.Current,
+                Debug.WriteLineIf(!IsOnCurrentDesktop(app.HWnd),
                     $"Window {app.AppTitle} appeared on inactive desktop");
 
 #if DEBUG
             this.DecideInitialZone(app)
-                .ContinueWith(zone => {
-                    if (zone.Result != null) {
-                        this.Move(window, zone.Result);
+                .ContinueWith(zoneTask => {
+                    if (zoneTask.IsFaulted) {
+                        this.ReportTaskException(zoneTask);
+                        return;
+                    }
+
+                    if (zoneTask.Result != null) {
+                        this.Move(window, zoneTask.Result);
                         Debug.WriteLine("Did it!");
                     }
                 }, this.taskScheduler);
 #endif
         }
 
+#if DEBUG
         Task<Zone> DecideInitialZone(WindowData window) {
             if (window.AppTitle == "Windows PowerShell")
                 return this.GetZoneByID("Tools");
@@ -139,6 +148,7 @@
 
             return Task.FromResult<Zone>(null);
         }
+#endif
 
         #region Virtual Desktop Support
         void InitVirtualDesktopSupport() {
@@ -147,11 +157,11 @@
         void DisposeVirtualDesktopSupport() {
             VirtualDesktop.CurrentChanged -= this.VirtualDesktopOnCurrentChanged;
         }
-        readonly Dictionary<VirtualDesktop, Dictionary<Zone, List<AppWindowViewModel>>> suspended =
-            new Dictionary<VirtualDesktop, Dictionary<Zone, List<AppWindowViewModel>>>();
+        readonly Dictionary<Guid?, Dictionary<Zone, List<AppWindowViewModel>>> suspended =
+            new Dictionary<Guid?, Dictionary<Zone, List<AppWindowViewModel>>>();
         async void VirtualDesktopOnCurrentChanged(object sender, VirtualDesktopChangedEventArgs change) {
             await this.StartOnParentThread(() => {
-                var oldWindows = this.suspended.GetOrCreate(change.OldDesktop);
+                var oldWindows = this.suspended.GetOrCreate(change.OldDesktop?.Id);
                 oldWindows.Clear();
 
                 var activeZones = this.locations.Values.Distinct();
@@ -176,7 +186,7 @@
                     }
                 }
 
-                if (this.suspended.TryGetValue(change.NewDesktop, out var newWindows)) {
+                if (this.suspended.TryGetValue(change.NewDesktop?.Id, out var newWindows)) {
                     foreach (var zoneContent in newWindows)
                         zoneContent.Key.Windows.AddRange(zoneContent.Value);
                 }
@@ -186,16 +196,35 @@
         static bool IsPinnedWindow(IntPtr hwnd) {
             try {
                 return VirtualDesktop.IsPinnedWindow(hwnd);
+            } catch (COMException e) {
+                e.ReportAsWarning();
+                return false;
             } catch (Win32Exception e) {
-                HockeyClient.Current.TrackException(e);
+                e.ReportAsWarning();
                 return false;
             } catch (ArgumentException e) {
-                HockeyClient.Current.TrackException(e);
+                e.ReportAsWarning();
                 return false;
             }
         }
 
-        Zone RemoveFromSuspended(IAppWindow window, bool dispose) {
+        static bool IsOnCurrentDesktop(IntPtr hwnd) {
+            try {
+                return VirtualDesktopHelper.IsCurrentVirtualDesktop(hwnd);
+            } catch (COMException e) {
+                e.ReportAsWarning();
+                return true;
+            } catch (Win32Exception e) {
+                e.ReportAsWarning();
+                return true;
+            } catch (ArgumentException e) {
+                e.ReportAsWarning();
+                return true;
+            }
+        }
+
+        [CanBeNull]
+        Zone RemoveFromSuspended([CanBeNull] IAppWindow window, bool dispose) {
             Zone zone = null;
             foreach (var desktopCollection in this.suspended.Values) {
                 foreach (var zoneCollection in desktopCollection) {
@@ -209,7 +238,7 @@
             }
             return zone;
         }
-        #endregion
+#endregion
 
         private Task<Zone> GetZoneByID(string layoutID) => this.StartOnParentThread(() => this.screenLayouts
                                 .SelectMany(layout => layout.Zones)
