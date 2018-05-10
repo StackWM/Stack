@@ -87,7 +87,10 @@
         IFolder layoutsFolder;
         LayoutLoader layoutLoader;
         LayoutMappingViewModel layoutMapping;
+        int zoneIndex;
         readonly Win32WindowFactory win32WindowFactory = new Win32WindowFactory();
+
+        public event EventHandler<EventArgs<ScreenLayout>> LayoutLoaded;
 
         internal static readonly bool IsUwp = new DesktopBridge.Helpers().IsRunningAsUwp();
 
@@ -655,7 +658,6 @@
                 layoutNameCollection, this.layoutLoader, this.screenProvider);
 
             this.screenLayouts = new ObservableCollection<ScreenLayout>();
-            int zoneIndex = 0;
 
             async Task AddLayoutForScreen(Win32Screen screen)
             {
@@ -692,33 +694,7 @@
                 await delay;
                 if (changeGroupTasks.TryGetValue(layout, out var changeGroupTask) && delay.Equals(changeGroupTask)) {
                     changeGroupTasks.Remove(layout);
-                    FrameworkElement element = await this.GetLayoutForScreen(layout.Screen);
-                    // windows must be visible before calling AdjustToClientArea,
-                    // otherwise final position is unpredictable
-                    foreach (Zone zone in layout.Zones)
-                    {
-                        zone.Id = zone.Id ?? $"{zoneIndex++}";
-                    }
-
-                    foreach (var troublemaker in layout.FindChildren<Control>().OfType<IObjectWithProblems>())
-                        troublemaker.ProblemOccurred += this.NonCriticalErrorHandler;
-
-                    int version = Layout.GetVersion(element);
-                    if (version < Layout.Version.Current)
-                    {
-                        // TODO: remember warning state per layout
-                        this.ShowNotification(title: $"Outdated layout {Layout.GetSource(element)}",
-                            message: $"Layout {Layout.GetSource(element)} is outdated. Upgrade it to v2.",
-                            navigateTo: new Uri("https://www.allanswered.com/post/kgnoz/how-do-i-upgrade-my-layouts-to-v2/"));
-                    }
-
-                    layout.SetLayout(element);
-
-                    if (layout.IsHandleInitialized)
-                        if (Layout.GetVersion(element) < Layout.Version.Min.PermanentlyVisible)
-                            layout.TryHide();
-                        else
-                            layout.TryShow();
+                    await this.ReloadLayout(layout);
                 } else
                     Debug.WriteLine("grouped updates!");
             }
@@ -802,14 +778,34 @@
                 throw new ArgumentNullException(nameof(screenLayout));
 
             this.layoutLoader.ProblemOccurred += this.NonCriticalErrorHandler;
-            FrameworkElement element = await this.GetLayoutForScreen(screenLayout.Screen);
-            screenLayout.SetLayout(element);
-            if (Layout.GetVersion(element) < Layout.Version.Min.PermanentlyVisible)
-                screenLayout.Hide();
-            else
-                screenLayout.Show();
+            try {
+                FrameworkElement element = await this.GetLayoutForScreen(screenLayout.Screen);
+                element.Loaded += delegate { this.LayoutLoaded?.Invoke(this, Args.Create(screenLayout)); };
+                screenLayout.SetLayout(element);
 
-            this.layoutLoader.ProblemOccurred -= this.NonCriticalErrorHandler;
+                foreach (var troublemaker in screenLayout.FindChildren<Control>().OfType<IObjectWithProblems>())
+                    troublemaker.ProblemOccurred += this.NonCriticalErrorHandler;
+
+                foreach (Zone zone in screenLayout.Zones)
+                    zone.Id = zone.Id ?? $"{this.zoneIndex++}";
+
+                int version = Layout.GetVersion(element);
+                if (screenLayout.IsHandleInitialized)
+                    if (version < Layout.Version.Min.PermanentlyVisible)
+                        screenLayout.TryHide();
+                    else
+                        screenLayout.TryShow();
+
+                if (version < Layout.Version.Current)
+                {
+                    // TODO: remember warning state per layout
+                    this.ShowNotification(title: $"Outdated layout {Layout.GetSource(element)}",
+                        message: $"Layout {Layout.GetSource(element)} is outdated. Upgrade it to v2.",
+                        navigateTo: new Uri("https://www.allanswered.com/post/kgnoz/how-do-i-upgrade-my-layouts-to-v2/"));
+                }
+            } finally {
+                this.layoutLoader.ProblemOccurred -= this.NonCriticalErrorHandler;
+            }
         }
 
         void OnLayoutClosed(object sender, EventArgs args) { this.BeginShutdown(); }
@@ -866,7 +862,7 @@
             this.autoCaptureBehavior = new AutoCaptureBehavior(
                 layoutManager: this.layoutManager,
                 settings: settings.Behaviors.General,
-                screenLayouts: this.screenLayouts,
+                layouts: this,
                 win32WindowFactory: this.win32WindowFactory);
 
             this.dragHook = new DragHook(MouseButtons.Middle, this.hook);

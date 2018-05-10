@@ -4,36 +4,39 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using JetBrains.Annotations;
     using LostTech.Stack.Models;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
+    using LostTech.Stack.ViewModels;
     using LostTech.Stack.Zones;
 
     class AutoCaptureBehavior: IDisposable
     {
         readonly GeneralBehaviorSettings settings;
         readonly LayoutManager layoutManager;
-        readonly ICollection<ScreenLayout> screenLayouts;
+        readonly ILayoutsViewModel layouts;
         readonly Win32WindowFactory win32WindowFactory;
+        readonly TaskScheduler taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
         public AutoCaptureBehavior(
             [NotNull] GeneralBehaviorSettings settings,
             [NotNull] LayoutManager layoutManager,
-            [NotNull] ICollection<ScreenLayout> screenLayouts,
+            [NotNull] ILayoutsViewModel layouts,
             [NotNull] Win32WindowFactory win32WindowFactory)
         {
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
             this.layoutManager = layoutManager ?? throw new ArgumentNullException(nameof(layoutManager));
-            this.screenLayouts = screenLayouts ?? throw new ArgumentNullException(nameof(screenLayouts));
+            this.layouts = layouts ?? throw new ArgumentNullException(nameof(layouts));
             this.win32WindowFactory = win32WindowFactory ?? throw new ArgumentNullException(nameof(win32WindowFactory));
             this.BeginInitAsync();
         }
 
         async void BeginInitAsync() {
-            await Task.WhenAll(this.screenLayouts.Active().Select(layout => layout.Ready));
+            await Task.WhenAll(this.layouts.ScreenLayouts.Active().Select(layout => layout.Ready));
 
             await Task.Yield();
 
@@ -42,23 +45,56 @@
 
             this.layoutManager.WindowAppeared += this.OnWindowAppeared;
             this.layoutManager.DesktopSwitched += this.OnDesktopSwitched;
+            this.layouts.LayoutLoaded += this.OnLayoutLoaded;
+        }
+
+        void OnLayoutLoaded(object sender, EventArgs<ScreenLayout> args) {
+            if (!this.settings.CaptureOnLayoutChange)
+                return;
+
+            if (args.Subject?.Layout == null)
+                return;
+
+            Rect bounds = args.Subject.Layout.GetPhysicalBounds();
+            this.win32WindowFactory
+                .ForEachTopLevel(window => {
+                    try {
+                        Rect intersection = window.Bounds.Intersection(bounds);
+                        if (intersection.IsEmpty || intersection.Width < 10 || intersection.Height < 10)
+                            return;
+
+                        if (this.win32WindowFactory.DisplayInSwitchToList(window))
+                            this.Capture(window);
+                    } catch (Exception e) { e.ReportAsWarning(); }
+                })
+                .ReportAsWarning();
         }
 
         void OnDesktopSwitched(object sender, EventArgs e) {
             if (this.settings.CaptureOnDesktopSwitch)
-                this.Capture();
+                Task.Factory.StartNew(() =>
+                        this.Capture(), CancellationToken.None, TaskCreationOptions.None,
+                        this.taskScheduler)
+                    .ReportAsWarning();
         }
 
-        void OnWindowAppeared(object sender, EventArgs<IAppWindow> e) {
+        void OnWindowAppeared(object sender, EventArgs<IAppWindow> args) {
             if (this.settings.CaptureOnAppStart)
-                this.Capture(e.Subject);
+                Task.Factory.StartNew(() => 
+                        this.Capture(args.Subject), CancellationToken.None, TaskCreationOptions.None,
+                        this.taskScheduler)
+                    .ReportAsWarning();
         }
 
         void Capture() {
             this.win32WindowFactory
                 .ForEachTopLevel(window => {
-                    if (this.win32WindowFactory.DisplayInSwitchToList(window))
-                        this.Capture(window);
+                    try {
+                        if (this.win32WindowFactory.DisplayInSwitchToList(window))
+                            this.Capture(window);
+                    } catch (Exception e) {
+                        e.ReportAsWarning();
+                    }
                 })
                 .ReportAsWarning();
         }
@@ -77,7 +113,7 @@
             if (this.layoutManager.GetLocation(window, searchSuspended: true) != null)
                 return;
 
-            Zone targetZone = this.screenLayouts.Active()
+            Zone targetZone = this.layouts.ScreenLayouts.Active()
                 .SelectMany(layout => layout.Zones.Final())
                 .OrderBy(zone => LocationError(bounds, zone))
                 .FirstOrDefault();
@@ -100,6 +136,7 @@
         public void Dispose() {
             this.layoutManager.WindowAppeared -= this.OnWindowAppeared;
             this.layoutManager.DesktopSwitched -= this.OnDesktopSwitched;
+            this.layouts.LayoutLoaded -= this.OnLayoutLoaded;
         }
     }
 }

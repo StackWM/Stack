@@ -7,6 +7,7 @@
         bool captureOnStackStart;
         bool captureOnDesktopSwitch;
         bool captureOnAppStart;
+        bool captureOnLayoutChange;
 
         public bool SuppressSystemMargin {
             get => this.suppressSystemMargin;
@@ -40,11 +41,20 @@
             }
         }
 
+        public bool CaptureOnLayoutChange {
+            get => this.captureOnLayoutChange;
+            set {
+                this.captureOnLayoutChange = value;
+                this.OnPropertyChanged();
+            }
+        }
+
         public GeneralBehaviorSettings Copy() => new GeneralBehaviorSettings {
             SuppressSystemMargin = this.SuppressSystemMargin,
             CaptureOnAppStart = this.CaptureOnAppStart,
             CaptureOnDesktopSwitch = this.CaptureOnDesktopSwitch,
             CaptureOnStackStart = this.CaptureOnStackStart,
+            CaptureOnLayoutChange = this.CaptureOnLayoutChange,
         };
     }
 }

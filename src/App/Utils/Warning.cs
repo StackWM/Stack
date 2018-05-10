@@ -19,6 +19,18 @@
             potentiallyFailingTask.ContinueWith(t => {
                 if (t.IsFaulted)
                     t.Exception.ReportAsWarning(prefix);
+                if (t.IsCompleted)
+                    t.Result.ReportAsWarning(prefix);
+            });
+        }
+
+        public static void ReportAsWarning([NotNull] this Task potentiallyFailingTask, string prefix = "Warning: ")
+        {
+            if (potentiallyFailingTask == null)
+                throw new ArgumentNullException(nameof(potentiallyFailingTask));
+            potentiallyFailingTask.ContinueWith(t => {
+                if (t.IsFaulted)
+                    t.Exception.ReportAsWarning(prefix);
             });
         }
     }
