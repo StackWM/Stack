@@ -73,8 +73,22 @@
             }
         }
 
-        public string Title => GetWindowText(this.Handle);
+        public string Title {
+            get {
+                try {
+                    return GetWindowText(this.Handle);
+                } catch (PInvoke.Win32Exception) {
+                    return null;
+                }
+            }
+        }
+
         public bool IsMinimized => IsIconic(this.Handle);
+        public bool IsVisible => IsWindowVisible(this.Handle);
+
+        public bool IsResizable =>
+            ((WindowStyles)GetWindowLong(this.Handle, WindowLongIndexFlags.GWL_STYLE))
+            .HasFlag(WindowStyles.WS_SIZEFRAME);
 
         public Task<Exception> Activate() {
             this.EnsureNotMinimized();

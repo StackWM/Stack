@@ -12,5 +12,7 @@
         Task<Exception> Activate();
         Task<Exception> BringToFront();
         bool IsMinimized { get; }
+        bool IsResizable { get; }
+        bool IsVisible { get; }
     }
 }

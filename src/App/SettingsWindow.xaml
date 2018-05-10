@@ -36,6 +36,12 @@
           <StackPanel Margin="8" Orientation="Vertical">
             <metro:ToggleSwitch Content="Suppress system margin around windows (empty area)"
                                 IsChecked="{Binding Behaviors.General.SuppressSystemMargin}"/>
+            <metro:ToggleSwitch Content="Capture windows on startup"
+                                IsChecked="{Binding Behaviors.General.CaptureOnStackStart}"/>
+            <metro:ToggleSwitch Content="Capture windows on desktop switch"
+                                IsChecked="{Binding Behaviors.General.CaptureOnDesktopSwitch}"/>
+            <metro:ToggleSwitch Content="Capture windows when they open"
+                                IsChecked="{Binding Behaviors.General.CaptureOnAppStart}"/>
           </StackPanel>
         </TabItem>
         <TabItem Header="Mouse Drag">

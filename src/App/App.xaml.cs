@@ -79,6 +79,7 @@
         StackSettings stackSettings;
         KeyboardArrowBehavior keyboardArrowBehavior;
         HotkeyBehavior hotkeyBehavior;
+        AutoCaptureBehavior autoCaptureBehavior;
         LayoutManager layoutManager;
         DispatcherTimer updateTimer;
         readonly IScreenProvider screenProvider = new Win32ScreenProvider();
@@ -608,6 +609,7 @@
             this.dragHook = null;
             this.keyboardArrowBehavior?.Dispose();
             this.hotkeyBehavior?.Dispose();
+            this.autoCaptureBehavior?.Dispose();
             this.trayIcon?.Dispose();
 
             LostTech.App.Settings settings = this.localSettings;
@@ -652,15 +654,11 @@
             this.layoutMapping = new LayoutMappingViewModel(settings.LayoutMap,
                 layoutNameCollection, this.layoutLoader, this.screenProvider);
 
-            FrameworkElement[] layouts = await Task.WhenAll(screens
-                .Select(screen => this.GetLayoutForScreen(screen))
-                .ToArray());
             this.screenLayouts = new ObservableCollection<ScreenLayout>();
             int zoneIndex = 0;
 
             async Task AddLayoutForScreen(Win32Screen screen)
             {
-                var layoutTask = this.GetLayoutForScreen(screen);
                 var layout = new ScreenLayout {
                     ViewModel = new ScreenLayoutViewModel{Screen = screen},
                     Title = $"{screen.ID}: {ScreenLayouts.GetDesignation(screen)}"
@@ -669,28 +667,8 @@
                 layout.QueryContinueDrag += (sender, args) => args.Action = DragAction.Cancel;
                 layout.SizeChanged += LayoutBoundsChanged;
                 layout.LocationChanged += LayoutBoundsChanged;
-                // windows must be visible before calling AdjustToClientArea,
-                // otherwise final position is unpredictable
-                foreach (Zone zone in layout.Zones) {
-                    zone.Id = zone.Id ?? $"{zoneIndex++}";
-                }
-
-                foreach (var troublemaker in layout.FindChildren<Control>().OfType<IObjectWithProblems>())
-                    troublemaker.ProblemOccurred += this.NonCriticalErrorHandler;
 
                 this.screenLayouts.Add(layout);
-                FrameworkElement layoutElement = await layoutTask;
-                int version = Layout.GetVersion(layoutElement);
-                if (version < Layout.Version.Current) {
-                    // TODO: remember warning state per layout
-                    this.ShowNotification(title: $"Outdated layout {Layout.GetSource(layoutElement)}", 
-                        message: $"Layout {Layout.GetSource(layoutElement)} is outdated. Upgrade it to v2.",
-                        navigateTo: new Uri("https://www.allanswered.com/post/kgnoz/how-do-i-upgrade-my-layouts-to-v2/"));
-                }
-                if (version < Layout.Version.Min.PermanentlyVisible)
-                    layout.Hide();
-
-                layout.SetLayout(layoutElement);
             }
 
             void RemoveLayoutForScreen(Win32Screen screen) {
@@ -706,15 +684,36 @@
                 }
             }
 
-            Task changeGroupTask;
+            var changeGroupTasks = new Dictionary<ScreenLayout, Task>();
             async void LayoutBoundsChanged(object sender, EventArgs e) {
                 var layout = (ScreenLayout)sender;
                 Task delay = Task.Delay(millisecondsDelay: 15);
-                changeGroupTask = delay;
+                changeGroupTasks[layout] = delay;
                 await delay;
-                if (delay.Equals(changeGroupTask)) {
+                if (changeGroupTasks.TryGetValue(layout, out var changeGroupTask) && delay.Equals(changeGroupTask)) {
+                    changeGroupTasks.Remove(layout);
                     FrameworkElement element = await this.GetLayoutForScreen(layout.Screen);
+                    // windows must be visible before calling AdjustToClientArea,
+                    // otherwise final position is unpredictable
+                    foreach (Zone zone in layout.Zones)
+                    {
+                        zone.Id = zone.Id ?? $"{zoneIndex++}";
+                    }
+
+                    foreach (var troublemaker in layout.FindChildren<Control>().OfType<IObjectWithProblems>())
+                        troublemaker.ProblemOccurred += this.NonCriticalErrorHandler;
+
+                    int version = Layout.GetVersion(element);
+                    if (version < Layout.Version.Current)
+                    {
+                        // TODO: remember warning state per layout
+                        this.ShowNotification(title: $"Outdated layout {Layout.GetSource(element)}",
+                            message: $"Layout {Layout.GetSource(element)} is outdated. Upgrade it to v2.",
+                            navigateTo: new Uri("https://www.allanswered.com/post/kgnoz/how-do-i-upgrade-my-layouts-to-v2/"));
+                    }
+
                     layout.SetLayout(element);
+
                     if (layout.IsHandleInitialized)
                         if (Layout.GetVersion(element) < Layout.Version.Min.PermanentlyVisible)
                             layout.TryHide();
@@ -863,6 +862,12 @@
                 this.Move, this.win32WindowFactory);
 
             this.hotkeyBehavior = new HotkeyBehavior(this.hook, settings.Behaviors.KeyBindings, this, this.screenProvider, this.layoutMapping);
+
+            this.autoCaptureBehavior = new AutoCaptureBehavior(
+                layoutManager: this.layoutManager,
+                settings: settings.Behaviors.General,
+                screenLayouts: this.screenLayouts,
+                win32WindowFactory: this.win32WindowFactory);
 
             this.dragHook = new DragHook(MouseButtons.Middle, this.hook);
             this.dragHook.DragStartPreview += this.OnDragStartPreview;

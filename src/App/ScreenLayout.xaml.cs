@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Interop;
@@ -34,6 +35,11 @@
         public void SetLayout(FrameworkElement layout) {
             layout.Width = layout.Height = double.NaN;
             this.Content = layout;
+
+            layout.Loaded += delegate {
+                if (this.windowPositioned)
+                    this.ready.TrySetResult(true);
+            };
         }
 
         public FrameworkElement Layout => this.Content as FrameworkElement;
@@ -44,7 +50,11 @@
             this.handle = (HwndSource)PresentationSource.FromVisual(this);
             // ReSharper disable once PossibleNullReferenceException
             this.handle.AddHook(this.OnWindowMessage);
+            this.SetScreen(this.Screen);
         }
+
+        readonly TaskCompletionSource<bool> loaded = new TaskCompletionSource<bool>();
+        void OnLoaded(object sender, EventArgs e) => this.loaded.TrySetResult(true);
 
         protected override void OnClosed(EventArgs e)
         {
@@ -66,7 +76,7 @@
         }
 
         Win32Screen lastScreen;
-        public Win32Screen Screen => this.ViewModel.Screen;
+        public Win32Screen Screen => this.ViewModel?.Screen;
 
         internal ScreenLayoutViewModel ViewModel {
             get => (ScreenLayoutViewModel)this.DataContext;
@@ -114,8 +124,8 @@
 
         public void AdjustToClientArea()
         {
-            if (this.DataContext is Win32Screen screen)
-                this.AdjustToClientArea(screen);
+            if (this.Screen != null)
+                this.AdjustToClientArea(this.Screen);
             else
                 throw new InvalidOperationException();
         }
@@ -129,13 +139,21 @@
 
         Task idleAdjustDelay;
         async void AdjustToScreenWhenIdle() {
-            var delay = Task.Delay(millisecondsDelay: 1000);
+            var delay = Task.Delay(millisecondsDelay: 500);
             this.idleAdjustDelay = delay;
-            await delay;
-            if (delay == this.idleAdjustDelay && this.IsLoaded)
+            await Task.WhenAll(delay, this.loaded.Task);
+            if (delay != this.idleAdjustDelay)
+                return;
+            if (this.IsLoaded)
                 this.AdjustToScreen();
         }
 
+        readonly TaskCompletionSource<bool> ready = new TaskCompletionSource<bool>();
+        bool windowPositioned = false;
+        /// <summary>
+        /// Completes, when this instance is adjusted to the screen, and some layout is loaded
+        /// </summary>
+        public Task Ready => this.ready.Task;
         async void AdjustToScreen()
         {
             for (int retry = 0; retry < 8; retry++) {
@@ -154,6 +172,11 @@
                 this.AdjustToClientArea(this.Screen);
                 this.Visibility = visibility;
                 this.Opacity = opacity;
+                this.windowPositioned = true;
+                if (this.Layout != null) {
+                    await Task.Yield();
+                    this.ready.TrySetResult(true);
+                }
                 return;
             }
         }

@@ -240,6 +240,7 @@
     <Compile Include="About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Behavior\AutoCaptureBehavior.cs" />
     <Compile Include="Behavior\GlobalHotkeyBehaviorBase.cs" />
     <Compile Include="Behavior\HotkeyBehavior.cs" />
     <Compile Include="Behavior\KeyboardArrowBehavior.cs" />
@@ -263,6 +264,7 @@
     <Compile Include="Licensing\ExtraFeatures.cs" />
     <Compile Include="Models\IAppWindow.cs" />
     <Compile Include="Models\IObjectWithProblems.cs" />
+    <Compile Include="Models\IWindowTracker.cs" />
     <Compile Include="Models\LayoutLoader.cs" />
     <Compile Include="Models\LayoutLoadException.cs" />
     <Compile Include="Models\LayoutManager.cs" />
@@ -302,6 +304,7 @@
     <Compile Include="Utils\DictUtils.cs" />
     <Compile Include="Utils\DragHookEventArgs.cs" />
     <Compile Include="Utils\EnumUtils.cs" />
+    <Compile Include="Utils\EventArgs.cs" />
     <Compile Include="Utils\GlassEffect.cs" />
     <Compile Include="Utils\ListInTaskSwitcher.cs" />
     <Compile Include="Utils\MathUtils.cs" />

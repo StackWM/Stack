@@ -54,6 +54,7 @@
             this.timer = timer ?? throw new ArgumentNullException(nameof(timer));
             this.windowHandle = windowHandle;
             this.timer.Tick += this.TimerOnTick;
+            this.TimerOnTick(this, EventArgs.Empty);
         }
 
         WindowDesktopHook(IntPtr windowHandle) : this(CreateTimer(), windowHandle) {

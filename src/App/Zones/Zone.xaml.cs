@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.IO;
+    using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
     using LostTech.Stack.Licensing;
@@ -80,10 +81,11 @@
 
         public string Id { get => this.ViewModel.Id; set => this.ViewModel.Id = value; }
         public ZoneViewModel ViewModel { get; } = new ZoneViewModel();
+        public bool IsFinal => this.Target == null || ReferenceEquals(this, this.Target);
 
         public Zone GetFinalTarget() {
             var result = this;
-            while (result.Target != null && !result.Equals(result.Target)) {
+            while (!result.IsFinal) {
                 result = result.Target;
             }
             return result;
@@ -91,5 +93,10 @@
 
         void Host_NonFatalErrorOccurred(object sender, ErrorEventArgs e) =>
             this.ProblemOccurred?.Invoke(sender, e);
+    }
+
+    static class ZoneExtensions
+    {
+        public static IEnumerable<Zone> Final(this IEnumerable<Zone> zones) => zones.Where(zone => zone.IsFinal);
     }
 }

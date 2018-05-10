@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         AllowsTransparency="True"
         DataContextChanged="OnDataContextChanged"
+        Loaded="OnLoaded"
         ShowInTaskbar="False" ShowActivated="False"
         Background="Transparent"
         Title="Layout" Icon="StackTaskbarIcon.ico"
@@ -14,8 +15,4 @@
     <Window.Resources>
         <ResourceDictionary Source="Themes/Generic.xaml"/>
     </Window.Resources>
-    <UniformGrid Rows="1">
-        <Button VerticalAlignment="Top" HorizontalAlignment="Right">X</Button>
-        <Button VerticalAlignment="Bottom" HorizontalAlignment="Left">Y</Button>
-    </UniformGrid>
 </Window>

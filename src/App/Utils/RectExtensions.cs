@@ -35,5 +35,8 @@
         }
 
         public static bool IsHorizontal(this Rect rect) => rect.Width > rect.Height;
+
+        public static Point[] Corners(this Rect rect) =>
+            new[] {rect.TopLeft, rect.TopRight, rect.BottomRight, rect.BottomLeft};
     }
 }

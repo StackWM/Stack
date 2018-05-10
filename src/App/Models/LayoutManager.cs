@@ -16,7 +16,7 @@
     using LostTech.Stack.Zones;
     using Microsoft.HockeyApp;
 
-    class LayoutManager : IDisposable
+    class LayoutManager : IDisposable, IWindowTracker
     {
         readonly ICollection<ScreenLayout> screenLayouts;
         readonly Dictionary<IAppWindow, Zone> locations = new Dictionary<IAppWindow, Zone>();
@@ -40,6 +40,13 @@
                 out Zone zone)
                 ? zone : null;
 
+        public Zone GetLocation([NotNull] IAppWindow window, bool searchSuspended) {
+            if (!searchSuspended)
+                return this.GetLocation(window);
+
+            return this.SearchSuspended(window, out var _);
+        }
+
         public void Move([NotNull] IAppWindow window, [NotNull] Zone target) {
             if (window == null)
                 throw new ArgumentNullException(nameof(window));
@@ -49,14 +56,21 @@
             var appWindow = new AppWindowViewModel(window);
             appWindow.PropertyChanged += this.AppWindowOnPropertyChanged;
 
+            this.RemoveFromSuspended(window, dispose: true);
             if (this.locations.TryGetValue(window, out var previousZone) && previousZone != null) {
                 AppWindowViewModel existingWindow = previousZone.Windows.FirstOrDefault(w => w.Equals(appWindow));
                 existingWindow?.Dispose();
                 previousZone.Windows.Remove(appWindow);
             }
 
-            target.Windows.Insert(0, appWindow);
-            this.locations[window] = target;
+            if (VirtualDesktop.IsSupported && !IsOnCurrentDesktop(((Win32Window)window).Handle)) {
+                var desktopSuspendList = this.suspended.GetOrCreate(appWindow.DesktopID);
+                var zoneSuspendList = desktopSuspendList.GetOrCreate(target);
+                zoneSuspendList.Add(appWindow);
+            } else {
+                target.Windows.Insert(0, appWindow);
+                this.locations[window] = target;
+            }
         }
 
         void AppWindowOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
@@ -136,6 +150,8 @@
                     }
                 }, this.taskScheduler);
 #endif
+
+            this.WindowAppeared?.Invoke(this, new EventArgs<IAppWindow>(window));
         }
 
 #if DEBUG
@@ -190,6 +206,8 @@
                     foreach (var zoneContent in newWindows)
                         zoneContent.Key.Windows.AddRange(zoneContent.Value);
                 }
+
+                this.DesktopSwitched?.Invoke(this, EventArgs.Empty);
             }).ConfigureAwait(false);
         }
 
@@ -229,11 +247,31 @@
             foreach (var desktopCollection in this.suspended.Values) {
                 foreach (var zoneCollection in desktopCollection) {
                     AppWindowViewModel existing = zoneCollection.Value.FirstOrDefault(vm => vm.Window.Equals(window));
+                    if (existing == null)
+                        continue;
+
                     if (dispose)
-                        existing?.Dispose();
-                    if (existing != null)
-                        zoneCollection.Value.Remove(existing);
+                        existing.Dispose();
+                    zoneCollection.Value.Remove(existing);
                     zone = zoneCollection.Key;
+                }
+            }
+            return zone;
+        }
+
+        [CanBeNull]
+        Zone SearchSuspended([CanBeNull] IAppWindow window, out Guid? desktop) {
+            desktop = null;
+            Zone zone = null;
+            foreach (var desktopCollection in this.suspended)
+            {
+                foreach (var zoneCollection in desktopCollection.Value)
+                {
+                    AppWindowViewModel existing = zoneCollection.Value.FirstOrDefault(vm => vm.Window.Equals(window));
+                    if (existing != null) {
+                        desktop = desktopCollection.Key;
+                        zone = zoneCollection.Key;
+                    }
                 }
             }
             return zone;
@@ -252,5 +290,8 @@
             if (VirtualDesktop.IsSupported)
                 this.DisposeVirtualDesktopSupport();
         }
+
+        public event EventHandler<EventArgs<IAppWindow>> WindowAppeared;
+        public event EventHandler DesktopSwitched;
     }
 }
