@@ -211,9 +211,13 @@
             }).ConfigureAwait(false);
         }
 
+        const int HRESULT_TYPE_E_ELEMENTNOTFOUND = unchecked((int)0x8002802B);
         static bool IsPinnedWindow(IntPtr hwnd) {
             try {
                 return VirtualDesktop.IsPinnedWindow(hwnd);
+            } catch (COMException e)
+                when (e.HResult == HRESULT_TYPE_E_ELEMENTNOTFOUND) {
+                return true;
             } catch (COMException e) {
                 e.ReportAsWarning();
                 return false;
@@ -229,6 +233,9 @@
         static bool IsOnCurrentDesktop(IntPtr hwnd) {
             try {
                 return VirtualDesktopHelper.IsCurrentVirtualDesktop(hwnd);
+            } catch (COMException e)
+                when (e.HResult == HRESULT_TYPE_E_ELEMENTNOTFOUND) {
+                return true;
             } catch (COMException e) {
                 e.ReportAsWarning();
                 return true;
