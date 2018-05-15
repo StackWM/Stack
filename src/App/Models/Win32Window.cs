@@ -83,6 +83,16 @@
             }
         }
 
+        public string Class {
+            get {
+                try {
+                    return GetClassName(this.Handle);
+                } catch (PInvoke.Win32Exception) {
+                    return null;
+                }
+            }
+        }
+
         public bool IsMinimized => IsIconic(this.Handle);
         public bool IsVisible => IsWindowVisible(this.Handle);
 
