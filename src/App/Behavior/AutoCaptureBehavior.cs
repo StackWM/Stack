@@ -80,8 +80,11 @@
 
         void OnWindowAppeared(object sender, EventArgs<IAppWindow> args) {
             if (this.settings.CaptureOnAppStart)
-                Task.Factory.StartNew(() => 
-                        this.Capture(args.Subject), CancellationToken.None, TaskCreationOptions.None,
+                Task.Factory.StartNew(async () => {
+                            this.Capture(args.Subject);
+                            await Task.Delay(300);
+                            this.Capture(args.Subject);
+                        }, CancellationToken.None, TaskCreationOptions.None,
                         this.taskScheduler)
                     .ReportAsWarning();
         }
