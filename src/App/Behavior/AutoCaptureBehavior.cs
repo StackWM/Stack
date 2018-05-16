@@ -7,6 +7,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
+    using EventHook.Hooks;
     using JetBrains.Annotations;
     using LostTech.Stack.Models;
     using LostTech.Stack.Settings;
@@ -20,6 +21,7 @@
         readonly LayoutManager layoutManager;
         readonly ILayoutsViewModel layouts;
         readonly Win32WindowFactory win32WindowFactory;
+        readonly WindowHookEx activationHook = new WindowHookEx();
         readonly TaskScheduler taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
         public AutoCaptureBehavior(
@@ -46,6 +48,7 @@
             this.layoutManager.WindowAppeared += this.OnWindowAppeared;
             this.layoutManager.DesktopSwitched += this.OnDesktopSwitched;
             this.layouts.LayoutLoaded += this.OnLayoutLoaded;
+            this.activationHook.Activated += this.OnWindowActivated;
         }
 
         void OnLayoutLoaded(object sender, EventArgs<ScreenLayout> args) {
@@ -111,6 +114,7 @@
 
                 if (window.IsMinimized || !window.IsVisible
                                        || !window.IsResizable || bounds.IsEmpty
+                                       || !window.IsOnCurrentDesktop
                                        || string.IsNullOrEmpty(window.Title))
                     return;
 
@@ -129,6 +133,15 @@
             } catch (WindowNotFoundException) { }
         }
 
+        void OnWindowActivated(object sender, WindowEventArgs e) {
+            // HACK: track foreground windows to see if they need to be captured
+            // needed because OnWindowAppeared in unreliable for cloacked windows
+            // see https://stackoverflow.com/questions/32149880/how-to-identify-windows-10-background-store-processes-that-have-non-displayed-wi
+            IAppWindow foreground = this.win32WindowFactory.Foreground;
+            if (foreground != null)
+                this.Capture(foreground);
+        }
+
         static double LocationError(Rect bounds, [NotNull] Zone zone) {
             if (zone == null) throw new ArgumentNullException(nameof(zone));
 
@@ -142,6 +155,7 @@
             this.layoutManager.WindowAppeared -= this.OnWindowAppeared;
             this.layoutManager.DesktopSwitched -= this.OnDesktopSwitched;
             this.layouts.LayoutLoaded -= this.OnLayoutLoaded;
+            this.activationHook.Dispose();
         }
     }
 }
