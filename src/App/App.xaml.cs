@@ -306,7 +306,7 @@
 
         static void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e) {
             foreach (Exception exception in e.Exception.Flatten().InnerExceptions)
-                HockeyClient.Current.TrackException(exception);
+                HockeyClient.Current.TrackException(exception, properties: new Dictionary<string, string>{["unobserved"] = "true"});
         }
 
         static void TelemetryHeartbeat(object sender, EventArgs e) {
