@@ -217,7 +217,7 @@
                 return VirtualDesktop.IsPinnedWindow(hwnd);
             } catch (COMException e)
                 when (e.HResult == HRESULT_TYPE_E_ELEMENTNOTFOUND) {
-                return true;
+                return false;
             } catch (COMException e) {
                 e.ReportAsWarning();
                 return false;
@@ -235,7 +235,7 @@
                 return VirtualDesktopHelper.IsCurrentVirtualDesktop(hwnd);
             } catch (COMException e)
                 when (e.HResult == HRESULT_TYPE_E_ELEMENTNOTFOUND) {
-                return true;
+                return false;
             } catch (COMException e) {
                 e.ReportAsWarning();
                 return true;
