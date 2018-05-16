@@ -5,6 +5,7 @@
     using System.Runtime.InteropServices;
     using System.Threading.Tasks;
     using System.Windows;
+    using JetBrains.Annotations;
     using PInvoke;
     using static PInvoke.User32;
     using Win32Exception = System.ComponentModel.Win32Exception;
@@ -55,7 +56,7 @@
         public Rect Bounds {
             get {
                 if (!Win32.GetWindowInfo(this.Handle, out var info))
-                    throw new Win32Exception();
+                    throw this.GetLastError();
 
                 var bounds = new Rect(info.rcWindow.left, info.rcWindow.top,
                     info.rcWindow.right - info.rcWindow.left,
@@ -95,20 +96,20 @@
 
         public bool IsMinimized => IsIconic(this.Handle);
         public bool IsVisible => IsWindowVisible(this.Handle);
+        public bool IsValid => IsWindow(this.Handle);
 
         public bool IsResizable =>
             ((WindowStyles)GetWindowLong(this.Handle, WindowLongIndexFlags.GWL_STYLE))
             .HasFlag(WindowStyles.WS_SIZEFRAME);
 
         public Task<Exception> Activate() {
-            this.EnsureNotMinimized();
+            Exception error = this.EnsureNotMinimized();
             return Task.FromResult(
-                SetForegroundWindow(this.Handle) ? null : (Exception)new Win32Exception());
+                SetForegroundWindow(this.Handle) ? error : this.GetLastError());
         }
 
         public Task<Exception> BringToFront() {
-            this.EnsureNotMinimized();
-            Exception issue = null;
+            Exception issue = this.EnsureNotMinimized();
             if (!SetWindowPos(this.Handle, GetForegroundWindow(), 0, 0, 0, 0,
                               SetWindowPosFlags.SWP_NOMOVE | SetWindowPosFlags.SWP_NOACTIVATE |
                               SetWindowPosFlags.SWP_NOSIZE))
@@ -117,8 +118,7 @@
         }
 
         public Task<Exception> SendToBottom() {
-            this.EnsureNotMinimized();
-            Exception issue = null;
+            Exception issue = this.EnsureNotMinimized();
             if (!SetWindowPos(this.Handle, HWND_BOTTOM, 0, 0, 0, 0,
                 SetWindowPosFlags.SWP_NOMOVE | SetWindowPosFlags.SWP_NOACTIVATE |
                 SetWindowPosFlags.SWP_NOSIZE))
@@ -126,11 +126,17 @@
             return Task.FromResult(issue);
         }
 
+        /// <summary>
+        /// Unreliable, may fire multiple times
+        /// </summary>
+        public event EventHandler Closed;
+
+        [MustUseReturnValue]
         Exception EnsureNotMinimized() {
             if (!IsIconic(this.Handle))
                 return null;
 
-            return ShowWindow(this.Handle, WindowShowStyle.SW_RESTORE) ? null : new Win32Exception();
+            return ShowWindow(this.Handle, WindowShowStyle.SW_RESTORE) ? null : this.GetLastError();
         }
 
         public bool Equals(Win32Window other) {
@@ -156,7 +162,7 @@
             if (processID == 0)
                 return false;
             try {
-                return Process.GetProcessById(processID)?.ProcessName == "explorer";
+                return Process.GetProcessById(processID).ProcessName == "explorer";
             } catch (ArgumentException) { } catch (InvalidOperationException) { }
             catch (Exception e) {
                 Debug.WriteLine(e);
@@ -188,6 +194,16 @@
 
         public override int GetHashCode() => this.Handle.GetHashCode();
 
+        [MustUseReturnValue]
+        Exception GetLastError() {
+            var exception = new Win32Exception();
+            if (exception.NativeErrorCode == (int)WinApiErrorCode.ERROR_INVALID_WINDOW_HANDLE) {
+                this.Closed?.Invoke(this, EventArgs.Empty);
+                return new WindowNotFoundException(innerException: exception);
+            } else
+                return exception;
+        }
+
         [DllImport("User32.dll", SetLastError = true)]
         static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
         [DllImport("Dwmapi.dll")]
@@ -196,8 +212,10 @@
         [DllImport("User32.dll")]
         static extern bool IsIconic(IntPtr hwnd);
 
+        // ReSharper disable InconsistentNaming
         static readonly IntPtr HWND_BOTTOM = new IntPtr(1);
         static readonly IntPtr HWND_TOP = IntPtr.Zero;
         static readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
+        // ReSharper restore InconsistentNaming
     }
 }

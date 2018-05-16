@@ -278,7 +278,9 @@
     <Compile Include="Models\MutableKeyValuePair.cs" />
     <Compile Include="Models\Serializer.cs" />
     <Compile Include="Models\Win32WindowFactory.cs" />
+    <Compile Include="Models\WinApiErrorCodes.cs" />
     <Compile Include="Models\WindowGroup.cs" />
+    <Compile Include="Models\WindowNotFoundException.cs" />
     <Compile Include="PixelTools.cs" />
     <Compile Include="ScreenCoordinates\WindowScreenLayouts.cs" />
     <Compile Include="ScreenLayoutSelector.xaml.cs">

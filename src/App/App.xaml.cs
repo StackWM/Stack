@@ -513,6 +513,13 @@
         }
 
         void NonCriticalErrorHandler(object sender, ErrorEventArgs error) {
+            error.GetException().ReportAsWarning(prefix: "User-visible warning: ");
+
+            #if !DEBUG
+            if (error.GetException() is WindowNotFoundException)
+                return;
+            #endif
+
             this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
             this.trayIcon.BalloonTipTitle = "Stack";
             this.trayIcon.BalloonTipText = error.GetException().Message;

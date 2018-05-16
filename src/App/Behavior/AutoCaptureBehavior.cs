@@ -106,25 +106,27 @@
             if (window == null)
                 throw new ArgumentNullException(nameof(window));
 
-            Rect bounds = window.Bounds;
+            try {
+                Rect bounds = window.Bounds;
 
-            if (window.IsMinimized || !window.IsVisible
-                || !window.IsResizable || bounds.IsEmpty
-                || string.IsNullOrEmpty(window.Title))
-                return;
+                if (window.IsMinimized || !window.IsVisible
+                                       || !window.IsResizable || bounds.IsEmpty
+                                       || string.IsNullOrEmpty(window.Title))
+                    return;
 
-            if (this.layoutManager.GetLocation(window, searchSuspended: true) != null)
-                return;
+                if (this.layoutManager.GetLocation(window, searchSuspended: true) != null)
+                    return;
 
-            Zone targetZone = this.layouts.ScreenLayouts.Active()
-                .SelectMany(layout => layout.Zones.Final())
-                .OrderBy(zone => LocationError(bounds, zone))
-                .FirstOrDefault();
+                Zone targetZone = this.layouts.ScreenLayouts.Active()
+                    .SelectMany(layout => layout.Zones.Final())
+                    .OrderBy(zone => LocationError(bounds, zone))
+                    .FirstOrDefault();
 
-            if (targetZone != null) {
-                this.layoutManager.Move(window, targetZone);
-                Debug.WriteLine($"move {window.Title} to {targetZone.GetPhysicalBounds()}");
-            }
+                if (targetZone != null) {
+                    this.layoutManager.Move(window, targetZone);
+                    Debug.WriteLine($"move {window.Title} to {targetZone.GetPhysicalBounds()}");
+                }
+            } catch (WindowNotFoundException) { }
         }
 
         static double LocationError(Rect bounds, [NotNull] Zone zone) {
