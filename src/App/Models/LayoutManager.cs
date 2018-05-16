@@ -63,8 +63,19 @@
                 previousZone.Windows.Remove(appWindow);
             }
 
-            if (VirtualDesktop.IsSupported && !IsOnCurrentDesktop(((Win32Window)window).Handle)) {
-                var desktopSuspendList = this.suspended.GetOrCreate(appWindow.DesktopID);
+            bool isOnCurrentDesktop;
+            try {
+                isOnCurrentDesktop = window.IsOnCurrentDesktop;
+            } catch (WindowNotFoundException) {
+                return;
+            }
+
+            if (!isOnCurrentDesktop) {
+                Guid? desktopID = appWindow.DesktopID;
+                if (desktopID == null)
+                    return;
+
+                var desktopSuspendList = this.suspended.GetOrCreate(desktopID);
                 var zoneSuspendList = desktopSuspendList.GetOrCreate(target);
                 zoneSuspendList.Add(appWindow);
             } else {
@@ -76,31 +87,35 @@
         void AppWindowOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
             var window = (AppWindowViewModel)sender;
             var underlyingWindow = (Win32Window)window.Window;
-            Guid? newDesktop = window.DesktopID;
-            switch (e.PropertyName) {
-            case nameof(AppWindowViewModel.DesktopID) when VirtualDesktop.IsSupported:
-                bool nowVisible = IsPinnedWindow(underlyingWindow.Handle) || IsOnCurrentDesktop(underlyingWindow.Handle);
-                this.locations.TryGetValue(underlyingWindow, out var currentZone);
-                if (nowVisible) {
-                    if (currentZone != null)
-                        // great - nothing to do!
-                        break;
+            try {
+                Guid? newDesktop = window.DesktopID;
+                switch (e.PropertyName) {
+                case nameof(AppWindowViewModel.DesktopID) when VirtualDesktop.IsSupported:
+                    bool nowVisible = IsPinnedWindow(underlyingWindow.Handle) || underlyingWindow.IsOnCurrentDesktop;
+                    this.locations.TryGetValue(underlyingWindow, out var currentZone);
+                    if (nowVisible) {
+                        if (currentZone != null)
+                            // great - nothing to do!
+                            break;
 
-                    // window moved to the current desktop from somewhere
-                    var suspendedInZone = this.RemoveFromSuspended(underlyingWindow, dispose: false);
-                    if (suspendedInZone != null) {
-                        suspendedInZone.Windows.Add(window);
-                        this.locations[underlyingWindow] = suspendedInZone;
+                        // window moved to the current desktop from somewhere
+                        var suspendedInZone = this.RemoveFromSuspended(underlyingWindow, dispose: false);
+                        if (suspendedInZone != null) {
+                            suspendedInZone.Windows.Add(window);
+                            this.locations[underlyingWindow] = suspendedInZone;
+                        }
+                        this.WindowAppeared?.Invoke(this, new EventArgs<IAppWindow>(underlyingWindow));
+                    } else if (currentZone != null && newDesktop != null) {
+                        // window is moved to another desktop, same zone
+                        currentZone.Windows.Remove(window);
+                        var targetList = this.suspended.GetOrCreate(newDesktop).GetOrCreate(currentZone);
+                        if (!targetList.Contains(window))
+                            targetList.Add(window);
                     }
-                } else if (currentZone != null && newDesktop != null) {
-                    // window is moved to another desktop, same zone
-                    currentZone.Windows.Remove(window);
-                    var targetList = this.suspended.GetOrCreate(newDesktop).GetOrCreate(currentZone);
-                    if (!targetList.Contains(window))
-                        targetList.Add(window);
+
+                    break;
                 }
-                break;
-            }
+            } catch (WindowNotFoundException) { }
         }
 
         void ReportTaskException(Task task) {
@@ -133,7 +148,7 @@
             // TODO: determine if window appeared in an existing zone, and if it needs to be moved
             this.locations.Add(window, null);
             if (VirtualDesktop.IsSupported)
-                Debug.WriteLineIf(!IsOnCurrentDesktop(app.HWnd),
+                Debug.WriteLineIf(!this.windowFactory.Create(app.HWnd).IsOnCurrentDesktop,
                     $"Window {app.AppTitle} appeared on inactive desktop");
 
 #if DEBUG
@@ -211,12 +226,11 @@
             }).ConfigureAwait(false);
         }
 
-        const int HRESULT_TYPE_E_ELEMENTNOTFOUND = unchecked((int)0x8002802B);
         static bool IsPinnedWindow(IntPtr hwnd) {
             try {
                 return VirtualDesktop.IsPinnedWindow(hwnd);
             } catch (COMException e)
-                when (e.HResult == HRESULT_TYPE_E_ELEMENTNOTFOUND) {
+                when (HResult.TYPE_E_ELEMENTNOTFOUND.EqualsCode(e.HResult)) {
                 return false;
             } catch (COMException e) {
                 e.ReportAsWarning();
@@ -227,24 +241,6 @@
             } catch (ArgumentException e) {
                 e.ReportAsWarning();
                 return false;
-            }
-        }
-
-        static bool IsOnCurrentDesktop(IntPtr hwnd) {
-            try {
-                return VirtualDesktopHelper.IsCurrentVirtualDesktop(hwnd);
-            } catch (COMException e)
-                when (e.HResult == HRESULT_TYPE_E_ELEMENTNOTFOUND) {
-                return false;
-            } catch (COMException e) {
-                e.ReportAsWarning();
-                return true;
-            } catch (Win32Exception e) {
-                e.ReportAsWarning();
-                return true;
-            } catch (ArgumentException e) {
-                e.ReportAsWarning();
-                return true;
             }
         }
 

@@ -1,4 +1,5 @@
-﻿namespace LostTech.Stack.Models
+﻿// ReSharper disable InconsistentNaming
+namespace LostTech.Stack.Models
 {
     public enum WinApiErrorCode
     {

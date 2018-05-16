@@ -14,5 +14,6 @@
         bool IsMinimized { get; }
         bool IsResizable { get; }
         bool IsVisible { get; }
+        bool IsOnCurrentDesktop { get; }
     }
 }

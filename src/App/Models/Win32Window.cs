@@ -5,10 +5,15 @@
     using System.Runtime.InteropServices;
     using System.Threading.Tasks;
     using System.Windows;
+    using WindowsDesktop;
     using JetBrains.Annotations;
     using PInvoke;
     using static PInvoke.User32;
+
+    using LostTech.Stack.Utils;
+
     using Win32Exception = System.ComponentModel.Win32Exception;
+    using HResult = PInvoke.HResult;
 
     [DebuggerDisplay("{" + nameof(Title) + "}")]
     class Win32Window : IAppWindow, IEquatable<Win32Window>
@@ -95,8 +100,34 @@
         }
 
         public bool IsMinimized => IsIconic(this.Handle);
-        public bool IsVisible => IsWindowVisible(this.Handle);
+        public bool IsVisible => IsWindowVisible(this.Handle)
+                                 && (!VirtualDesktop.IsSupported
+                                     // see https://stackoverflow.com/questions/32149880/how-to-identify-windows-10-background-store-processes-that-have-non-displayed-wi
+                                     || VirtualDesktop.IdFromHwnd(this.Handle) != null && VirtualDesktop.IdFromHwnd(this.Handle) != Guid.Empty);
         public bool IsValid => IsWindow(this.Handle);
+        public bool IsOnCurrentDesktop {
+            get {
+                if (!VirtualDesktop.IsSupported)
+                    return true;
+
+                try {
+                    return VirtualDesktopHelper.IsCurrentVirtualDesktop(this.Handle);
+                } catch (COMException e)
+                    when (Models.HResult.TYPE_E_ELEMENTNOTFOUND.EqualsCode(e.HResult)) {
+                    this.Closed?.Invoke(this, EventArgs.Empty);
+                    throw new WindowNotFoundException(innerException: e);
+                } catch (COMException e) {
+                    e.ReportAsWarning();
+                    return true;
+                } catch (Win32Exception e) {
+                    e.ReportAsWarning();
+                    return true;
+                } catch (ArgumentException e) {
+                    e.ReportAsWarning();
+                    return true;
+                }
+            }
+        }
 
         public bool IsResizable =>
             ((WindowStyles)GetWindowLong(this.Handle, WindowLongIndexFlags.GWL_STYLE))
@@ -172,7 +203,7 @@
         }
 
         static RECT GetSystemMargin(IntPtr handle) {
-            HResult success = DwmGetWindowAttribute(handle, DwmApi.DWMWINDOWATTRIBUTE.DWMWA_EXTENDED_FRAME_BOUNDS,
+            PInvoke.HResult success = DwmGetWindowAttribute(handle, DwmApi.DWMWINDOWATTRIBUTE.DWMWA_EXTENDED_FRAME_BOUNDS,
                 out var withMargin, Marshal.SizeOf<RECT>());
             if (!success.Succeeded) {
                 Debug.WriteLine($"DwmGetWindowAttribute: {success.GetException()}");
@@ -207,7 +238,7 @@
         [DllImport("User32.dll", SetLastError = true)]
         static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
         [DllImport("Dwmapi.dll")]
-        static extern HResult DwmGetWindowAttribute(IntPtr hwnd, DwmApi.DWMWINDOWATTRIBUTE attribute, out RECT value, int valueSize);
+        static extern PInvoke.HResult DwmGetWindowAttribute(IntPtr hwnd, DwmApi.DWMWINDOWATTRIBUTE attribute, out RECT value, int valueSize);
 
         [DllImport("User32.dll")]
         static extern bool IsIconic(IntPtr hwnd);

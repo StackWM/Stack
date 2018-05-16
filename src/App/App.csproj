@@ -262,6 +262,7 @@
     </Compile>
     <Compile Include="Licensing\Expiration.cs" />
     <Compile Include="Licensing\ExtraFeatures.cs" />
+    <Compile Include="Models\HResult.cs" />
     <Compile Include="Models\IAppWindow.cs" />
     <Compile Include="Models\IObjectWithProblems.cs" />
     <Compile Include="Models\IWindowTracker.cs" />
@@ -278,7 +279,7 @@
     <Compile Include="Models\MutableKeyValuePair.cs" />
     <Compile Include="Models\Serializer.cs" />
     <Compile Include="Models\Win32WindowFactory.cs" />
-    <Compile Include="Models\WinApiErrorCodes.cs" />
+    <Compile Include="Models\WinApiErrorCode.cs" />
     <Compile Include="Models\WindowGroup.cs" />
     <Compile Include="Models\WindowNotFoundException.cs" />
     <Compile Include="PixelTools.cs" />
