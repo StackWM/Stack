@@ -67,32 +67,11 @@
                 : Link(text: "Feedback...", url: "http://bit.ly/2o7Rxvr");
             contextMenu.Items.Add(feedback);
 
-            var keyboardMovement = new ToolStripMenuItem("Override Win key + arrows") {
-                Checked = stackSettings.Behaviors.KeyboardMove.Enabled,
-            };
-            keyboardMovement.Click += delegate {
-                keyboardMovement.Checked = stackSettings.Behaviors.KeyboardMove.Enabled = !keyboardMovement.Checked;
-                App.Restart();
-            };
-
-            var middleMouseMovement = new ToolStripMenuItem("Middle mouse drag") {
-                Checked = stackSettings.Behaviors.MouseMove.Enabled,
-            };
-            middleMouseMovement.Click += delegate {
-                middleMouseMovement.Checked = stackSettings.Behaviors.MouseMove.Enabled = !middleMouseMovement.Checked;
-                App.Restart();
-            };
-            contextMenu.Items.Add(keyboardMovement);
-            contextMenu.Items.Add(middleMouseMovement);
             contextMenu.Items.Add(new ToolStripSeparator());
 
             trayIcon.CreateScreensMenu(layoutsDirectory, screenProvider, contextMenu);
             trayIcon.CreateLayoutsMenu(layoutsDirectory, contextMenu);
 
-            contextMenu.Items.Add(new ToolStripMenuItem("Restart", image: null,
-                onClick: (_, __) => App.Restart()) {
-                DisplayStyle = ToolStripItemDisplayStyle.Text
-            });
             if (!new DesktopBridge.Helpers().IsRunningAsUwp())
             {
                 contextMenu.Items.Add(new ToolStripMenuItem("Restart as Admin", image: null,
@@ -250,6 +229,7 @@
 
         void CreateScreensMenu(ObservableDirectory layoutsDirectory, IScreenProvider screenProvider, ToolStrip contextMenu)
         {
+            var switchMenu = new ToolStripMenuItem("Switch Layout"){DisplayStyle =  ToolStripItemDisplayStyle.Text};
             var font = contextMenu.Font;
             var boldFont = new Font(font, FontStyle.Bold);
             foreach (var screen in screenProvider.Screens)
@@ -299,9 +279,9 @@
                             menu.DropDownItems.Remove(layoutMenu);
                     });
 
-                contextMenu.Items.Add(menu);
+                switchMenu.DropDownItems.Add(menu);
             }
-            contextMenu.Items.Add(new ToolStripSeparator());
+            contextMenu.Items.Add(switchMenu);
         }
 
         ToolStripMenuItem SwitchToLayoutMenuItem(ObservableFile file, Win32Screen screen, Font font)
