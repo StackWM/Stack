@@ -57,9 +57,12 @@
             this.lastRect = rect.Value;
 
             IAppWindow windowToMove = this.Window.Window;
-            Exception error = await windowToMove.Move(this.lastRect);
-            if (error != null)
+            try {
+                await windowToMove.Move(this.lastRect);
+            } catch (WindowNotFoundException) {
+            } catch (Exception error) {
                 this.NonFatalErrorOccurred?.Invoke(this, new ErrorEventArgs(error));
+            }
         }
     }
 }

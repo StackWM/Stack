@@ -28,7 +28,7 @@
             this.excludeFromMargin = new Lazy<bool>(this.GetExcludeFromMargin);
         }
 
-        public async Task<Exception> Move(Rect targetBounds) {
+        public async Task Move(Rect targetBounds) {
             var windowPlacement = WINDOWPLACEMENT.Create();
             if (GetWindowPlacement(this.Handle, ref windowPlacement) &&
                 windowPlacement.showCmd.HasFlag(WindowShowStyle.SW_MAXIMIZE)) {
@@ -45,13 +45,17 @@
 
             if (!MoveWindow(this.Handle, (int)targetBounds.Left, (int)targetBounds.Top,
                 (int)targetBounds.Width, (int)targetBounds.Height, bRepaint: true)) {
-                return new Win32Exception();
+                var exception = this.GetLastError();
+                if (exception is Win32Exception win32Exception
+                    && win32Exception.NativeErrorCode == (int)WinApiErrorCode.ERROR_ACCESS_DENIED)
+                    throw new UnauthorizedAccessException("Not enough privileges to move window", inner: exception);
+                else
+                    throw exception;
             } else {
                 // TODO: option to not activate on move
                 await Task.Yield();
                 MoveWindow(this.Handle, (int)targetBounds.Left, (int)targetBounds.Top, (int)targetBounds.Width,
                     (int)targetBounds.Height, true);
-                return null;
             }
         }
 
@@ -128,6 +132,29 @@
                 }
             }
         }
+        public bool IsVisibleOnAllDesktops {
+            get {
+                if (!VirtualDesktop.IsSupported)
+                    return false;
+
+                try {
+                    return VirtualDesktop.IsPinnedWindow(this.Handle);
+                } catch (COMException e)
+                    when (Models.HResult.TYPE_E_ELEMENTNOTFOUND.EqualsCode(e.HResult)) {
+                    this.Closed?.Invoke(this, EventArgs.Empty);
+                    throw new WindowNotFoundException(innerException: e);
+                } catch (COMException e) {
+                    e.ReportAsWarning();
+                    return false;
+                } catch (Win32Exception e) {
+                    e.ReportAsWarning();
+                    return false;
+                } catch (ArgumentException e) {
+                    e.ReportAsWarning();
+                    return false;
+                }
+            }
+        }
 
         public bool IsResizable =>
             ((WindowStyles)GetWindowLong(this.Handle, WindowLongIndexFlags.GWL_STYLE))
@@ -144,7 +171,7 @@
             if (!SetWindowPos(this.Handle, GetForegroundWindow(), 0, 0, 0, 0,
                               SetWindowPosFlags.SWP_NOMOVE | SetWindowPosFlags.SWP_NOACTIVATE |
                               SetWindowPosFlags.SWP_NOSIZE))
-                issue = new Win32Exception();
+                issue = new Win32Exception().Capture();
             return Task.FromResult(issue);
         }
 
@@ -153,7 +180,7 @@
             if (!SetWindowPos(this.Handle, HWND_BOTTOM, 0, 0, 0, 0,
                 SetWindowPosFlags.SWP_NOMOVE | SetWindowPosFlags.SWP_NOACTIVATE |
                 SetWindowPosFlags.SWP_NOSIZE))
-                issue = new Win32Exception();
+                issue = new Win32Exception().Capture();
             return Task.FromResult(issue);
         }
 
@@ -230,9 +257,9 @@
             var exception = new Win32Exception();
             if (exception.NativeErrorCode == (int)WinApiErrorCode.ERROR_INVALID_WINDOW_HANDLE) {
                 this.Closed?.Invoke(this, EventArgs.Empty);
-                return new WindowNotFoundException(innerException: exception);
+                return new WindowNotFoundException(innerException: exception.Capture()).Capture();
             } else
-                return exception;
+                return exception.Capture();
         }
 
         [DllImport("User32.dll", SetLastError = true)]

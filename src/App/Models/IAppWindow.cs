@@ -6,7 +6,7 @@
 
     public interface IAppWindow
     {
-        Task<Exception> Move(Rect targetBounds);
+        Task Move(Rect targetBounds);
         Rect Bounds { get; }
         string Title { get; }
         Task<Exception> Activate();
@@ -15,5 +15,6 @@
         bool IsResizable { get; }
         bool IsVisible { get; }
         bool IsOnCurrentDesktop { get; }
+        bool IsVisibleOnAllDesktops { get; }
     }
 }

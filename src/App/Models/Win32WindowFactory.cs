@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
     using JetBrains.Annotations;
+    using LostTech.Stack.Utils;
     using static PInvoke.User32;
     using Win32Exception = System.ComponentModel.Win32Exception;
 
@@ -19,7 +20,7 @@
         [CanBeNull]
         public Win32Window Shell => this.CreateIfNotNull(GetShellWindow());
 
-        public Win32Exception ForEachTopLevel(Action<Win32Window> action) {
+        public Exception ForEachTopLevel(Action<Win32Window> action) {
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
 
@@ -30,7 +31,7 @@
             });
             bool done = EnumWindows(enumerator, IntPtr.Zero);
             GC.KeepAlive(enumerator);
-            return done ? null : new Win32Exception();
+            return done ? null : new Win32Exception().Capture();
         }
 
         public bool DisplayInSwitchToList([NotNull] Win32Window window) {

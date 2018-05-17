@@ -86,12 +86,12 @@
 
         void AppWindowOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
             var window = (AppWindowViewModel)sender;
-            var underlyingWindow = (Win32Window)window.Window;
+            var underlyingWindow = window.Window;
             try {
                 Guid? newDesktop = window.DesktopID;
                 switch (e.PropertyName) {
                 case nameof(AppWindowViewModel.DesktopID) when VirtualDesktop.IsSupported:
-                    bool nowVisible = IsPinnedWindow(underlyingWindow.Handle) || underlyingWindow.IsOnCurrentDesktop;
+                    bool nowVisible = underlyingWindow.IsVisibleOnAllDesktops || underlyingWindow.IsOnCurrentDesktop;
                     this.locations.TryGetValue(underlyingWindow, out var currentZone);
                     if (nowVisible) {
                         if (currentZone != null)
@@ -144,12 +144,19 @@
                 return;
             }
 
+            if (this.locations.ContainsKey(window))
+                return;
+
             Debug.WriteLine($"Appeared: {app.AppTitle} from {app.AppName}, {app.AppPath}");
             // TODO: determine if window appeared in an existing zone, and if it needs to be moved
             this.locations.Add(window, null);
+#if DEBUG
             if (VirtualDesktop.IsSupported)
-                Debug.WriteLineIf(!this.windowFactory.Create(app.HWnd).IsOnCurrentDesktop,
-                    $"Window {app.AppTitle} appeared on inactive desktop");
+                try {
+                    Debug.WriteLineIf(!this.windowFactory.Create(app.HWnd).IsOnCurrentDesktop,
+                        $"Window {app.AppTitle} appeared on inactive desktop");
+                } catch (WindowNotFoundException) { }
+#endif
 
 #if DEBUG
             this.DecideInitialZone(app)
@@ -203,18 +210,18 @@
                     var zoneSuspendList = oldWindows.GetOrCreate(activeZone);
                     zoneSuspendList.Clear();
 
-                    foreach (AppWindowViewModel appWindow in activeZone.Windows.ToArray()) {
-                        if (appWindow.Window is Win32Window window) {
-                            if (!IsPinnedWindow(window.Handle)) {
+                    foreach (AppWindowViewModel appWindow in activeZone.Windows.ToArray())
+                        try {
+                            if (!appWindow.Window.IsVisibleOnAllDesktops) {
                                 zoneSuspendList.Add(appWindow);
                                 Debug.WriteLine($"suspended layout of: {appWindow.Title}");
                                 activeZone.Windows.Remove(appWindow);
                             } else {
                                 Debug.WriteLine($"ignoring pinned window: {appWindow.Title}");
                             }
-                        } else
-                            throw new NotSupportedException();
-                    }
+                        } catch (WindowNotFoundException) {
+                            activeZone.Windows.Remove(appWindow);
+                        }
                 }
 
                 if (this.suspended.TryGetValue(change.NewDesktop?.Id, out var newWindows)) {
@@ -224,24 +231,6 @@
 
                 this.DesktopSwitched?.Invoke(this, EventArgs.Empty);
             }).ConfigureAwait(false);
-        }
-
-        static bool IsPinnedWindow(IntPtr hwnd) {
-            try {
-                return VirtualDesktop.IsPinnedWindow(hwnd);
-            } catch (COMException e)
-                when (HResult.TYPE_E_ELEMENTNOTFOUND.EqualsCode(e.HResult)) {
-                return false;
-            } catch (COMException e) {
-                e.ReportAsWarning();
-                return false;
-            } catch (Win32Exception e) {
-                e.ReportAsWarning();
-                return false;
-            } catch (ArgumentException e) {
-                e.ReportAsWarning();
-                return false;
-            }
         }
 
         [CanBeNull]
