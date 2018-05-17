@@ -22,12 +22,16 @@
         readonly Dictionary<IAppWindow, Zone> locations = new Dictionary<IAppWindow, Zone>();
         readonly TaskScheduler taskScheduler;
         readonly Win32WindowFactory windowFactory;
+        readonly EventHookFactory eventHookFactory = new EventHookFactory();
+        readonly ApplicationWatcher applicationWatcher;
 
         public LayoutManager([NotNull] ICollection<ScreenLayout> screenLayouts,
             [NotNull] Win32WindowFactory windowFactory) {
             this.screenLayouts = screenLayouts ?? throw new ArgumentNullException(nameof(screenLayouts));
             this.windowFactory = windowFactory ?? throw new ArgumentNullException(nameof(windowFactory));
-            ApplicationWatcher.OnApplicationWindowChange += this.OnApplicationWindowChange;
+            this.applicationWatcher = this.eventHookFactory.GetApplicationWatcher();
+            this.applicationWatcher.OnApplicationWindowChange += this.OnApplicationWindowChange;
+            this.applicationWatcher.Start();
             this.taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
             if (VirtualDesktop.IsSupported)
@@ -278,7 +282,9 @@
         Task<T> StartOnParentThread<T>(Func<T> action) => Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.None, this.taskScheduler);
 
         public void Dispose() {
-            ApplicationWatcher.OnApplicationWindowChange -= this.OnApplicationWindowChange;
+            this.applicationWatcher.OnApplicationWindowChange -= this.OnApplicationWindowChange;
+            this.applicationWatcher.Stop();
+            this.eventHookFactory.Dispose();
             if (VirtualDesktop.IsSupported)
                 this.DisposeVirtualDesktopSupport();
         }

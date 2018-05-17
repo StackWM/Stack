@@ -18,7 +18,6 @@
     using System.Windows.Media;
     using System.Windows.Threading;
     using DesktopNotifications;
-    using EventHook;
     using global::Windows.UI.Notifications;
     using Gma.System.MouseKeyHook;
     using JetBrains.Annotations;
@@ -29,7 +28,6 @@
     using LostTech.Stack.Models;
     using LostTech.Stack.Extensibility.Filters;
     using LostTech.Stack.Licensing;
-    using LostTech.Stack.ScreenCoordinates;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
     using LostTech.Stack.ViewModels;
@@ -75,7 +73,6 @@
         SettingsWindow SettingsWindow { get; set; }
 
         DragHook dragHook;
-        bool applicationWatcherStarted;
         StackSettings stackSettings;
         KeyboardArrowBehavior keyboardArrowBehavior;
         HotkeyBehavior hotkeyBehavior;
@@ -109,8 +106,6 @@
 
             this.MainWindow = this.winApiHandler;
             this.winApiHandler.Show();
-            ApplicationWatcher.Start();
-            this.applicationWatcherStarted = true;
 
             if (!IsUwp) {
                 this.BeginCheckForUpdates();
@@ -513,7 +508,10 @@
         }
 
         void NonCriticalErrorHandler(object sender, ErrorEventArgs error) {
-            error.GetException().ReportAsWarning(prefix: "User-visible warning: ");
+            HockeyClient.Current.TrackException(error.GetException(), properties: new Dictionary<string, string> {
+                ["warning"] = "true",
+                ["user-visible"] = "true",
+            });
 
             #if !DEBUG
             if (error.GetException() is WindowNotFoundException)
@@ -610,10 +608,6 @@
         {
             this.layoutManager?.Dispose();
             this.layoutManager = null;
-            if (this.applicationWatcherStarted) {
-                this.applicationWatcherStarted = false;
-                ApplicationWatcher.Stop();
-            }
             this.hook?.Dispose();
             this.dragHook?.Dispose();
             this.dragHook = null;
