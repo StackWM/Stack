@@ -39,8 +39,8 @@
                 RECT systemMargin = GetSystemMargin(this.Handle);
                 targetBounds.X -= systemMargin.left;
                 targetBounds.Y -= systemMargin.top;
-                targetBounds.Width += systemMargin.left + systemMargin.right;
-                targetBounds.Height += systemMargin.top + systemMargin.bottom;
+                targetBounds.Width = Math.Max(0, targetBounds.Width + systemMargin.left + systemMargin.right);
+                targetBounds.Height = Math.Max(0, targetBounds.Height + systemMargin.top + systemMargin.bottom);
             }
 
             if (!MoveWindow(this.Handle, (int)targetBounds.Left, (int)targetBounds.Top,
@@ -71,8 +71,8 @@
                     RECT systemMargin = GetSystemMargin(this.Handle);
                     bounds.X += systemMargin.left;
                     bounds.Y += systemMargin.top;
-                    bounds.Width -= systemMargin.left + systemMargin.right;
-                    bounds.Height -= systemMargin.top + systemMargin.bottom;
+                    bounds.Width = Math.Max(0, bounds.Width - (systemMargin.left + systemMargin.right));
+                    bounds.Height = Math.Max(0, bounds.Height - (systemMargin.top + systemMargin.bottom));
                 }
 
                 return bounds;
