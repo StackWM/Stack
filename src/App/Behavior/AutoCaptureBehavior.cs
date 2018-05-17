@@ -21,7 +21,7 @@
         readonly LayoutManager layoutManager;
         readonly ILayoutsViewModel layouts;
         readonly Win32WindowFactory win32WindowFactory;
-        readonly WindowHookEx activationHook = new WindowHookEx();
+        readonly WindowHookEx activationHook = WindowHookExFactory.Instance.GetHook();
         readonly TaskScheduler taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
         public AutoCaptureBehavior(
@@ -155,7 +155,7 @@
             this.layoutManager.WindowAppeared -= this.OnWindowAppeared;
             this.layoutManager.DesktopSwitched -= this.OnDesktopSwitched;
             this.layouts.LayoutLoaded -= this.OnLayoutLoaded;
-            this.activationHook.Dispose();
+            this.activationHook.Activated -= this.OnWindowActivated;
         }
     }
 }

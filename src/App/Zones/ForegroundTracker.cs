@@ -14,7 +14,7 @@
         readonly DependencyPropertyKey isForegroundKey;
         readonly Win32WindowFactory win32WindowFactory = new Win32WindowFactory();
 
-        public WindowHookEx Hook { get; } = new WindowHookEx();
+        public WindowHookEx Hook { get; } = WindowHookExFactory.Instance.GetHook();
 
         public ForegroundTracker(FrameworkElement attachTo,
             Func<IAppWindow, bool> isForegroundLambda,
@@ -38,17 +38,14 @@
         }
 
         void OnUnloaded(object sender, RoutedEventArgs routedEventArgs) {
-            this.attachedTo.DataContextChanged -= this.OnDataContextChanged;
-            this.Hook.Dispose();
-            this.attachedTo.Dispatcher.ShutdownStarted -= this.DispatcherOnShutdownStarted;
+            this.Dispose();
         }
         void DispatcherOnShutdownStarted(object sender, EventArgs eventArgs) {
-            this.attachedTo.DataContextChanged -= this.OnDataContextChanged;
-            this.Hook.Dispose();
+            this.Dispose();
         }
 
         public void Dispose() {
-            this.Hook.Dispose();
+            this.Hook.Activated -= this.WindowHookOnActivated;
             this.attachedTo.DataContextChanged -= this.OnDataContextChanged;
             Dispatcher dispatcher = this.attachedTo.Dispatcher;
             if (dispatcher != null)

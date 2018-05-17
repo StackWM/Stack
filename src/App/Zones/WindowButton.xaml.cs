@@ -71,6 +71,9 @@
                 this.Dispose();
         }
 
-        public void Dispose() => this.foregroundTracker.Dispose();
+        public void Dispose() {
+            this.foregroundTracker.Hook.TextChanged -= this.HookOnTextChanged;
+            this.foregroundTracker.Dispose();
+        }
     }
 }

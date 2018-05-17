@@ -13,7 +13,7 @@
         static readonly Win32WindowFactory Win32WindowFactory = new Win32WindowFactory();
         [NotNull]
         public IAppWindow Window { get; }
-        readonly WindowHookEx hook = new WindowHookEx();
+        readonly WindowHookEx hook = WindowHookExFactory.Instance.GetHook();
         readonly WindowDesktopHook desktopHook;
 
         public AppWindowViewModel([NotNull] IAppWindow window) {
@@ -41,7 +41,8 @@
         }
 
         public void Dispose() {
-            this.hook.Dispose();
+            this.hook.Minimized -= this.HookOnMinimizeChanged;
+            this.hook.Unminimized -= this.HookOnMinimizeChanged;
             this.desktopHook?.Dispose();
         }
 

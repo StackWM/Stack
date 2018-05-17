@@ -281,6 +281,7 @@
     <Compile Include="Models\Win32WindowFactory.cs" />
     <Compile Include="Models\WinApiErrorCode.cs" />
     <Compile Include="Models\WindowGroup.cs" />
+    <Compile Include="Models\WindowHookExFactory.cs" />
     <Compile Include="Models\WindowNotFoundException.cs" />
     <Compile Include="PixelTools.cs" />
     <Compile Include="ScreenCoordinates\WindowScreenLayouts.cs" />
