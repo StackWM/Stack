@@ -44,10 +44,11 @@
                 ? zone : null;
 
         public Zone GetLocation([NotNull] IAppWindow window, bool searchSuspended) {
+            var currentScreenLocation = this.GetLocation(window);
             if (!searchSuspended)
-                return this.GetLocation(window);
+                return currentScreenLocation;
 
-            return this.SearchSuspended(window, out var _);
+            return currentScreenLocation ?? this.SearchSuspended(window, out var _);
         }
 
         public void Move([NotNull] IAppWindow window, [NotNull] Zone target) {
