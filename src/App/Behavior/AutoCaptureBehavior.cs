@@ -105,7 +105,7 @@
                 .ReportAsWarning();
         }
 
-        void Capture([NotNull] IAppWindow window) {
+        async void Capture([NotNull] IAppWindow window) {
             if (window == null)
                 throw new ArgumentNullException(nameof(window));
 
@@ -126,7 +126,16 @@
                     .OrderBy(zone => LocationError(bounds, zone))
                     .FirstOrDefault();
 
-                if (targetZone != null) {
+                var targetBounds = targetZone?.TryGetPhysicalBounds();
+                if (targetBounds != null) {
+                    try {
+                        await window.Move(targetBounds.Value);
+                    } catch (UnauthorizedAccessException) {
+                        return;
+                    } catch (WindowNotFoundException) {
+                        return;
+                    }
+
                     this.layoutManager.Move(window, targetZone);
                     Debug.WriteLine($"move {window.Title} to {targetZone.GetPhysicalBounds()}");
                 }
