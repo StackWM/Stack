@@ -616,6 +616,8 @@
             this.autoCaptureBehavior?.Dispose();
             this.trayIcon?.Dispose();
 
+            WindowHookExFactory.Instance.Shutdown();
+
             LostTech.App.Settings settings = this.localSettings;
             if (settings != null)
             {

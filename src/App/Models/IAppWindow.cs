@@ -16,5 +16,6 @@
         bool IsVisible { get; }
         bool IsOnCurrentDesktop { get; }
         bool IsVisibleOnAllDesktops { get; }
+        event EventHandler Closed;
     }
 }

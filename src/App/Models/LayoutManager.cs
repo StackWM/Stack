@@ -5,7 +5,6 @@
     using System.ComponentModel;
     using System.Diagnostics;
     using System.Linq;
-    using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
     using WindowsDesktop;
@@ -59,13 +58,9 @@
 
             var appWindow = new AppWindowViewModel(window);
             appWindow.PropertyChanged += this.AppWindowOnPropertyChanged;
+            appWindow.Window.Closed += this.OnWindowClosed;
 
-            this.RemoveFromSuspended(window, dispose: true);
-            if (this.locations.TryGetValue(window, out var previousZone) && previousZone != null) {
-                AppWindowViewModel existingWindow = previousZone.Windows.FirstOrDefault(w => w.Equals(appWindow));
-                existingWindow?.Dispose();
-                previousZone.Windows.Remove(appWindow);
-            }
+            this.StopTracking(appWindow);
 
             bool isOnCurrentDesktop;
             try {
@@ -86,6 +81,18 @@
                 target.Windows.Insert(0, appWindow);
                 this.locations[window] = target;
             }
+        }
+
+        void StopTracking(AppWindowViewModel appWindow) {
+            this.RemoveFromSuspended(appWindow.Window, dispose: true);
+            if (!this.locations.TryGetValue(appWindow.Window, out var previousZone) || previousZone == null)
+                return;
+
+            AppWindowViewModel existingWindow = previousZone.Windows.FirstOrDefault(w => w.Equals(appWindow));
+            if (existingWindow != null)
+                existingWindow.Window.Closed -= this.OnWindowClosed;
+            existingWindow?.Dispose();
+            previousZone.Windows.Remove(appWindow);
         }
 
         void AppWindowOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
@@ -128,22 +135,32 @@
                     HockeyClient.Current.TrackException(exception);
         }
 
+        bool StopTracking(IAppWindow window) {
+            this.StartOnParentThread(() => this.RemoveFromSuspended(window, dispose: true))
+                .ContinueWith(this.ReportTaskException);
+            bool wasTracked = this.locations.TryGetValue(window, out var existedAt);
+            if (wasTracked) {
+                this.locations.Remove(window);
+                this.StartOnParentThread(() => {
+                    var existing = existedAt?.Windows.FirstOrDefault(vm => vm.Window.Equals(window));
+                    if (existing != null)
+                        existing.Window.Closed -= this.OnWindowClosed;
+                    existing?.Dispose();
+                    return existedAt?.Windows.Remove(existing);
+                }).ContinueWith(this.ReportTaskException);
+            }
+
+            return wasTracked;
+        }
+
+        void OnWindowClosed(object sender, EventArgs _) => this.StopTracking((IAppWindow)sender);
+
         void OnApplicationWindowChange(object sender, ApplicationEventArgs applicationEventArgs)
         {
             var app = applicationEventArgs.ApplicationData;
             var window = this.windowFactory.Create(app.HWnd);
             if (applicationEventArgs.Event != ApplicationEvents.Launched) {
-                this.StartOnParentThread(() => this.RemoveFromSuspended(window, dispose: true))
-                    .ContinueWith(this.ReportTaskException);
-                bool wasTracked = this.locations.TryGetValue(window, out var existedAt);
-                if (wasTracked) {
-                    this.locations.Remove(window);
-                    this.StartOnParentThread(() => {
-                        var existing = existedAt?.Windows.FirstOrDefault(vm => vm.Window.Equals(window));
-                        existing?.Dispose();
-                        return existedAt?.Windows.Remove(existing);
-                    }).ContinueWith(this.ReportTaskException);
-                }
+                bool wasTracked = this.StopTracking(window);
                 Debug.WriteLine($"Disappeared: {app.AppTitle} traked: {wasTracked}");
                 return;
             }
@@ -246,8 +263,11 @@
                     if (existing == null)
                         continue;
 
-                    if (dispose)
+                    if (dispose) {
+                        existing.Window.Closed -= this.OnWindowClosed;
                         existing.Dispose();
+                    }
+
                     zoneCollection.Value.Remove(existing);
                     zone = zoneCollection.Key;
                 }
@@ -287,6 +307,14 @@
             this.eventHookFactory.Dispose();
             if (VirtualDesktop.IsSupported)
                 this.DisposeVirtualDesktopSupport();
+
+            var windows = this.locations.Values
+                .SelectMany(zone => zone?.Windows ?? Enumerable.Empty<AppWindowViewModel>())
+                .Concat(this.suspended.Values.SelectMany(desktopWindows =>
+                    desktopWindows.Values.SelectMany(windowList => windowList))).ToList();
+
+            foreach (var window in windows)
+                this.StopTracking(window);
         }
 
         public event EventHandler<EventArgs<IAppWindow>> WindowAppeared;

@@ -8,5 +8,10 @@
         public WindowHookEx GetHook() => this.hook.Value;
 
         public static WindowHookExFactory Instance { get; } = new WindowHookExFactory();
+
+        /// <summary>
+        /// Needs to be called for each participating thread.
+        /// </summary>
+        public void Shutdown() => this.hook.Value.Dispose();
     }
 }
