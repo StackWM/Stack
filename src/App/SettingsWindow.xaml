@@ -40,7 +40,7 @@
                                 IsChecked="{Binding Behaviors.General.CaptureOnStackStart}"/>
             <metro:ToggleSwitch Content="Re-capture windows on layout change/reload"
                                 IsChecked="{Binding Behaviors.General.CaptureOnLayoutChange}"/>
-            <metro:ToggleSwitch Content="Capture windows on desktop switch"
+            <metro:ToggleSwitch Content="Capture windows on desktop switch (not recommended: performance)"
                                 IsChecked="{Binding Behaviors.General.CaptureOnDesktopSwitch}"/>
             <metro:ToggleSwitch Content="Capture windows when they open"
                                 IsChecked="{Binding Behaviors.General.CaptureOnAppStart}"/>
