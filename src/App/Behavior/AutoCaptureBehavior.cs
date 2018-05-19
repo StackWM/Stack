@@ -115,6 +115,7 @@
                 if (window.IsMinimized || !window.IsVisible
                                        || !window.IsResizable || bounds.IsEmpty
                                        || !window.IsOnCurrentDesktop
+                                       || !window.CanMove
                                        || string.IsNullOrEmpty(window.Title))
                     return;
 
@@ -128,14 +129,6 @@
 
                 var targetBounds = targetZone?.TryGetPhysicalBounds();
                 if (targetBounds != null) {
-                    try {
-                        await window.Move(targetBounds.Value);
-                    } catch (UnauthorizedAccessException) {
-                        return;
-                    } catch (WindowNotFoundException) {
-                        return;
-                    }
-
                     this.layoutManager.Move(window, targetZone);
                     Debug.WriteLine($"move {window.Title} to {targetZone.GetPhysicalBounds()}");
                 }

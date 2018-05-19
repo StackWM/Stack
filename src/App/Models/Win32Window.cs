@@ -59,6 +59,10 @@
             }
         }
 
+        public bool CanMove =>
+            PostMessage(this.Handle, WindowMessage.WM_USER, IntPtr.Zero, IntPtr.Zero)
+            || Marshal.GetLastWin32Error() != (int)WinApiErrorCode.ERROR_ACCESS_DENIED;
+
         /// <summary>
         /// Non-WPF coordinates
         /// </summary>
