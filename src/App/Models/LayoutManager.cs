@@ -37,11 +37,14 @@
                 this.InitVirtualDesktopSupport();
         }
 
-        public Zone GetLocation([NotNull] IAppWindow window) =>
-            this.locations.TryGetValue(
-                window ?? throw new ArgumentNullException(nameof(window)),
-                out Zone zone)
-                ? zone : null;
+        public Zone GetLocation([NotNull] IAppWindow window) {
+            lock(this.locations)
+                return this.locations.TryGetValue(
+                    window ?? throw new ArgumentNullException(nameof(window)),
+                    out Zone zone)
+                    ? zone
+                    : null;
+        }
 
         public Zone GetLocation([NotNull] IAppWindow window, bool searchSuspended) {
             var currentScreenLocation = this.GetLocation(window);
@@ -80,14 +83,17 @@
                 zoneSuspendList.Add(appWindow);
             } else {
                 target.Windows.Insert(0, appWindow);
-                this.locations[window] = target;
+                lock (this.locations)
+                    this.locations[window] = target;
             }
         }
 
         void StopTracking(AppWindowViewModel appWindow) {
             this.RemoveFromSuspended(appWindow.Window, dispose: true);
-            if (!this.locations.TryGetValue(appWindow.Window, out var previousZone) || previousZone == null)
-                return;
+            Zone previousZone;
+            lock (this.locations)
+                if (!this.locations.TryGetValue(appWindow.Window, out previousZone) || previousZone == null)
+                    return;
 
             AppWindowViewModel existingWindow = previousZone.Windows.FirstOrDefault(w => w.Equals(appWindow));
             if (existingWindow != null)
@@ -104,7 +110,9 @@
                 switch (e.PropertyName) {
                 case nameof(AppWindowViewModel.DesktopID) when VirtualDesktop.IsSupported:
                     bool nowVisible = underlyingWindow.IsVisibleOnAllDesktops || underlyingWindow.IsOnCurrentDesktop;
-                    this.locations.TryGetValue(underlyingWindow, out var currentZone);
+                    Zone currentZone;
+                    lock (this.locations)
+                        this.locations.TryGetValue(underlyingWindow, out currentZone);
                     if (nowVisible) {
                         if (currentZone != null)
                             // great - nothing to do!
@@ -114,7 +122,8 @@
                         var suspendedInZone = this.RemoveFromSuspended(underlyingWindow, dispose: false);
                         if (suspendedInZone != null) {
                             suspendedInZone.Windows.Add(window);
-                            this.locations[underlyingWindow] = suspendedInZone;
+                            lock(this.locations)
+                                this.locations[underlyingWindow] = suspendedInZone;
                         }
                         this.WindowAppeared?.Invoke(this, new EventArgs<IAppWindow>(underlyingWindow));
                     } else if (currentZone != null && newDesktop != null) {
@@ -139,19 +148,21 @@
         bool StopTracking(IAppWindow window) {
             this.StartOnParentThread(() => this.RemoveFromSuspended(window, dispose: true))
                 .ContinueWith(this.ReportTaskException);
-            bool wasTracked = this.locations.TryGetValue(window, out var existedAt);
-            if (wasTracked) {
-                this.locations.Remove(window);
-                this.StartOnParentThread(() => {
-                    var existing = existedAt?.Windows.FirstOrDefault(vm => vm.Window.Equals(window));
-                    if (existing != null)
-                        existing.Window.Closed -= this.OnWindowClosed;
-                    existing?.Dispose();
-                    return existedAt?.Windows.Remove(existing);
-                }).ContinueWith(this.ReportTaskException);
-            }
+            lock (this.locations) {
+                bool wasTracked = this.locations.TryGetValue(window, out var existedAt);
+                if (wasTracked) {
+                    this.locations.Remove(window);
+                    this.StartOnParentThread(() => {
+                        var existing = existedAt?.Windows.FirstOrDefault(vm => vm.Window.Equals(window));
+                        if (existing != null)
+                            existing.Window.Closed -= this.OnWindowClosed;
+                        existing?.Dispose();
+                        return existedAt?.Windows.Remove(existing);
+                    }).ContinueWith(this.ReportTaskException);
+                }
 
-            return wasTracked;
+                return wasTracked;
+            }
         }
 
         void OnWindowClosed(object sender, EventArgs _) => this.StopTracking((IAppWindow)sender);
@@ -166,12 +177,14 @@
                 return;
             }
 
-            if (this.locations.ContainsKey(window))
-                return;
+            lock (this.locations)
+                if (this.locations.ContainsKey(window))
+                    return;
 
             Debug.WriteLine($"Appeared: {app.AppTitle} from {app.AppName}, {app.AppPath}");
             // TODO: determine if window appeared in an existing zone, and if it needs to be moved
-            this.locations.Add(window, null);
+            lock(this.locations)
+                this.locations.Add(window, null);
 #if DEBUG
             if (VirtualDesktop.IsSupported)
                 try {
@@ -224,7 +237,10 @@
                 var oldWindows = this.suspended.GetOrCreate(change.OldDesktop?.Id);
                 oldWindows.Clear();
 
-                var activeZones = this.locations.Values.Distinct();
+                IEnumerable<Zone> activeZones;
+                lock(this.locations)
+                    activeZones = this.locations.Values.Distinct().ToList();
+
                 foreach (Zone activeZone in activeZones) {
                     if (activeZone == null)
                         continue;
@@ -309,10 +325,12 @@
             if (VirtualDesktop.IsSupported)
                 this.DisposeVirtualDesktopSupport();
 
-            var windows = this.locations.Values
-                .SelectMany(zone => zone?.Windows ?? Enumerable.Empty<AppWindowViewModel>())
-                .Concat(this.suspended.Values.SelectMany(desktopWindows =>
-                    desktopWindows.Values.SelectMany(windowList => windowList))).ToList();
+            List<AppWindowViewModel> windows;
+            lock (this.locations)
+                windows = this.locations.Values
+                    .SelectMany(zone => zone?.Windows ?? Enumerable.Empty<AppWindowViewModel>())
+                    .Concat(this.suspended.Values.SelectMany(desktopWindows =>
+                        desktopWindows.Values.SelectMany(windowList => windowList))).ToList();
 
             foreach (var window in windows)
                 this.StopTracking(window);
