@@ -59,26 +59,26 @@
                 return;
 
             Rect bounds = args.Subject.Layout.GetPhysicalBounds();
-            this.win32WindowFactory
-                .ForEachTopLevel(window => {
-                    try {
-                        Rect intersection = window.Bounds.Intersection(bounds);
-                        if (intersection.IsEmpty || intersection.Width < 10 || intersection.Height < 10)
-                            return;
+            Task.Factory.StartNew(() =>
+                this.win32WindowFactory
+                    .ForEachTopLevel(window => {
+                        try {
+                            Rect intersection = window.Bounds.Intersection(bounds);
+                            if (intersection.IsEmpty || intersection.Width < 10 || intersection.Height < 10)
+                                return;
 
-                        if (this.win32WindowFactory.DisplayInSwitchToList(window))
-                            this.Capture(window);
-                    } catch (Exception e) { e.ReportAsWarning(); }
-                })
-                .ReportAsWarning();
+                            if (this.win32WindowFactory.DisplayInSwitchToList(window))
+                                this.Capture(window);
+                        } catch (Exception e) {
+                            e.ReportAsWarning();
+                        }
+                    })
+                    .ReportAsWarning());
         }
 
         void OnDesktopSwitched(object sender, EventArgs e) {
             if (this.settings.CaptureOnDesktopSwitch)
-                Task.Factory.StartNew(() =>
-                        this.Capture(), CancellationToken.None, TaskCreationOptions.None,
-                        this.taskScheduler)
-                    .ReportAsWarning();
+                Task.Factory.StartNew(this.Capture).ReportAsWarning();
         }
 
         void OnWindowAppeared(object sender, EventArgs<IAppWindow> args) {
@@ -87,8 +87,7 @@
                             this.Capture(args.Subject);
                             await Task.Delay(300);
                             this.Capture(args.Subject);
-                        }, CancellationToken.None, TaskCreationOptions.None,
-                        this.taskScheduler)
+                        })
                     .ReportAsWarning();
         }
 
@@ -122,16 +121,18 @@
                 if (this.layoutManager.GetLocation(window, searchSuspended: true) != null)
                     return;
 
-                Zone targetZone = this.layouts.ScreenLayouts.Active()
-                    .SelectMany(layout => layout.Zones.Final())
-                    .OrderBy(zone => LocationError(bounds, zone))
-                    .FirstOrDefault();
+                await Task.Factory.StartNew(() => {
+                    Zone targetZone = this.layouts.ScreenLayouts.Active()
+                        .SelectMany(layout => layout.Zones.Final())
+                        .OrderBy(zone => LocationError(bounds, zone))
+                        .FirstOrDefault();
 
-                var targetBounds = targetZone?.TryGetPhysicalBounds();
-                if (targetBounds != null) {
-                    this.layoutManager.Move(window, targetZone);
-                    Debug.WriteLine($"move {window.Title} to {targetZone.GetPhysicalBounds()}");
-                }
+                    var targetBounds = targetZone?.TryGetPhysicalBounds();
+                    if (targetBounds != null) {
+                        this.layoutManager.Move(window, targetZone);
+                        Debug.WriteLine($"move {window.Title} to {targetZone.GetPhysicalBounds()}");
+                    }
+                }, CancellationToken.None, TaskCreationOptions.None, this.taskScheduler);
             } catch (WindowNotFoundException) { }
         }
 
