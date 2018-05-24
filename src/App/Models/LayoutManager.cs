@@ -2,11 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Specialized;
     using System.ComponentModel;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows;
+    using System.Windows.Controls;
     using WindowsDesktop;
     using EventHook;
     using JetBrains.Annotations;
@@ -27,6 +30,12 @@
         public LayoutManager([NotNull] ICollection<ScreenLayout> screenLayouts,
             [NotNull] Win32WindowFactory windowFactory) {
             this.screenLayouts = screenLayouts ?? throw new ArgumentNullException(nameof(screenLayouts));
+            if (this.screenLayouts is INotifyCollectionChanged trackableLayouts) {
+                trackableLayouts.CollectionChanged += this.OnScreenLayoutCollectionChanged;
+                this.OnScreenLayoutCollectionChanged(trackableLayouts, new NotifyCollectionChangedEventArgs(
+                    NotifyCollectionChangedAction.Replace, newItems: screenLayouts.ToArray(), oldItems: Array.Empty<ScreenLayout>()));
+            }
+
             this.windowFactory = windowFactory ?? throw new ArgumentNullException(nameof(windowFactory));
             this.applicationWatcher = this.eventHookFactory.GetApplicationWatcher();
             this.applicationWatcher.OnApplicationWindowChange += this.OnApplicationWindowChange;
@@ -311,6 +320,24 @@
         }
 #endregion
 
+        static readonly DependencyPropertyDescriptor ScreenContentDescriptor = DependencyPropertyDescriptor.FromProperty(
+            ContentControl.ContentProperty, typeof(ContentControl));
+
+        void OnScreenLayoutCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            foreach (ScreenLayout layout in e.OldItems ?? Array.Empty<ScreenLayout>())
+                ScreenContentDescriptor.RemoveValueChanged(layout, this.OnScreenLayoutContentChanged);
+            foreach (ScreenLayout layout in e.NewItems ?? Array.Empty<ScreenLayout>())
+                ScreenContentDescriptor.AddValueChanged(layout, this.OnScreenLayoutContentChanged);
+        }
+
+        void OnScreenLayoutContentChanged(object sender, EventArgs e) {
+            var remove = this.locations
+                .Where(location => location.Value != null && Window.GetWindow(location.Value) == null)
+                .ToList();
+            foreach (var entry in remove)
+                this.StopTracking(entry.Key);
+        }
+
         private Task<Zone> GetZoneByID(string layoutID) => this.StartOnParentThread(() => this.screenLayouts
                                 .SelectMany(layout => layout.Zones)
                                 .FirstOrDefault(zone => zone.Id != null && zone.Id.StartsWith(layoutID))
@@ -319,6 +346,12 @@
         Task<T> StartOnParentThread<T>(Func<T> action) => Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.None, this.taskScheduler);
 
         public void Dispose() {
+            if (this.screenLayouts is INotifyCollectionChanged trackableLayouts) {
+                trackableLayouts.CollectionChanged -= this.OnScreenLayoutCollectionChanged;
+            }
+            this.OnScreenLayoutCollectionChanged(this.screenLayouts, new NotifyCollectionChangedEventArgs(
+                NotifyCollectionChangedAction.Replace, newItems: Array.Empty<ScreenLayout>(), oldItems: this.screenLayouts.ToArray()));
+
             this.applicationWatcher.OnApplicationWindowChange -= this.OnApplicationWindowChange;
             this.applicationWatcher.Stop();
             this.eventHookFactory.Dispose();

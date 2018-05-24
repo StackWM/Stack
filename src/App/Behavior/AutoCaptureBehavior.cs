@@ -51,15 +51,17 @@
             this.activationHook.Activated += this.OnWindowActivated;
         }
 
-        void OnLayoutLoaded(object sender, EventArgs<ScreenLayout> args) {
+        async void OnLayoutLoaded(object sender, EventArgs<ScreenLayout> args) {
             if (!this.settings.CaptureOnLayoutChange)
                 return;
 
             if (args.Subject?.Layout == null)
                 return;
 
+            await Task.Yield();
+
             Rect bounds = args.Subject.Layout.GetPhysicalBounds();
-            Task.Factory.StartNew(() =>
+            await Task.Factory.StartNew(() =>
                 this.win32WindowFactory
                     .ForEachTopLevel(window => {
                         try {
@@ -73,7 +75,7 @@
                             e.ReportAsWarning();
                         }
                     })
-                    .ReportAsWarning());
+                    .ReportAsWarning()).ConfigureAwait(false);
         }
 
         void OnDesktopSwitched(object sender, EventArgs e) {
