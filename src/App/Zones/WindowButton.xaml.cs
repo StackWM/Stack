@@ -1,14 +1,10 @@
-﻿namespace LostTech.Stack.Zones
-{
+﻿namespace LostTech.Stack.Zones {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.IO;
-    using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
-    using System.Windows.Data;
-    using EventHook.Hooks;
     using LostTech.Stack.Licensing;
     using LostTech.Stack.Models;
     using LostTech.Stack.ViewModels;
@@ -26,8 +22,6 @@
             this.foregroundTracker = new ForegroundTracker(this,
                 window => this.Window?.Equals(window) == true,
                 IsForegroundPropertyKey);
-            this.foregroundTracker.Hook.TextChanged += this.HookOnTextChanged;
-            this.titleBinding = this.TitleText.GetBindingExpression(TextBlock.TextProperty);
         }
 
         public AppWindowViewModel ViewModel => this.DataContext as AppWindowViewModel;
@@ -49,12 +43,6 @@
             DependencyProperty.RegisterReadOnly(nameof(IsForeground), typeof(bool), typeof(WindowButton), new PropertyMetadata(false));
 
         readonly ForegroundTracker foregroundTracker;
-        readonly BindingExpression titleBinding;
-
-        void HookOnTextChanged(object sender, WindowEventArgs windowEventArgs) {
-            if (this.win32WindowFactory.Create(windowEventArgs.Handle).Equals(this.Window))
-                this.titleBinding.UpdateTarget();
-        }
 
         readonly List<string> problems = new List<string>();
         public IList<string> Problems => new ReadOnlyCollection<string>(this.problems);
@@ -72,7 +60,6 @@
         }
 
         public void Dispose() {
-            this.foregroundTracker.Hook.TextChanged -= this.HookOnTextChanged;
             this.foregroundTracker.Dispose();
         }
     }

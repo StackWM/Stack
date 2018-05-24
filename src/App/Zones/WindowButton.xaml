@@ -17,7 +17,7 @@
           BorderBrush="{Binding BorderBrush, ElementName=Root}"
           >
     <Grid>
-      <TextBlock x:Name="TitleText" Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
+      <TextBlock x:Name="TitleText" Text="{Binding Title, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
     </Grid>
   </Button>
 </UserControl>

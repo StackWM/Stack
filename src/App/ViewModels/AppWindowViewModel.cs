@@ -20,6 +20,7 @@
             this.Window = window ?? throw new ArgumentNullException(nameof(window));
             this.hook.Minimized += this.HookOnMinimizeChanged;
             this.hook.Unminimized += this.HookOnMinimizeChanged;
+            this.hook.TextChanged += this.HookOnTextChanged;
             if (VirtualDesktop.IsSupported) {
                 this.desktopHook = new WindowDesktopHook(window);
                 this.desktopHook.PropertyChanged += this.DesktopHookPropertyChanged;
@@ -35,6 +36,11 @@
                 this.OnPropertyChanged(nameof(this.IsMinimized));
         }
 
+        void HookOnTextChanged(object sender, WindowEventArgs windowEventArgs) {
+            if (Win32WindowFactory.Create(windowEventArgs.Handle).Equals(this.Window))
+                this.OnPropertyChanged(nameof(this.Title));
+        }
+
         void DesktopHookPropertyChanged(object sender, PropertyChangedEventArgs e) {
             if (e.PropertyName == nameof(this.desktopHook.DesktopID))
                 this.OnPropertyChanged(nameof(this.DesktopID));
@@ -43,6 +49,7 @@
         public void Dispose() {
             this.hook.Minimized -= this.HookOnMinimizeChanged;
             this.hook.Unminimized -= this.HookOnMinimizeChanged;
+            this.hook.TextChanged -= this.HookOnTextChanged;
             this.desktopHook?.Dispose();
         }
 
