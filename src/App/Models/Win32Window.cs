@@ -28,7 +28,7 @@
             this.excludeFromMargin = new Lazy<bool>(this.GetExcludeFromMargin);
         }
 
-        public async Task Move(Rect targetBounds) {
+        public Task Move(Rect targetBounds) => Task.Run(async () => {
             var windowPlacement = WINDOWPLACEMENT.Create();
             if (GetWindowPlacement(this.Handle, ref windowPlacement) &&
                 windowPlacement.showCmd.HasFlag(WindowShowStyle.SW_MAXIMIZE)) {
@@ -57,7 +57,7 @@
                 MoveWindow(this.Handle, (int)targetBounds.Left, (int)targetBounds.Top, (int)targetBounds.Width,
                     (int)targetBounds.Height, true);
             }
-        }
+        });
 
         public bool CanMove =>
             PostMessage(this.Handle, WindowMessage.WM_USER, IntPtr.Zero, IntPtr.Zero)
