@@ -15,7 +15,7 @@
             this.Handle = handle;
         }
 
-        public async Task<Exception> Move(Rect targetBounds) {
+        public Task<Exception> Move(Rect targetBounds) => Task.Run(async () => {
             try {
                 var windowPlacement = WINDOWPLACEMENT.Create();
                 if (GetWindowPlacement(this.Handle, ref windowPlacement) &&
@@ -26,7 +26,7 @@
 
             if (!MoveWindow(this.Handle, (int)targetBounds.Left, (int)targetBounds.Top, (int)targetBounds.Width,
                 (int)targetBounds.Height, true)) {
-                return new System.ComponentModel.Win32Exception();
+                return (Exception)new System.ComponentModel.Win32Exception();
             } else {
                 // TODO: option to not activate on move
                 SetForegroundWindow(this.Handle);
@@ -35,7 +35,7 @@
                     (int)targetBounds.Height, true);
                 return null;
             }
-        }
+        });
 
         public Rect Bounds {
             get {
