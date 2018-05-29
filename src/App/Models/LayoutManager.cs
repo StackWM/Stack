@@ -186,14 +186,14 @@
                 return;
             }
 
-            lock (this.locations)
+            lock (this.locations) {
                 if (this.locations.ContainsKey(window))
                     return;
 
-            Debug.WriteLine($"Appeared: {app.AppTitle} from {app.AppName}, {app.AppPath}");
-            // TODO: determine if window appeared in an existing zone, and if it needs to be moved
-            lock(this.locations)
+                Debug.WriteLine($"Appeared: {app.AppTitle} from {app.AppName}, {app.AppPath}");
+                // TODO: determine if window appeared in an existing zone, and if it needs to be moved
                 this.locations.Add(window, null);
+            }
 #if DEBUG
             if (VirtualDesktop.IsSupported)
                 try {
