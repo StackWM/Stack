@@ -3,12 +3,14 @@
     using System;
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
     using System.Windows.Threading;
 
     using JetBrains.Annotations;
     using Microsoft.HockeyApp;
     using WindowsDesktop;
     using LostTech.Stack.Models;
+    using LostTech.Stack.Utils;
 
     sealed class WindowDesktopHook: IDisposable, INotifyPropertyChanged
     {
@@ -40,6 +42,9 @@
                 this.strikes++;
             } catch (ArgumentException e) {
                 HockeyClient.Current.TrackException(e);
+                this.strikes++;
+            } catch (COMException e) {
+                e.ReportAsWarning();
                 this.strikes++;
             }
 
