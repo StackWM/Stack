@@ -7,6 +7,7 @@
     using System.Windows;
     using System.Windows.Controls;
     using LostTech.Stack.Models;
+    using LostTech.Stack.Utils;
     using LostTech.Stack.ViewModels;
 
     sealed class WindowHost: Control
@@ -47,11 +48,16 @@
 
         public event EventHandler<ErrorEventArgs> NonFatalErrorOccurred;
 
-        Rect lastRect;
+        Rect lastRect, newRect;
+        readonly Throttle adjustThrottle = new Throttle {MinimumDelay = TimeSpan.FromSeconds(1f / 30)};
         async void AdjustWindow() {
-            await Task.Yield();
             Rect? rect = this.TryGetPhysicalBounds();
             if (rect.Equals(this.lastRect) || rect == null)
+                return;
+
+            this.newRect = rect.Value;
+
+            if (!await this.adjustThrottle.TryAcquire() || this.newRect != rect.Value)
                 return;
 
             this.lastRect = rect.Value;

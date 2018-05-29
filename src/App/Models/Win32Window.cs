@@ -28,6 +28,7 @@
             this.excludeFromMargin = new Lazy<bool>(this.GetExcludeFromMargin);
         }
 
+        const bool RepaintOnMove = true;
         public Task Move(Rect targetBounds) => Task.Run(async () => {
             var windowPlacement = WINDOWPLACEMENT.Create();
             if (GetWindowPlacement(this.Handle, ref windowPlacement) &&
@@ -44,7 +45,7 @@
             }
 
             if (!MoveWindow(this.Handle, (int)targetBounds.Left, (int)targetBounds.Top,
-                (int)targetBounds.Width, (int)targetBounds.Height, bRepaint: true)) {
+                (int)targetBounds.Width, (int)targetBounds.Height, bRepaint: RepaintOnMove)) {
                 var exception = this.GetLastError();
                 if (exception is Win32Exception win32Exception
                     && win32Exception.NativeErrorCode == (int)WinApiErrorCode.ERROR_ACCESS_DENIED)
@@ -55,7 +56,7 @@
                 // TODO: option to not activate on move
                 await Task.Yield();
                 MoveWindow(this.Handle, (int)targetBounds.Left, (int)targetBounds.Top, (int)targetBounds.Width,
-                    (int)targetBounds.Height, true);
+                    (int)targetBounds.Height, bRepaint: RepaintOnMove);
             }
         });
 
