@@ -868,7 +868,8 @@
                 layouts: this,
                 win32WindowFactory: this.win32WindowFactory);
 
-            this.dragHook = new DragHook(MouseButtons.Middle, this.hook);
+            this.dragHook = new DragHook(settings.Behaviors.MouseMove.DragButton, this.hook);
+            settings.Behaviors.MouseMove.OnChange(s => s.DragButton, newButton => this.dragHook.SetButton(newButton));
             this.dragHook.DragStartPreview += this.OnDragStartPreview;
             this.dragHook.DragStart += this.OnDragStart;
             this.dragHook.DragEnd += this.OnDragEnd;
