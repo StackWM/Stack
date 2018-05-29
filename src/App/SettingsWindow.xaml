@@ -7,6 +7,7 @@
         xmlns:local="clr-namespace:LostTech.Stack"
         xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:app="clr-namespace:LostTech.App;assembly=LostTech.App.KeySettings.WPF"
+        xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:settings="clr-namespace:LostTech.Stack.Settings"
         xmlns:views="clr-namespace:LostTech.Stack.Views"
         BorderThickness="1" BorderBrush="Black"
@@ -27,23 +28,63 @@
                 <!-- Accent and AppTheme setting -->
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
+        <ResourceDictionary>
+          <x:Array x:Key="MouseButtonOptions" Type="forms:MouseButtons">
+            <forms:MouseButtons>Left</forms:MouseButtons>
+            <forms:MouseButtons>Right</forms:MouseButtons>
+            <forms:MouseButtons>Middle</forms:MouseButtons>
+            <forms:MouseButtons>XButton1</forms:MouseButtons>
+            <forms:MouseButtons>XButton2</forms:MouseButtons>
+          </x:Array>
+          <Style TargetType="{x:Type metro:ToggleSwitch}" BasedOn="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}">
+            <Setter Property="OffLabel" Value=" Off"/>
+            <Setter Property="OnLabel" Value=" On"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+          </Style>
+          <Style TargetType="HeaderedContentControl">
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Template">
+              <Setter.Value>
+                <ControlTemplate TargetType="HeaderedContentControl">
+                  <DockPanel>
+                    <ContentPresenter Margin="0,0,0,6" DockPanel.Dock="Top" ContentSource="Header"
+                                      TextBlock.FontSize="14" TextBlock.FontFamily="{StaticResource ToggleSwitchHeaderFontFamily.Win10}" />
+                    <ContentPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                  </DockPanel>
+                </ControlTemplate>
+              </Setter.Value>
+            </Setter>
+          </Style>
+        </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </metro:MetroWindow.Resources>
     <metro:MetroAnimatedSingleRowTabControl Margin="8">
         <TabItem Header="Mouse Drag">
             <DockPanel Margin="8">
-                <metro:ToggleSwitch Content="Use middle mouse button to move windows"
+                <!-- exists here to override style application issue -->
+                <metro:ToggleSwitch Visibility="Collapsed" DockPanel.Dock="Top"/>
+                <metro:ToggleSwitch Header="Use mouse drag to move windows"
                                     DockPanel.Dock="Top"
                                     IsChecked="{Binding Behaviors.MouseMove.Enabled}"/>
-                <TextBlock DockPanel.Dock="Top">Disable for these windows:</TextBlock>
+                <HeaderedContentControl DockPanel.Dock="Top"/>
+                <HeaderedContentControl Header="Mouse button" DockPanel.Dock="Top">
+                  <ComboBox IsEditable="False" Width="100" HorizontalAlignment="Left"
+                            SelectedItem="{Binding Behaviors.MouseMove.DragButton, Mode=TwoWay}"
+                            ItemsSource="{StaticResource MouseButtonOptions}"
+                  />
+                </HeaderedContentControl>
+                <HeaderedContentControl Header="Disable for these windows:" VerticalContentAlignment="Stretch" Margin="0">
                 <views:WindowGroupListEditor AvailableGroups="{Binding WindowGroups}"
+                                             VerticalAlignment="Stretch"
                                              Groups="{Binding Behaviors.MouseMove.WindowGroupIgnoreList}"/>
+                </HeaderedContentControl>
             </DockPanel>
         </TabItem>
         <TabItem Header="Keyboard Move">
             <DockPanel Margin="8">
-                <metro:ToggleSwitch Content="Use keyboard to move windows horizontally or vertically"
+                <metro:ToggleSwitch Header="Use keyboard to move windows horizontally or vertically"
                                     DockPanel.Dock="Top"
                                     IsChecked="{Binding Behaviors.KeyboardMove.Enabled}"/>
                 <TextBlock DockPanel.Dock="Top">Disable for these windows:</TextBlock>

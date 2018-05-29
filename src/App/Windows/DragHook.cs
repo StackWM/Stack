@@ -16,7 +16,7 @@
 
     public sealed class DragHook : IDisposable
     {
-        public MouseButtons Button { get; }
+        public MouseButtons Button { get; private set; }
         public event EventHandler<DragHookEventArgs> DragStartPreview;
         public event EventHandler<DragHookEventArgs> DragStart;
         public event EventHandler<DragHookEventArgs> DragMove;
@@ -31,12 +31,23 @@
             [MouseButtons.Middle] = User32.MOUSEEVENTF.MOUSEEVENTF_MIDDLEDOWN,
             [MouseButtons.Left] = User32.MOUSEEVENTF.MOUSEEVENTF_LEFTDOWN,
             [MouseButtons.Right] = User32.MOUSEEVENTF.MOUSEEVENTF_RIGHTDOWN,
+            [MouseButtons.XButton1] = User32.MOUSEEVENTF.MOUSEEVENTF_XDOWN,
+            [MouseButtons.XButton2] = User32.MOUSEEVENTF.MOUSEEVENTF_XDOWN,
         };
         static readonly SortedList<MouseButtons, User32.MOUSEEVENTF> ButtonUpEventCodes = new SortedList<MouseButtons, User32.MOUSEEVENTF>
         {
             [MouseButtons.Middle] = User32.MOUSEEVENTF.MOUSEEVENTF_MIDDLEUP,
             [MouseButtons.Left] = User32.MOUSEEVENTF.MOUSEEVENTF_LEFTUP,
             [MouseButtons.Right] = User32.MOUSEEVENTF.MOUSEEVENTF_RIGHTUP,
+            [MouseButtons.XButton1] = User32.MOUSEEVENTF.MOUSEEVENTF_XUP,
+            [MouseButtons.XButton2] = User32.MOUSEEVENTF.MOUSEEVENTF_XUP,
+        };
+        static readonly SortedList<MouseButtons, uint> XButton = new SortedList<MouseButtons, uint> {
+            [MouseButtons.Middle] = 0,
+            [MouseButtons.Left] = 0,
+            [MouseButtons.Right] = 0,
+            [MouseButtons.XButton1] = MOUSE_XBUTTON1,
+            [MouseButtons.XButton2] = MOUSE_XBUTTON2,
         };
 
         bool isPressed;
@@ -105,15 +116,29 @@
         {
             Task.Factory.StartNew(() => {
                 // replay captured event
+                var up = upLocation ?? this.dragStart;
                 Interlocked.Increment(ref this.releasing);
-                SendMouseInput(ButtonDownEventCodes[this.Button], this.dragStart.X, this.dragStart.Y);
-                SendMouseInput(ButtonUpEventCodes[this.Button], this.dragStart.X, this.dragStart.Y);
+                SendMouseInput(ButtonDownEventCodes[this.Button], this.dragStart.X, this.dragStart.Y, XButton[this.Button]);
+                SendMouseInput(ButtonUpEventCodes[this.Button], up.X, up.Y, XButton[this.Button]);
                 Interlocked.Decrement(ref this.releasing);
             });
             this.isPressed = false;
         }
 
-        void SendMouseInput(User32.MOUSEEVENTF eventType, int x, int y)
+        public void SetButton(MouseButtons button) {
+            if (this.Button == button)
+                return;
+
+            if (!ButtonDownEventCodes.ContainsKey(button))
+                throw new NotSupportedException($"Button {button} is not supported");
+
+            this.ReleaseCapture();
+            this.Button = button;
+        }
+
+        const uint MOUSE_XBUTTON1 = 1, MOUSE_XBUTTON2 = 2;
+
+        void SendMouseInput(User32.MOUSEEVENTF eventType, int x, int y, uint XBUTTON = 0)
         {
             User32.SendInput(1, new[] {
                     new User32.INPUT {
@@ -123,6 +148,7 @@
                                 dwFlags = eventType | User32.MOUSEEVENTF.MOUSEEVENTF_ABSOLUTE,
                                 dx = x,
                                 dy = y,
+                                mouseData = XBUTTON,
                             }
                         }
                     }

@@ -642,21 +642,19 @@
 
             this.layoutManager = new LayoutManager(this.screenLayouts);
 
-            if (settings.Behaviors.KeyboardMove.Enabled)
-                this.keyboardArrowBehavior = new KeyboardArrowBehavior(
-                    this.hook, this.screenLayouts, this.layoutManager, settings.Behaviors.KeyBindings,
-                    settings.Behaviors.KeyboardMove,
-                    settings.WindowGroups,
-                    this.Move);
+            this.keyboardArrowBehavior = new KeyboardArrowBehavior(
+                this.hook, this.screenLayouts, this.layoutManager, settings.Behaviors.KeyBindings,
+                settings.Behaviors.KeyboardMove,
+                settings.WindowGroups,
+                this.Move);
 
-            if (settings.Behaviors.MouseMove.Enabled) {
-                this.dragHook = new DragHook(MouseButtons.Middle, this.hook);
-                this.dragHook.DragStartPreview += this.OnDragStartPreview;
-                this.dragHook.DragStart += this.OnDragStart;
-                this.dragHook.DragEnd += this.OnDragEnd;
-                this.dragHook.DragMove += this.OnDragMove;
-                this.hook.KeyDown += this.GlobalKeyDown;
-            }
+            this.dragHook = new DragHook(settings.Behaviors.MouseMove.DragButton, this.hook);
+            settings.Behaviors.MouseMove.OnChange(s => s.DragButton, newButton => this.dragHook.SetButton(newButton));
+            this.dragHook.DragStartPreview += this.OnDragStartPreview;
+            this.dragHook.DragStart += this.OnDragStart;
+            this.dragHook.DragEnd += this.OnDragEnd;
+            this.dragHook.DragMove += this.OnDragMove;
+            this.hook.KeyDown += this.GlobalKeyDown;
         }
 
         public static DirectoryInfo AppData {
