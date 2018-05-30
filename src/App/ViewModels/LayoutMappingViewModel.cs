@@ -10,6 +10,7 @@
     using LostTech.Stack.ScreenCoordinates;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
+    using LostTech.Stack.WindowManagement;
     using LostTech.Windows;
 
     class LayoutMappingViewModel : ILayoutMappingViewModel
@@ -51,6 +52,7 @@
             };
             selector.Show();
             selector.FitToMargin(screen);
+            selector.TryGetNativeWindow()?.BringToFront().ReportAsWarning();
             selector.UpdateLayout();
             selector.ScrollToSelection();
             return selector;

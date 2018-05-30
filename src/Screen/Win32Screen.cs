@@ -6,11 +6,12 @@
     using System.Diagnostics;
     using System.Drawing;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Interop;
     using System.Windows.Media;
-    using LostTech.Stack.Compat;
+    using LostTech.Stack.Utils;
     using LostTech.Windows.Win32;
     using PInvoke;
     using static System.FormattableString;
@@ -19,18 +20,13 @@
     public sealed class Win32Screen: INotifyPropertyChanged
     {
         DisplayDevice displayDevice;
+        IntPtr hMonitor;
         RectangleF workingArea;
 
-        void EnsureUpToDate()
-        {
-            if (!this.dirty)
-                return;
-
-            this.detectorWindow.Left = this.WorkingArea.Left;
-            this.detectorWindow.Top = this.WorkingArea.Top;
-            this.detectorWindow.Show();
-            this.detectorWindow.Hide();
-            this.dirty = false;
+        void SetPosition() {
+            var topLeft = this.WorkingArea.TopLeft().Scale(1 / (float)this.ToDeviceScale);
+            this.detectorWindow.Left = topLeft.X;
+            this.detectorWindow.Top = topLeft.Y;
         }
 
         bool dirty;
@@ -39,20 +35,23 @@
 
         internal Win32Screen(DisplayDevice displayDevice)
         {
-            this.displayDevice = displayDevice;
-            Debug.WriteLine($"new screen: {this.WorkingArea}");
+            this.Device = displayDevice;
+            Debug.WriteLine($"new screen: {this}");
             this.detectorWindow = new Window {
                 Left = this.WorkingArea.Left,
                 Top = this.WorkingArea.Top,
-                //ShowInTaskbar = false,
+                ShowInTaskbar = false,
                 Title = this.DeviceName,
                 WindowStyle = WindowStyle.None,
+                ResizeMode = ResizeMode.NoResize,
+                WindowStartupLocation = WindowStartupLocation.Manual,
                 Width = 1,
                 Height = 1,
             };
             this.detectorWindow.Show();
             try {
                 this.presentationSource = PresentationSource.FromVisual(this.detectorWindow);
+                this.SetPosition();
             }
             finally {
                 this.detectorWindow.Hide();
@@ -62,6 +61,16 @@
             this.workingArea = this.GetWorkingArea();
         }
 
+        void EnsureUpToDate() {
+            if (!this.dirty)
+                return;
+
+            this.SetPosition();
+            this.detectorWindow.Show();
+            this.detectorWindow.Hide();
+            this.dirty = false;
+        }
+
         IntPtr OnWindowMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             // ReSharper disable once SwitchStatementMissingSomeCases
@@ -69,17 +78,17 @@
             case User32.WindowMessage.WM_DPICHANGED:
             case User32.WindowMessage.WM_SETTINGCHANGE:
             case User32.WindowMessage.WM_DISPLAYCHANGE:
-                var oldDeviceInfo = this.displayDevice;
-                this.displayDevice = Win32ScreenProvider.GetDisplayDevices()
+                var oldDeviceInfo = this.Device;
+                this.Device = Win32ScreenProvider.GetDisplayDevices()
                     .FirstOrDefault(device => device.Name == this.DeviceName);
-                if (!this.displayDevice.IsValid) {
-                    this.displayDevice = oldDeviceInfo;
-                    this.displayDevice.StateFlags &= ~(DisplayDeviceStateFlags.AttachedToDesktop |
-                                                       DisplayDeviceStateFlags.PrimaryDevice);
+                if (!this.Device.IsValid) {
+                    oldDeviceInfo.StateFlags &= ~(DisplayDeviceStateFlags.AttachedToDesktop |
+                                                  DisplayDeviceStateFlags.PrimaryDevice);
+                    this.Device = oldDeviceInfo;
                 }
-                if (oldDeviceInfo.IsActive != this.displayDevice.IsActive)
+                if (oldDeviceInfo.IsActive != this.Device.IsActive)
                     this.OnPropertyChanged(nameof(this.IsActive));
-                if (oldDeviceInfo.IsPrimary != this.displayDevice.IsPrimary)
+                if (oldDeviceInfo.IsPrimary != this.Device.IsPrimary)
                     this.OnPropertyChanged(nameof(this.IsPrimary));
 
                 this.BeginUpdateWorkingArea();
@@ -88,6 +97,18 @@
                 return IntPtr.Zero;
             }
             return IntPtr.Zero;
+        }
+
+        unsafe void ResetMonitorInfo() {
+            EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (monitor, hdcMonitor, lprcMonitor, data) => {
+                if (User32.GetMonitorInfoEx(monitor, out var info)
+                    && new string(info.DeviceName) == this.DeviceName) {
+                    this.hMonitor = monitor;
+                    return false;
+                }
+
+                return true;
+            }, IntPtr.Zero);
         }
 
         HwndSource HwndSource => (HwndSource)this.presentationSource;
@@ -116,26 +137,54 @@
             get {
                 this.EnsureUpToDate();
                 Debug.Assert(ReferenceEquals(this.presentationSource, PresentationSource.FromVisual(this.detectorWindow)));
-                return this.presentationSource.CompositionTarget.TransformFromDevice;
+                var scale = Matrix.Identity;
+                double toDeviceScale = 1/this.ToDeviceScale;
+                scale.Scale(toDeviceScale, toDeviceScale);
+                return scale;
+                // return this.presentationSource.CompositionTarget.TransformFromDevice;
             }
         }
-
         public Matrix TransformToDevice {
             get {
                 this.EnsureUpToDate();
-                return this.presentationSource.CompositionTarget.TransformToDevice;
+                var scale = Matrix.Identity;
+                double toDeviceScale = this.ToDeviceScale;
+                scale.Scale(toDeviceScale, toDeviceScale);
+                return scale;
+                //return this.presentationSource.CompositionTarget.TransformToDevice;
             }
         }
-        public bool IsActive => this.displayDevice.IsActive;
+
+        double ToDeviceScale => this.WindowToDeviceScale(this.HwndSource);
+
+        public double WindowToDeviceScale(HwndSource windowHandleSource) {
+            double toDevice = windowHandleSource.CompositionTarget.TransformToDevice.M11;
+            if (this.hMonitor == IntPtr.Zero || GetDpiForMonitor(this.hMonitor, MONITOR_DPI_TYPE.MDT_EFFECTIVE_DPI,
+                    out var dpi, out var _) != HResult.Code.S_OK) {
+                return toDevice;
+            }
+
+            int windowDPI = User32.GetDpiForWindow(windowHandleSource.Handle);
+            return toDevice * dpi / windowDPI;
+        }
+        public bool IsActive => this.Device.IsActive;
         public string ID => this.DeviceName.Replace(@"\\.\DISPLAY", "");
-        internal string DeviceName => this.displayDevice.Name;
-        public override string ToString() => Invariant($"{this.ID} ({this.WorkingArea.Width}x{this.WorkingArea.Height})");
-        public bool IsPrimary => this.displayDevice.StateFlags.HasFlag(DisplayDeviceStateFlags.PrimaryDevice);
+        internal string DeviceName => this.Device.Name;
+        public override string ToString() => Invariant($"{this.ID} ({(int)this.WorkingArea.Width}x{(int)this.WorkingArea.Height} @ {(int)this.WorkingArea.Left};{(int)this.WorkingArea.Top})");
+        public bool IsPrimary => this.Device.StateFlags.HasFlag(DisplayDeviceStateFlags.PrimaryDevice);
 
         /// <summary>
         /// This is non-WPF area. One needs to use <see cref="TransformFromDevice"/> to get WPF compatible one.
         /// </summary>
         public RectangleF WorkingArea => this.GetWorkingArea();
+
+        DisplayDevice Device {
+            get { return this.displayDevice; }
+            set {
+                this.displayDevice = value;
+                this.ResetMonitorInfo();
+            }
+        }
 
         RectangleF GetWorkingArea()
         {
@@ -148,5 +197,13 @@
         public event PropertyChangedEventHandler PropertyChanged;
         void OnPropertyChanged(string propertyName)
             => this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        [DllImport("User32.dll", SetLastError = true)]
+        static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MONITORENUMPROC lpfnEnum, IntPtr dwData);
+
+        [DllImport("User32.dll")]
+        static extern HResult GetDpiForMonitor(IntPtr hMonitor, MONITOR_DPI_TYPE dpiType, out uint dpiX, out uint dpiY);
+
+        public delegate bool MONITORENUMPROC(IntPtr hMonitor, IntPtr hdcMonitor, IntPtr lprcMonitor, IntPtr dwData);
     }
 }

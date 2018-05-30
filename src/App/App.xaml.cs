@@ -397,7 +397,7 @@
 
             await Task.Yield();
 
-            var layoutCenter = first.GetPhysicalBounds().Center().ToDrawingPoint();
+            var layoutCenter = first.GetPhysicalBounds().Center();
             this.disableDragHandler = true;
             Debug.WriteLine("forcing focus; drag handler disabled");
 

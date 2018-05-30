@@ -2,6 +2,7 @@
 {
     using System;
     using System.Windows;
+    using System.Windows.Interop;
     using JetBrains.Annotations;
     using LostTech.Stack.Utils;
     using LostTech.Windows;
@@ -23,8 +24,12 @@
             if (window == null)
                 throw new ArgumentNullException(nameof(window));
 
-            var topLeft = screen.TransformFromDevice.Transform(screen.WorkingArea.TopLeft().ToWPF());
+            var handleSource = (HwndSource)PresentationSource.FromVisual(window);
+            double windowToDeviceScale = screen.WindowToDeviceScale(handleSource);
+            var topLeft = screen.WorkingArea.TopLeft().Scale(1/(float)windowToDeviceScale);
                 //screen.WorkingArea.TopLeft();
+            if (topLeft.X > 0) topLeft.X = (int)topLeft.X + 0.5f;
+            if (topLeft.Y > 0) topLeft.Y = (int)topLeft.Y + 0.5f;
             window.Left = topLeft.X;
             window.Top = topLeft.Y;
         }

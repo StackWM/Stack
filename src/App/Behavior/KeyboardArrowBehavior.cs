@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Drawing;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -68,12 +69,12 @@
 
         protected override bool IsCommandSupported(string commandName) => Commands.All.Contains(commandName);
 
-        static readonly SortedList<string, Vector> Directions = new SortedList<string, Vector>
+        static readonly SortedList<string, PointF> Directions = new SortedList<string, PointF>
         {
-            [Commands.MoveLeft] = new Vector(-1, 0),
-            [Commands.MoveRight] = new Vector(1, 0),
-            [Commands.MoveUp] = new Vector(0, -1),
-            [Commands.MoveDown] = new Vector(0, 1),
+            [Commands.MoveLeft] = new PointF(-1, 0),
+            [Commands.MoveRight] = new PointF(1, 0),
+            [Commands.MoveUp] = new PointF(0, -1),
+            [Commands.MoveDown] = new PointF(0, 1),
         };
 
         public static class Commands

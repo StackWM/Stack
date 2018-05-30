@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Drawing;
     using System.Linq;
     using System.Windows;
     using System.Windows.Input;
@@ -71,9 +72,9 @@
             return true;
         }
 
-        void ICommand.Execute(object parameter) => this.MoveCurrentWindow((Vector)parameter);
+        void ICommand.Execute(object parameter) => this.MoveCurrentWindow((PointF)parameter);
 
-        public bool Execute(Vector direction) => this.MoveCurrentWindow(direction);
+        public bool Execute(PointF direction) => this.MoveCurrentWindow(direction);
 
 #pragma warning disable CS0169
         public event EventHandler CanExecuteChanged;
@@ -82,7 +83,7 @@
         const float Epsilon = 2;
         const float LargeValue = 1e9f;
 
-        bool MoveCurrentWindow(Vector direction)
+        bool MoveCurrentWindow(PointF direction)
         {
             var windowHandle = User32.GetForegroundWindow();
             if (!this.CanExecute(windowHandle))
@@ -116,7 +117,7 @@
             Debug.WriteLineIf(next != null, "going to a zone with the same center");
 
             var strip = reducedWindowBounds;
-            var directionalInfinity = direction * LargeValue;
+            var directionalInfinity = direction.Scale(LargeValue);
             if (directionalInfinity.X > 1)
                 strip.Width += LargeValue;
             if (directionalInfinity.X < -1) {
@@ -148,7 +149,7 @@
                     zone.GetPhysicalBounds().Area().AtLeast(1)
                     / zone.GetPhysicalBounds().Intersection(strip).Area().AtLeast(1);
 
-                double centerTravelDistance = (windowCenter - zone.GetPhysicalBounds().Center()).Length;
+                double centerTravelDistance = windowCenter.Diff(zone.GetPhysicalBounds().Center()).Length();
 
                 return DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction)
                        * centerTravelDistance
@@ -184,6 +185,6 @@
             return true;
         }
 
-        static double DistanceAlongDirection(Point @from, Point to, Vector direction) => (to - @from).DotProduct(direction);
+        static double DistanceAlongDirection(PointF @from, PointF to, PointF direction) => to.Diff(@from).DotProduct(direction);
     }
 }

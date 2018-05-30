@@ -303,7 +303,6 @@
     <Compile Include="Utils\CollectionUtils.cs" />
     <Compile Include="Utils\DictUtils.cs" />
     <Compile Include="Utils\DragHookEventArgs.cs" />
-    <Compile Include="Utils\DrawingPointUtils.cs" />
     <Compile Include="Utils\EnumUtils.cs" />
     <Compile Include="Utils\EventArgs.cs" />
     <Compile Include="Utils\ExceptionExtensions.cs" />
@@ -311,7 +310,6 @@
     <Compile Include="Utils\ListInTaskSwitcher.cs" />
     <Compile Include="Utils\MathUtils.cs" />
     <Compile Include="Utils\BasicGeometryConversions.cs" />
-    <Compile Include="Utils\RectExtensions.cs" />
     <Compile Include="Utils\ScreenExtensions.cs" />
     <Compile Include="Utils\Throttle.cs" />
     <Compile Include="Utils\VersionUtils.cs" />

@@ -1,17 +1,10 @@
-﻿namespace LostTech.Stack.Utils
-{
+﻿namespace LostTech.Stack.Utils {
     using System.Drawing;
-    using System.Windows;
-    using Point = System.Windows.Point;
     using Rect = System.Drawing.RectangleF;
 
-    public static class RectExtensions
-    {
-        public static Point Center(this Rect rect)
-        {
-            var vector = 0.5 * new Vector(rect.Left + rect.Right, rect.Top + rect.Bottom);
-            return new Point(vector.X, vector.Y);
-        }
+    public static class RectExtensions {
+        public static PointF Center(this Rect rect) =>
+            new PointF(0.5f * (rect.Left + rect.Right), 0.5f * (rect.Top + rect.Bottom));
 
         public static Rect Intersection(this Rect rect, Rect otherRect) {
             rect.Intersect(otherRect);
@@ -20,15 +13,9 @@
 
         public static double Area(this Rect rect) => rect.Width * rect.Height;
 
-        public static bool Equals(this Point value, Point other, double epsilon)
-        {
-            return (value - other).LengthSquared < epsilon * epsilon;
-        }
+        public static double DotProduct(this PointF value, PointF other) => value.X * other.X + value.Y * other.Y;
 
-        public static double DotProduct(this Vector value, Vector other) => value.X * other.X + value.Y * other.Y;
-
-        public static Rect Inflated(this Rect rect, float x, float y)
-        {
+        public static Rect Inflated(this Rect rect, float x, float y) {
             if (x < 0 && rect.Width < x)
                 return rect;
             if (y < 0 && rect.Height < y)
@@ -44,6 +31,6 @@
         public static PointF BottomLeft(this Rect rect) => new PointF(rect.Left, rect.Bottom);
 
         public static PointF[] Corners(this Rect rect) =>
-            new[] {rect.TopLeft(), rect.TopRight(), rect.BottomRight(), rect.BottomLeft()};
+            new[] { rect.TopLeft(), rect.TopRight(), rect.BottomRight(), rect.BottomLeft() };
     }
 }
