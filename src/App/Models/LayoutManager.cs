@@ -15,6 +15,7 @@
     using JetBrains.Annotations;
     using LostTech.Stack.Utils;
     using LostTech.Stack.ViewModels;
+    using LostTech.Stack.WindowManagement;
     using LostTech.Stack.Zones;
     using Microsoft.HockeyApp;
 

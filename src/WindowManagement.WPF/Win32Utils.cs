@@ -1,12 +1,12 @@
-﻿namespace LostTech.Stack.Utils
+﻿namespace LostTech.Stack.WindowManagement
 {
     using System;
     using System.Windows;
     using System.Windows.Interop;
     using JetBrains.Annotations;
-    using LostTech.Stack.Models;
+    using LostTech.Stack.Utils;
 
-    static class WindowUtils
+    public static class Win32Utils
     {
         static readonly Win32WindowFactory win32WindowFactory = new Win32WindowFactory();
         [NotNull]

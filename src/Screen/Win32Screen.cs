@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
+    using System.Drawing;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -18,7 +19,7 @@
     public sealed class Win32Screen: INotifyPropertyChanged
     {
         DisplayDevice displayDevice;
-        Rect workingArea;
+        RectangleF workingArea;
 
         void EnsureUpToDate()
         {
@@ -39,10 +40,11 @@
         internal Win32Screen(DisplayDevice displayDevice)
         {
             this.displayDevice = displayDevice;
+            Debug.WriteLine($"new screen: {this.WorkingArea}");
             this.detectorWindow = new Window {
                 Left = this.WorkingArea.Left,
                 Top = this.WorkingArea.Top,
-                ShowInTaskbar = false,
+                //ShowInTaskbar = false,
                 Title = this.DeviceName,
                 WindowStyle = WindowStyle.None,
                 Width = 1,
@@ -55,9 +57,8 @@
             finally {
                 this.detectorWindow.Hide();
             }
-            var window = (HwndSource) this.presentationSource;
-            WtsApi.WTSRegisterSessionNotification(window.Handle, NotifySessionFlags.ThisSessionOnly);
-            window.AddHook(this.OnWindowMessage);
+            WtsApi.WTSRegisterSessionNotification(this.HwndSource.Handle, NotifySessionFlags.ThisSessionOnly);
+            this.HwndSource.AddHook(this.OnWindowMessage);
             this.workingArea = this.GetWorkingArea();
         }
 
@@ -89,6 +90,8 @@
             return IntPtr.Zero;
         }
 
+        HwndSource HwndSource => (HwndSource)this.presentationSource;
+
         async void BeginUpdateWorkingArea() {
             for (int retry = 0; retry < 100; retry++) {
                 var newWorkingArea = this.GetWorkingArea();
@@ -112,6 +115,7 @@
         {
             get {
                 this.EnsureUpToDate();
+                Debug.Assert(ReferenceEquals(this.presentationSource, PresentationSource.FromVisual(this.detectorWindow)));
                 return this.presentationSource.CompositionTarget.TransformFromDevice;
             }
         }
@@ -131,14 +135,14 @@
         /// <summary>
         /// This is non-WPF area. One needs to use <see cref="TransformFromDevice"/> to get WPF compatible one.
         /// </summary>
-        public Rect WorkingArea => this.GetWorkingArea();
+        public RectangleF WorkingArea => this.GetWorkingArea();
 
-        Rect GetWorkingArea()
+        RectangleF GetWorkingArea()
         {
             return FormsScreen.AllScreens
                        .FirstOrDefault(s => s.DeviceName == this.DeviceName)
-                       ?.WorkingArea.ToWPF()
-                   ?? new Rect();
+                       ?.WorkingArea
+                   ?? new RectangleF();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

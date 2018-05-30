@@ -13,6 +13,7 @@
     using LostTech.Stack.Commands;
     using LostTech.Stack.Models;
     using LostTech.Stack.Settings;
+    using LostTech.Stack.WindowManagement;
     using LostTech.Stack.Zones;
     using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 

@@ -1,13 +1,9 @@
-﻿namespace LostTech.Stack
-{
+﻿namespace LostTech.Stack.WindowManagement.WinApi {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Runtime.InteropServices;
     using PInvoke;
 
-    class Win32
-    {
+    public static class Win32 {
         public struct WINDOWINFO
         {
             uint cbSize;

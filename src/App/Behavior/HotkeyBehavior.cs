@@ -11,6 +11,7 @@
     using LostTech.Stack.Models;
     using LostTech.Stack.Utils;
     using LostTech.Stack.ViewModels;
+    using LostTech.Stack.WindowManagement;
     using LostTech.Windows;
     using PInvoke;
 
@@ -77,7 +78,7 @@
 
             User32.GetCursorPos(out var point);
             var mouseScreen = this.screenProvider.Screens
-                .FirstOrDefault(s => s.IsActive && s.WorkingArea.Contains(point.ToWPF()));
+                .FirstOrDefault(s => s.IsActive && s.WorkingArea.Contains(point.ToDrawingPoint()));
             return mouseScreen ?? this.screenProvider.Screens.First(s => s.IsActive && s.IsPrimary);
         }
 

@@ -6,8 +6,8 @@
     using System.Linq;
     using System.Windows;
     using System.Windows.Data;
-    using LostTech.Stack.Models;
     using LostTech.Stack.ViewModels;
+    using LostTech.Stack.WindowManagement;
 
     public class ZoneElement : CollectionContainer
     {

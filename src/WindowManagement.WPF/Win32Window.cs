@@ -1,22 +1,20 @@
-﻿namespace LostTech.Stack.Models
-{
+﻿namespace LostTech.Stack.WindowManagement {
     using System;
     using System.Diagnostics;
     using System.Runtime.InteropServices;
     using System.Threading.Tasks;
-    using System.Windows;
     using WindowsDesktop;
     using JetBrains.Annotations;
+    using LostTech.Stack.Utils;
+    using LostTech.Stack.WindowManagement.WinApi;
     using PInvoke;
     using static PInvoke.User32;
 
-    using LostTech.Stack.Utils;
-
     using Win32Exception = System.ComponentModel.Win32Exception;
-    using HResult = PInvoke.HResult;
+    using Rect = System.Drawing.RectangleF;
 
     [DebuggerDisplay("{" + nameof(Title) + "}")]
-    class Win32Window : IAppWindow, IEquatable<Win32Window>
+    public sealed class Win32Window : IAppWindow, IEquatable<Win32Window>
     {
         readonly Lazy<bool> excludeFromMargin;
         public IntPtr Handle { get; }
@@ -122,7 +120,7 @@
                 try {
                     return VirtualDesktopHelper.IsCurrentVirtualDesktop(this.Handle);
                 } catch (COMException e)
-                    when (Models.HResult.TYPE_E_ELEMENTNOTFOUND.EqualsCode(e.HResult)) {
+                    when (WinApi.HResult.TYPE_E_ELEMENTNOTFOUND.EqualsCode(e.HResult)) {
                     this.Closed?.Invoke(this, EventArgs.Empty);
                     throw new WindowNotFoundException(innerException: e);
                 } catch (COMException e) {
@@ -145,7 +143,7 @@
                 try {
                     return VirtualDesktop.IsPinnedWindow(this.Handle);
                 } catch (COMException e)
-                    when (Models.HResult.TYPE_E_ELEMENTNOTFOUND.EqualsCode(e.HResult)) {
+                    when (WinApi.HResult.TYPE_E_ELEMENTNOTFOUND.EqualsCode(e.HResult)) {
                     this.Closed?.Invoke(this, EventArgs.Empty);
                     throw new WindowNotFoundException(innerException: e);
                 } catch (COMException e) {
@@ -176,7 +174,7 @@
             if (!SetWindowPos(this.Handle, GetForegroundWindow(), 0, 0, 0, 0,
                               SetWindowPosFlags.SWP_NOMOVE | SetWindowPosFlags.SWP_NOACTIVATE |
                               SetWindowPosFlags.SWP_NOSIZE))
-                issue = new Win32Exception().Capture();
+                issue = new Win32Exception();
             return Task.FromResult(issue);
         }
 
@@ -185,7 +183,7 @@
             if (!SetWindowPos(this.Handle, HWND_BOTTOM, 0, 0, 0, 0,
                 SetWindowPosFlags.SWP_NOMOVE | SetWindowPosFlags.SWP_NOACTIVATE |
                 SetWindowPosFlags.SWP_NOSIZE))
-                issue = new Win32Exception().Capture();
+                issue = new Win32Exception();
             return Task.FromResult(issue);
         }
 
@@ -262,9 +260,9 @@
             var exception = new Win32Exception();
             if (exception.NativeErrorCode == (int)WinApiErrorCode.ERROR_INVALID_WINDOW_HANDLE) {
                 this.Closed?.Invoke(this, EventArgs.Empty);
-                return new WindowNotFoundException(innerException: exception.Capture()).Capture();
+                return new WindowNotFoundException(innerException: exception);
             } else
-                return exception.Capture();
+                return exception;
         }
 
         [DllImport("User32.dll", SetLastError = true)]

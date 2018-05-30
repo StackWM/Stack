@@ -1,4 +1,4 @@
-﻿namespace LostTech.Stack.Models
+﻿namespace LostTech.Stack.WindowManagement
 {
     using System;
     public class WindowNotFoundException: Exception

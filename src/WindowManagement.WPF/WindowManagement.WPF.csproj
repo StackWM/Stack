@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+    <AssemblyName>LostTech.Stack.WindowManagement.WPF</AssemblyName>
+    <RootNamespace>LostTech.Stack.WindowManagement</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
+    <PackageReference Include="PInvoke.DwmApi" Version="0.5.152" />
+    <PackageReference Include="PInvoke.User32" Version="0.5.152" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\External\HockeySDK\Src\Kit.Core45\Kit.Core45.csproj" />
+    <ProjectReference Include="..\..\External\VirtualDesktop\source\VirtualDesktop\VirtualDesktop.csproj" />
+    <ProjectReference Include="..\WindowManagement\WindowManagement.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+
+</Project>

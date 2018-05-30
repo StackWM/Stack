@@ -9,6 +9,8 @@
     using LostTech.Stack.Models;
     using LostTech.Stack.Utils;
     using LostTech.Stack.ViewModels;
+    using LostTech.Stack.WindowManagement;
+    using Rect = System.Drawing.RectangleF;
 
     sealed class WindowHost: Control
     {
@@ -51,6 +53,7 @@
         Rect lastRect, newRect;
         readonly Throttle adjustThrottle = new Throttle {MinimumDelay = TimeSpan.FromSeconds(1f / 30)};
         async void AdjustWindow() {
+            await Task.Yield();
             Rect? rect = this.TryGetPhysicalBounds();
             if (rect.Equals(this.lastRect) || rect == null)
                 return;
@@ -64,7 +67,7 @@
 
             IAppWindow windowToMove = this.Window.Window;
             try {
-                await windowToMove.Move(this.lastRect);
+                await windowToMove.Move(this.newRect);
             } catch (WindowNotFoundException) {
             } catch (Exception error) {
                 this.NonFatalErrorOccurred?.Invoke(this, new ErrorEventArgs(error));

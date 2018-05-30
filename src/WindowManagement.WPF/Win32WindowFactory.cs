@@ -1,5 +1,4 @@
-﻿namespace LostTech.Stack.Models
-{
+﻿namespace LostTech.Stack.WindowManagement {
     using System;
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
@@ -8,7 +7,7 @@
     using static PInvoke.User32;
     using Win32Exception = System.ComponentModel.Win32Exception;
 
-    class Win32WindowFactory
+    public sealed class Win32WindowFactory
     {
         public bool SuppressSystemMargin { get; set; } = true;
         [NotNull]
@@ -31,7 +30,7 @@
             });
             bool done = EnumWindows(enumerator, IntPtr.Zero);
             GC.KeepAlive(enumerator);
-            return done ? null : new Win32Exception().Capture();
+            return done ? null : new Win32Exception();
         }
 
         public bool DisplayInSwitchToList([NotNull] Win32Window window) {

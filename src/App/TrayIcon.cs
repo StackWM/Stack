@@ -15,6 +15,7 @@
     using LostTech.Stack.Models;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
+    using LostTech.Stack.WindowManagement;
     using LostTech.Windows;
     using Microsoft.HockeyApp;
     using Microsoft.VisualBasic;

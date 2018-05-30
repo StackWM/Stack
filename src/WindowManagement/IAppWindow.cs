@@ -1,8 +1,8 @@
-﻿namespace LostTech.Stack.Models
+﻿namespace LostTech.Stack.WindowManagement
 {
     using System;
     using System.Threading.Tasks;
-    using System.Windows;
+    using Rect = System.Drawing.RectangleF;
 
     public interface IAppWindow
     {

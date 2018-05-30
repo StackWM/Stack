@@ -6,6 +6,7 @@
     using EventHook.Hooks;
     using JetBrains.Annotations;
     using LostTech.Stack.Models;
+    using LostTech.Stack.WindowManagement;
     using LostTech.Stack.Windows;
 
     public class AppWindowViewModel : SimpleViewModel, IDisposable, IEquatable<AppWindowViewModel>

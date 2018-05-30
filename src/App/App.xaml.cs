@@ -31,6 +31,7 @@
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
     using LostTech.Stack.ViewModels;
+    using LostTech.Stack.WindowManagement;
     using LostTech.Stack.Windows;
     using LostTech.Stack.Zones;
     using LostTech.Windows;
@@ -48,6 +49,8 @@
     using static PInvoke.User32;
     using MessageBox = System.Windows.MessageBox;
     using XmlDocument = global::Windows.Data.Xml.Dom.XmlDocument;
+    using Rect = System.Drawing.RectangleF;
+    using Point = System.Drawing.PointF;
 
     /// <summary>
     /// Interaction logic for App.xaml
@@ -344,7 +347,7 @@
             }
 
 
-            var relativeDropPoint = screen.PointFromScreen(currentPosition);
+            var relativeDropPoint = screen.PointFromScreen(currentPosition.ToWPF());
             var zone = screen.GetZone(relativeDropPoint)?.GetFinalTarget();
             if (zone == null) {
                 if (this.dragOperation.CurrentZone != null) {
@@ -398,8 +401,8 @@
             this.disableDragHandler = true;
             Debug.WriteLine("forcing focus; drag handler disabled");
 
-            SendMouseInput(MOUSEEVENTF.MOUSEEVENTF_MIDDLEDOWN, layoutCenter.X, layoutCenter.Y);
-            SendMouseInput(MOUSEEVENTF.MOUSEEVENTF_MIDDLEUP, layoutCenter.X, layoutCenter.Y);
+            SendMouseInput(MOUSEEVENTF.MOUSEEVENTF_MIDDLEDOWN, (int)layoutCenter.X, (int)layoutCenter.Y);
+            SendMouseInput(MOUSEEVENTF.MOUSEEVENTF_MIDDLEUP, (int)layoutCenter.X, (int)layoutCenter.Y);
 
             await Task.Yield();
 
@@ -453,7 +456,7 @@
                 Debug.WriteLine("can't drop: no screen at the target point");
                 return;
             }
-            var relativeDropPoint = screen.PointFromScreen(dropPoint);
+            var relativeDropPoint = screen.PointFromScreen(dropPoint.ToWPF());
             var zone = screen.GetZone(relativeDropPoint)?.GetFinalTarget();
             if (zone == null) {
                 Debug.WriteLine("can't drop: no zone at the target point");

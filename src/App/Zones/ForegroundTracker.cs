@@ -5,6 +5,7 @@
     using System.Windows.Threading;
     using EventHook.Hooks;
     using LostTech.Stack.Models;
+    using LostTech.Stack.WindowManagement;
     using PInvoke;
 
     class ForegroundTracker: IDisposable

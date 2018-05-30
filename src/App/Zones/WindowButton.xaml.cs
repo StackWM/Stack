@@ -8,6 +8,7 @@
     using LostTech.Stack.Licensing;
     using LostTech.Stack.Models;
     using LostTech.Stack.ViewModels;
+    using LostTech.Stack.WindowManagement;
 
     /// <summary>
     /// Interaction logic for WindowButton.xaml

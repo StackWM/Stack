@@ -2,6 +2,7 @@
 {
     using System;
     using LostTech.Stack.Utils;
+    using LostTech.Stack.WindowManagement;
 
     interface IWindowTracker
     {

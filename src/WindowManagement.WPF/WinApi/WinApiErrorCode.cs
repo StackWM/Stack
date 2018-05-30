@@ -1,6 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
-namespace LostTech.Stack.Models
-{
+namespace LostTech.Stack.WindowManagement.WinApi {
     public enum WinApiErrorCode
     {
         ERROR_ACCESS_DENIED = 5,

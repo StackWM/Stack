@@ -13,7 +13,9 @@
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
     using LostTech.Stack.ViewModels;
+    using LostTech.Stack.WindowManagement;
     using LostTech.Stack.Zones;
+    using Rect = System.Drawing.RectangleF;
 
     class AutoCaptureBehavior: IDisposable
     {
@@ -164,7 +166,7 @@
 
             var zoneBounds = zone.GetPhysicalBounds();
             return bounds.Corners().Zip(zoneBounds.Corners(),
-                (from, to) => (from - to).LengthSquared)
+                (from, to) => from.Diff(to).LengthSquared())
                 .Sum();
         }
 

@@ -1,9 +1,8 @@
-﻿namespace LostTech.Stack.ViewModels
-{
+﻿namespace LostTech.Stack.ViewModels {
     using System;
     using System.Threading.Tasks;
-    using System.Windows;
-    using LostTech.Stack.Models;
+    using LostTech.Stack.WindowManagement;
+    using Rect = System.Drawing.RectangleF;
 
     class DesignTimeWindow : IAppWindow
     {

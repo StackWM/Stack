@@ -11,6 +11,7 @@
     using WindowsDesktop;
     using LostTech.Stack.Models;
     using LostTech.Stack.Utils;
+    using LostTech.Stack.WindowManagement;
 
     sealed class WindowDesktopHook: IDisposable, INotifyPropertyChanged
     {

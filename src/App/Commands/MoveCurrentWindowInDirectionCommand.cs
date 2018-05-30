@@ -10,6 +10,8 @@
     using LostTech.Stack.Models;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
+    using LostTech.Stack.WindowManagement;
+    using LostTech.Stack.WindowManagement.WinApi;
     using LostTech.Stack.Zones;
     using PInvoke;
 
@@ -77,8 +79,8 @@
         public event EventHandler CanExecuteChanged;
 #pragma warning restore CS0169
 
-        const double Epsilon = 2;
-        const double LargeValue = 1e9;
+        const float Epsilon = 2;
+        const float LargeValue = 1e9f;
 
         bool MoveCurrentWindow(Vector direction)
         {

@@ -2,8 +2,8 @@
 {
     using System;
     using System.Windows;
-    using System.Windows.Media;
     using JetBrains.Annotations;
+    using LostTech.Stack.Utils;
     using LostTech.Windows;
 
     static class WindowScreenLayouts
@@ -17,24 +17,14 @@
             window.Height = dimensions.Y;
         }
 
-        public static void Center([NotNull] this Window window, [NotNull] Win32Screen screen) {
-            MoveToScreen(window, screen);
-
-            var screenSize = new Vector(screen.WorkingArea.Width, screen.WorkingArea.Height);
-            Vector windowSize = screen.TransformToDevice.Transform(new Vector(window.Width, window.Height));
-            Point topLeft = screen.WorkingArea.TopLeft + (screenSize - windowSize) / 2;
-            topLeft = screen.TransformFromDevice.Transform(topLeft);
-            window.Left = topLeft.X;
-            window.Top = topLeft.Y;
-        }
-
         public static void MoveToScreen([NotNull] Window window, [NotNull] Win32Screen screen) {
             if (screen == null)
                 throw new ArgumentNullException(nameof(screen));
             if (window == null)
                 throw new ArgumentNullException(nameof(window));
 
-            Point topLeft = screen.TransformFromDevice.Transform(screen.WorkingArea.TopLeft);
+            var topLeft = screen.TransformFromDevice.Transform(screen.WorkingArea.TopLeft().ToWPF());
+                //screen.WorkingArea.TopLeft();
             window.Left = topLeft.X;
             window.Top = topLeft.Y;
         }
@@ -46,7 +36,7 @@
         public static void FitToMargin([NotNull] this Window window, [NotNull] Win32Screen screen) {
             MoveToScreen(window, screen);
 
-            Vector wpfScreenSize = screen.TransformFromDevice.Transform((Vector)screen.WorkingArea.Size);
+            Vector wpfScreenSize = screen.TransformFromDevice.Transform(screen.WorkingArea.Size.AsWPFVector());
             double width = wpfScreenSize.X - window.Margin.Left - window.Margin.Right;
             window.Width = Math.Min(width, double.IsNaN(window.MaxWidth) ? width : window.MaxWidth);
             double height = wpfScreenSize.Y - window.Margin.Top - window.Margin.Bottom;
@@ -54,7 +44,7 @@
             Vector sizeFix = new Vector(width - window.Width, height - window.Height) / 2;
             Vector marginOffset = new Vector(window.Margin.Left, window.Margin.Top);
 
-            Point topLeft = screen.TransformFromDevice.Transform(screen.WorkingArea.TopLeft)
+            var topLeft = screen.TransformFromDevice.Transform(screen.WorkingArea.TopLeft().ToWPF())
                             + marginOffset + sizeFix;
             window.Left = topLeft.X;
             window.Top = topLeft.Y;

@@ -187,6 +187,12 @@
       <Component Id="LostTech.Stack.Extensibility.dll" Guid="d2550fa6-9676-46f7-9e8a-f1fe8c907b45">
         <File Id="LostTech.Stack.Extensibility.dll" Name="LostTech.Stack.Extensibility.dll" Source="$(var.App_TargetDir)LostTech.Stack.Extensibility.dll" />
       </Component>
+      <Component Id="LostTech.Stack.WindowManagement.dll" Guid="{AF2BC98A-FFB2-44A9-9928-C8F9C3764BD9}">
+        <File Id="LostTech.Stack.WindowManagement.dll" Name="LostTech.Stack.WindowManagement.dll" Source="$(var.App_TargetDir)LostTech.Stack.WindowManagement.dll" />
+      </Component>
+      <Component Id="LostTech.Stack.WindowManagement.WPF.dll" Guid="{B169ED7B-3656-4B00-B24A-6A92A3A5C2A5}">
+        <File Id="LostTech.Stack.WindowManagement.WPF.dll" Name="LostTech.Stack.WindowManagement.WPF.dll" Source="$(var.App_TargetDir)LostTech.Stack.WindowManagement.WPF.dll" />
+      </Component>
       <Component Id="LostTech.App.DataBinding.dll" Guid="7d36992c-41a0-43c2-9929-4998fbaf6d7d">
         <File Id="LostTech.App.DataBinding.dll" Name="LostTech.App.DataBinding.dll" Source="$(var.App_TargetDir)LostTech.App.DataBinding.dll" />
       </Component>

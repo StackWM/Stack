@@ -84,7 +84,7 @@ namespace LostTech.Stack.Settings
         }
 
         public static string GetDesignation(Win32Screen screen) {
-            Rect area = screen.WorkingArea;
+            var area = screen.WorkingArea;
             return FormattableString.Invariant(
                 $"{(int)area.Width}x{(int)area.Height} @ {(int)area.Left},{(int)area.Top}");
         }

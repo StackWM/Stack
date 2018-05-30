@@ -1,6 +1,9 @@
 ﻿namespace LostTech.Stack.Utils
 {
+    using System.Drawing;
     using System.Windows;
+    using Point = System.Windows.Point;
+    using Rect = System.Drawing.RectangleF;
 
     public static class RectExtensions
     {
@@ -24,7 +27,7 @@
 
         public static double DotProduct(this Vector value, Vector other) => value.X * other.X + value.Y * other.Y;
 
-        public static Rect Inflated(this Rect rect, double x, double y)
+        public static Rect Inflated(this Rect rect, float x, float y)
         {
             if (x < 0 && rect.Width < x)
                 return rect;
@@ -35,8 +38,12 @@
         }
 
         public static bool IsHorizontal(this Rect rect) => rect.Width > rect.Height;
+        public static PointF TopLeft(this Rect rect) => rect.Location;
+        public static PointF TopRight(this Rect rect) => new PointF(rect.Right, rect.Top);
+        public static PointF BottomRight(this Rect rect) => new PointF(rect.Right, rect.Bottom);
+        public static PointF BottomLeft(this Rect rect) => new PointF(rect.Left, rect.Bottom);
 
-        public static Point[] Corners(this Rect rect) =>
-            new[] {rect.TopLeft, rect.TopRight, rect.BottomRight, rect.BottomLeft};
+        public static PointF[] Corners(this Rect rect) =>
+            new[] {rect.TopLeft(), rect.TopRight(), rect.BottomRight(), rect.BottomLeft()};
     }
 }
