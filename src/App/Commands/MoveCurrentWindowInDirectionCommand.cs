@@ -144,24 +144,23 @@
 
             Debug.WriteLineIf(next != null, "going to a zone with the same directional coordinate");
 
-            double GetRank(Zone zone) {
-                double intersectionPercentage =
-                    zone.GetPhysicalBounds().Area().AtLeast(1)
-                    / zone.GetPhysicalBounds().Intersection(strip).Area().AtLeast(1);
+            Rank GetRank(Zone zone) =>
+                new Rank {
+                    IntersectionPercentage =
+                        zone.GetPhysicalBounds().Intersection(strip).Area().AtLeast(1)
+                        / zone.GetPhysicalBounds().Area().AtLeast(1),
 
-                double centerTravelDistance = windowCenter.Diff(zone.GetPhysicalBounds().Center()).Length();
+                    CenterTravelDistance = windowCenter.Diff(zone.GetPhysicalBounds().Center()).Length(),
 
-                return DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction)
-                       * centerTravelDistance
-                       * intersectionPercentage;
-            }
+                    DistanceAlongDirection = DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction),
+                };
 
             next = next
                    // if there are no zones with the same directional coordinate, continue along it
                    ?? allZones.Where(zone =>
                            zone.GetPhysicalBounds().IntersectsWith(strip)
                            && !sameCenter.Contains(zone)
-                           && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction) > 0)
+                           && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction) > Epsilon)
                        .OrderBy(GetRank)
                        .FirstOrDefault();
 
@@ -169,11 +168,11 @@
             var targets = allZones.Where(zone =>
                     zone.GetPhysicalBounds().IntersectsWith(strip)
                     && !sameCenter.Contains(zone)
-                    && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction) > 0)
+                    && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction) > Epsilon)
                 .ToArray();
             Debug.WriteLine("potential targets:");
             foreach (var zone in targets) {
-                Debug.Write($"[{GetRank(zone)}]{zone.GetPhysicalBounds()},");
+                Debug.WriteLine($"[{GetRank(zone)}]{zone.GetPhysicalBounds()},");
             }
             Debug.WriteLine("");
 #endif
@@ -183,6 +182,19 @@
                 Debug.WriteLine($"nowhere to move {window.Title}");
 
             return true;
+        }
+
+        struct Rank: IComparable<Rank>
+        {
+            public double IntersectionPercentage { get; set; }
+            public double CenterTravelDistance { get; set; }
+            public double DistanceAlongDirection { get; set; }
+
+            public double Total =>
+                this.CenterTravelDistance * this.DistanceAlongDirection / this.IntersectionPercentage;
+
+            public override string ToString() => $"{this.Total:F0} i:{this.IntersectionPercentage*100:F0}% c:{this.CenterTravelDistance:F0} d:{this.DistanceAlongDirection:F0}";
+            public int CompareTo(Rank other) => this.Total.CompareTo(other.Total);
         }
 
         static double DistanceAlongDirection(PointF @from, PointF to, PointF direction) => to.Diff(@from).DotProduct(direction);
