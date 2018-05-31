@@ -1,7 +1,9 @@
 ﻿namespace LostTech.Stack.Utils
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Globalization;
     using System.Threading.Tasks;
     using JetBrains.Annotations;
     using Microsoft.HockeyApp;
@@ -9,8 +11,15 @@
     public static class WarningExtensions
     {
         public static void ReportAsWarning(this Exception exception, string prefix = "Warning: ") {
-            if (exception != null)
-                HockeyClient.Current.TrackException(new WarningException(prefix + exception.Message, exception));
+            if (exception != null) {
+                string message = prefix + exception.Message;
+                HockeyClient.Current.TrackTrace(message, SeverityLevel.Warning, properties: new SortedDictionary<string, string> {
+                    [nameof(exception.StackTrace)] = exception.StackTrace,
+                    [nameof(exception.Source)] = exception.Source,
+                    [nameof(exception.HResult)] = exception.HResult.ToString(CultureInfo.InvariantCulture),
+                    [nameof(exception.InnerException)] = exception.InnerException.ToString(),
+                });
+            }
         }
 
         public static void ReportAsWarning([NotNull] this Task<Exception> potentiallyFailingTask, string prefix = "Warning: ") {
