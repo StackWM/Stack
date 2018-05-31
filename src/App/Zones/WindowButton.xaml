@@ -12,12 +12,30 @@
              d:DataContext="{d:DesignInstance vm:DesignTimeWindow, d:IsDesignTimeCreatable=True}"
              >
   <Button Padding="6,4" Click="Window_OnClick"
+          x:Name="ActivateButton"
           Background="{Binding Background, ElementName=Root}"
           Foreground="{Binding Foreground, ElementName=Root}"
           BorderBrush="{Binding BorderBrush, ElementName=Root}"
+          ToolTip="{Binding Title, Mode=OneWay}"
           >
     <Grid>
-      <TextBlock x:Name="TitleText" Text="{Binding Title, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+
+      <TextBlock x:Name="TitleText" Text="{Binding Title, Mode=OneWay}" TextTrimming="CharacterEllipsis"
+                 VerticalAlignment="Center"/>
+      <Button Command="{Binding CloseCommand, Mode=OneWay}" Grid.Column="1"
+              Background="Transparent"
+              Foreground="{Binding Foreground, ElementName=ActivateButton}"
+              MinWidth="14"
+              Padding="2,0"
+              Margin="2,0,0,0"
+              BorderThickness="0"
+              VerticalAlignment="Center"
+              ToolTip="Close"
+              >x</Button>
     </Grid>
   </Button>
 </UserControl>

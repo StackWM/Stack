@@ -7,6 +7,7 @@
     public interface IAppWindow
     {
         Task Move(Rect targetBounds);
+        Task<bool?> Close();
         bool CanMove { get; }
         Rect Bounds { get; }
         string Title { get; }

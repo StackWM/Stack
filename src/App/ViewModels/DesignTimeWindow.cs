@@ -15,6 +15,7 @@
         public bool IsVisibleOnAllDesktops { get; } = false;
         public Task<Exception> Activate() => throw new NotSupportedException();
         public Task<Exception> BringToFront() => throw new NotSupportedException();
+        public Task<bool?> Close() => throw new NotSupportedException();
         public Task Move(Rect targetBounds) => throw new NotSupportedException();
         public bool CanMove => false;
         public event EventHandler Closed;

@@ -2,12 +2,14 @@
 {
     using System;
     using System.ComponentModel;
+    using System.Windows.Input;
     using WindowsDesktop;
     using EventHook.Hooks;
     using JetBrains.Annotations;
     using LostTech.Stack.Models;
     using LostTech.Stack.WindowManagement;
     using LostTech.Stack.Windows;
+    using Prism.Commands;
 
     public class AppWindowViewModel : SimpleViewModel, IDisposable, IEquatable<AppWindowViewModel>
     {
@@ -22,12 +24,18 @@
             this.hook.Minimized += this.HookOnMinimizeChanged;
             this.hook.Unminimized += this.HookOnMinimizeChanged;
             this.hook.TextChanged += this.HookOnTextChanged;
+            this.CloseCommand = new DelegateCommand(async () => {
+                try {
+                    await this.Window.Close();
+                } catch (WindowNotFoundException) {}
+            });
             if (VirtualDesktop.IsSupported) {
                 this.desktopHook = new WindowDesktopHook(window);
                 this.desktopHook.PropertyChanged += this.DesktopHookPropertyChanged;
             }
         }
 
+        public ICommand CloseCommand { get; }
         public string Title => this.Window.Title;
         public bool IsMinimized => this.Window.IsMinimized;
         public Guid? DesktopID => this.desktopHook?.DesktopID;

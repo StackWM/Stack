@@ -58,6 +58,11 @@
             }
         });
 
+        public Task<bool?> Close() => Task.Run(() => {
+            IntPtr result = SendMessage(this.Handle, WindowMessage.WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+            return (bool?)null;
+        });
+
         public bool CanMove =>
             PostMessage(this.Handle, WindowMessage.WM_USER, IntPtr.Zero, IntPtr.Zero)
             || Marshal.GetLastWin32Error() != (int)WinApiErrorCode.ERROR_ACCESS_DENIED;
