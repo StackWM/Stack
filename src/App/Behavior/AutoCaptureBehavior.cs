@@ -65,14 +65,14 @@
             Rect bounds = args.Subject.Layout.GetPhysicalBounds();
             await Task.Factory.StartNew(() =>
                 this.win32WindowFactory
-                    .ForEachTopLevel(window => {
+                    .ForEachTopLevel(async window => {
                         try {
                             Rect intersection = window.Bounds.Intersection(bounds);
                             if (intersection.IsEmpty || intersection.Width < 10 || intersection.Height < 10)
                                 return;
 
                             if (this.win32WindowFactory.DisplayInSwitchToList(window))
-                                this.Capture(window);
+                                await this.Capture(window);
                         } catch (Exception e) {
                             e.ReportAsWarning();
                         }
@@ -88,19 +88,19 @@
         void OnWindowAppeared(object sender, EventArgs<IAppWindow> args) {
             if (this.settings.CaptureOnAppStart)
                 Task.Factory.StartNew(async () => {
-                            this.Capture(args.Subject);
+                            await this.Capture(args.Subject);
                             await Task.Delay(300);
-                            this.Capture(args.Subject);
+                            await this.Capture(args.Subject);
                         })
                     .ReportAsWarning();
         }
 
         void Capture() {
             this.win32WindowFactory
-                .ForEachTopLevel(window => {
+                .ForEachTopLevel(async window => {
                     try {
                         if (this.win32WindowFactory.DisplayInSwitchToList(window))
-                            this.Capture(window);
+                            await this.Capture(window);
                     } catch (Exception e) {
                         e.ReportAsWarning();
                     }
@@ -108,7 +108,7 @@
                 .ReportAsWarning();
         }
 
-        async void Capture([NotNull] IAppWindow window) {
+        async Task Capture([NotNull] IAppWindow window) {
             if (window == null)
                 throw new ArgumentNullException(nameof(window));
 
@@ -134,9 +134,11 @@
                 if (retryAttempts == 0)
                     return;
 
-                await Task.Factory.StartNew(() => {
+                await Task.Factory.StartNew(async () => {
                     if (this.layoutManager.GetLocation(window, searchSuspended: true) != null)
                         return;
+
+                    await Task.WhenAll(this.layouts.ScreenLayouts.Active().Select(l => Layout.GetReady(l.Layout)));
 
                     Zone targetZone = this.layouts.ScreenLayouts.Active()
                         .SelectMany(layout => layout.Zones.Final())
@@ -148,17 +150,17 @@
                         this.layoutManager.Move(window, targetZone);
                         Debug.WriteLine($"move {window.Title} to {targetZone.GetPhysicalBounds()}");
                     }
-                }, CancellationToken.None, TaskCreationOptions.None, this.taskScheduler);
-            } catch (WindowNotFoundException) { }
+                }, CancellationToken.None, TaskCreationOptions.None, this.taskScheduler).Unwrap();
+            } catch (WindowNotFoundException) { } catch (OperationCanceledException) { }
         }
 
-        void OnWindowActivated(object sender, WindowEventArgs e) {
+        async void OnWindowActivated(object sender, WindowEventArgs e) {
             // HACK: track foreground windows to see if they need to be captured
             // needed because OnWindowAppeared in unreliable for cloacked windows
             // see https://stackoverflow.com/questions/32149880/how-to-identify-windows-10-background-store-processes-that-have-non-displayed-wi
             IAppWindow foreground = this.win32WindowFactory.Foreground;
             if (foreground != null)
-                this.Capture(foreground);
+                await Task.Run(() => this.Capture(foreground)).ConfigureAwait(false);
         }
 
         static double LocationError(Rect bounds, [NotNull] Zone zone) {

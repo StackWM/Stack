@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -15,6 +16,7 @@
     using LostTech.Stack.Zones;
     using LostTech.Windows;
     using MahApps.Metro.Controls;
+    using Microsoft.Win32;
     using PInvoke;
 
     /// <summary>
@@ -30,16 +32,22 @@
             this.Show();
             // this also makes window to be visible on all virtual desktops
             this.SetIsListedInTaskSwitcher(false);
+            SystemEvents.SessionSwitch += this.OnSessionSwitch;
         }
 
         public void SetLayout(FrameworkElement layout) {
             layout.Width = layout.Height = double.NaN;
             this.Content = layout;
+            var readiness = new TaskCompletionSource<bool>();
+            Stack.Zones.Layout.SetReady(layout, readiness.Task);
 
             layout.Loaded += delegate {
-                if (this.windowPositioned)
+                if (this.windowPositioned) {
                     this.ready.TrySetResult(true);
+                    readiness.TrySetResult(true);
+                }
             };
+            layout.Unloaded += delegate { readiness.TrySetCanceled(); };
         }
 
         public FrameworkElement Layout => this.Content as FrameworkElement;
@@ -73,6 +81,16 @@
                 break;
             }
             return IntPtr.Zero;
+        }
+
+        void OnSessionSwitch(object sender, SessionSwitchEventArgs e) {
+            switch (e.Reason) {
+            case SessionSwitchReason.ConsoleConnect:
+            case SessionSwitchReason.RemoteConnect:
+            case SessionSwitchReason.SessionUnlock:
+                this.AdjustToScreenWhenIdle();
+                break;
+            }
         }
 
         Win32Screen lastScreen;
@@ -169,6 +187,7 @@
                     await Task.Delay(400);
                     continue;
                 }
+                Debug.WriteLine($"adjusting {this.Title} to {this.Screen.WorkingArea}");
                 this.AdjustToClientArea(this.Screen);
                 this.Visibility = visibility;
                 this.Opacity = opacity;
