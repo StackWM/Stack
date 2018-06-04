@@ -62,6 +62,8 @@
 
             await Task.Yield();
 
+            await Layout.GetReady(args.Subject.Layout);
+
             Rect bounds = args.Subject.Layout.GetPhysicalBounds();
             await Task.Factory.StartNew(() =>
                 this.win32WindowFactory
@@ -120,9 +122,10 @@
                 while (retryAttempts > 0) {
                     if (window.IsMinimized || !window.IsVisible
                                            || !window.IsResizable || bounds.IsEmpty
-                                           || !window.IsOnCurrentDesktop
                                            || !window.CanMove
-                                           || string.IsNullOrEmpty(window.Title)) {
+                                           || string.IsNullOrEmpty(window.Title)
+                                           || !window.IsOnCurrentDesktop
+                                           ) {
                         await Task.Delay(retryDelay).ConfigureAwait(false);
                         retryDelay = new TimeSpan(retryDelay.Ticks * 2);
                     } else
