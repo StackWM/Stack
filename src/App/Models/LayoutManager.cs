@@ -195,13 +195,6 @@
                 // TODO: determine if window appeared in an existing zone, and if it needs to be moved
                 this.locations.Add(window, null);
             }
-#if DEBUG
-            if (VirtualDesktop.IsSupported)
-                try {
-                    Debug.WriteLineIf(!this.windowFactory.Create(app.HWnd).IsOnCurrentDesktop,
-                        $"Window {app.AppTitle} appeared on inactive desktop");
-                } catch (WindowNotFoundException) { }
-#endif
 
 #if DEBUG
             this.DecideInitialZone(app)
