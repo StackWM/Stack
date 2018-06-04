@@ -43,7 +43,7 @@
             this.applicationWatcher.Start();
             this.taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
-            if (VirtualDesktop.IsSupported)
+            if (VirtualDesktop.HasMinimalSupport)
                 this.InitVirtualDesktopSupport();
         }
 
@@ -118,8 +118,8 @@
             try {
                 Guid? newDesktop = window.DesktopID;
                 switch (e.PropertyName) {
-                case nameof(AppWindowViewModel.DesktopID) when VirtualDesktop.IsSupported:
-                    bool nowVisible = underlyingWindow.IsVisibleOnAllDesktops || underlyingWindow.IsOnCurrentDesktop;
+                case nameof(AppWindowViewModel.DesktopID) when VirtualDesktop.HasMinimalSupport:
+                    bool nowVisible = underlyingWindow.IsOnCurrentDesktop;
                     Zone currentZone;
                     lock (this.locations)
                         this.locations.TryGetValue(underlyingWindow, out currentZone);
@@ -253,7 +253,7 @@
 
                     foreach (AppWindowViewModel appWindow in activeZone.Windows.ToArray())
                         try {
-                            if (!appWindow.Window.IsVisibleOnAllDesktops) {
+                            if (!appWindow.Window.IsOnCurrentDesktop) {
                                 zoneSuspendList.Add(appWindow);
                                 Debug.WriteLine($"suspended layout of: {appWindow.Title}");
                                 activeZone.Windows.Remove(appWindow);
@@ -349,7 +349,7 @@
             this.applicationWatcher.OnApplicationWindowChange -= this.OnApplicationWindowChange;
             this.applicationWatcher.Stop();
             this.eventHookFactory.Dispose();
-            if (VirtualDesktop.IsSupported)
+            if (VirtualDesktop.HasMinimalSupport)
                 this.DisposeVirtualDesktopSupport();
 
             List<AppWindowViewModel> windows;

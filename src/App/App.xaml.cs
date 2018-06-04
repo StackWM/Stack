@@ -203,7 +203,7 @@
                 this.trayIcon.ShowBalloonTip(30);
             }
 
-            if (WindowsDesktop.VirtualDesktop.IsPresent && !WindowsDesktop.VirtualDesktop.IsSupported) {
+            if (WindowsDesktop.VirtualDesktop.IsPresent && !WindowsDesktop.VirtualDesktop.HasMinimalSupport) {
                 WindowsDesktop.VirtualDesktop.InitializationException.ReportAsWarning();
                 this.NonCriticalErrorHandler(this, new ErrorEventArgs(new Exception(
                     message: "Your OS has Virtual Desktops, but this version of API is not supported. You might notice Stack behaving weird when using Virtual Desktops.",

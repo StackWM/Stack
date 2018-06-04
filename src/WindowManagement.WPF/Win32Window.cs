@@ -124,7 +124,7 @@
         public bool IsValid => IsWindow(this.Handle);
         public bool IsOnCurrentDesktop {
             get {
-                if (!VirtualDesktop.IsSupported)
+                if (!VirtualDesktop.HasMinimalSupport)
                     return true;
 
                 try {
@@ -145,6 +145,8 @@
                 }
             }
         }
+
+        [Obsolete("This API may not be supported in this version")]
         public bool IsVisibleOnAllDesktops {
             get {
                 if (!VirtualDesktop.IsSupported)

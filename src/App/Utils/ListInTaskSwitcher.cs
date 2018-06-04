@@ -25,7 +25,7 @@
                 : style | WindowStylesEx.WS_EX_TOOLWINDOW;
             return SetWindowLong(helper.Handle, WindowLongIndexFlags.GWL_EXSTYLE,
                        (SetWindowLongFlags)style) == 0
-                ? new Win32Exception().Capture() : null;
+                ? new Win32Exception() : null;
         }
     }
 }

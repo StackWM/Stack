@@ -29,7 +29,7 @@
                     await this.Window.Close();
                 } catch (WindowNotFoundException) {}
             });
-            if (VirtualDesktop.IsSupported) {
+            if (VirtualDesktop.HasMinimalSupport) {
                 this.desktopHook = new WindowDesktopHook(window);
                 this.desktopHook.PropertyChanged += this.DesktopHookPropertyChanged;
             }
