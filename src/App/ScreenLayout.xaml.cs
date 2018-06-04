@@ -203,14 +203,15 @@
                 this.Opacity = opacity;
                 this.windowPositioned = true;
                 this.InvalidateMeasure();
-                if (this.Layout != null) {
-                    await Task.Yield();
-                    this.ready.TrySetResult(true);
-                }
 
                 if (Math.Abs(this.RenderSize.Width - this.Width) < 10
-                    && Math.Abs(this.RenderSize.Height - this.Height) < 10)
+                    && Math.Abs(this.RenderSize.Height - this.Height) < 10) {
+                    if (this.Layout != null) {
+                        await Task.Yield();
+                        this.ready.TrySetResult(true);
+                    }
                     return;
+                }
                 else
                     await Task.Delay(400);
             }
