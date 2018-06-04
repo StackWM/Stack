@@ -5,6 +5,8 @@
     using System.ComponentModel;
     using System.Diagnostics;
     using System.Linq;
+    using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
@@ -77,7 +79,8 @@
         {
             switch ((User32.WindowMessage) msg) {
             case User32.WindowMessage.WM_SETTINGCHANGE:
-                this.AdjustToScreenWhenIdle();
+                string reason = "OnWindowMessage:" + (lParam == IntPtr.Zero ? null : Marshal.PtrToStringAuto(lParam));
+                this.AdjustToScreenWhenIdle(reason);
                 break;
             }
             return IntPtr.Zero;
@@ -152,18 +155,22 @@
         {
             base.OnDpiChanged(oldDpi, newDpi);
 
+            Debug.WriteLine($"{this.Screen} DPI: {oldDpi.PixelsPerInchX} -> {newDpi.PixelsPerInchX}");
+
             this.AdjustToScreenWhenIdle();
         }
 
         Task idleAdjustDelay;
-        async void AdjustToScreenWhenIdle() {
+        async void AdjustToScreenWhenIdle([CallerMemberName] string callerName = null) {
             var delay = Task.Delay(millisecondsDelay: 500);
             this.idleAdjustDelay = delay;
             await Task.WhenAll(delay, this.loaded.Task);
             if (delay != this.idleAdjustDelay)
                 return;
-            if (this.IsLoaded)
+            if (this.IsLoaded) {
                 this.AdjustToScreen();
+                Debug.WriteLine($"adjust caused by {callerName}");
+            }
         }
 
         readonly TaskCompletionSource<bool> ready = new TaskCompletionSource<bool>();
@@ -180,23 +187,32 @@
 
                 var opacity = this.Opacity;
                 var visibility = this.Visibility;
-                this.Opacity = 0;
-                try {
-                    this.Show();
-                } catch (InvalidOperationException) {
-                    await Task.Delay(400);
-                    continue;
+                if (visibility != Visibility.Visible) {
+                    this.Opacity = 0;
+                    try {
+                        this.Show();
+                    } catch (InvalidOperationException) {
+                        await Task.Delay(400);
+                        continue;
+                    }
                 }
+
                 Debug.WriteLine($"adjusting {this.Title} to {this.Screen.WorkingArea}");
                 this.AdjustToClientArea(this.Screen);
                 this.Visibility = visibility;
                 this.Opacity = opacity;
                 this.windowPositioned = true;
+                this.InvalidateMeasure();
                 if (this.Layout != null) {
                     await Task.Yield();
                     this.ready.TrySetResult(true);
                 }
-                return;
+
+                if (Math.Abs(this.RenderSize.Width - this.Width) < 10
+                    && Math.Abs(this.RenderSize.Height - this.Height) < 10)
+                    return;
+                else
+                    await Task.Delay(400);
             }
         }
 

@@ -14,6 +14,8 @@
 
             var size = new Vector(screen.WorkingArea.Width, screen.WorkingArea.Height);
             var dimensions = screen.TransformFromDevice.Transform(size);
+            // this is a hack to force layout recompute. InvalidateMeasure does not help
+            window.Width = dimensions.X - 1;
             window.Width = dimensions.X;
             window.Height = dimensions.Y;
         }

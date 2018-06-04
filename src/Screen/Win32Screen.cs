@@ -126,6 +126,13 @@
                     this.OnPropertyChanged(nameof(this.WorkingArea));
                     Debug.WriteLine($"screen {this.ID} new working area: {this.workingArea.Width}x{this.workingArea.Height}");
                 }
+
+                if (this.ToDeviceScale != this.lastToDeviceScale) {
+                    this.lastToDeviceScale = this.ToDeviceScale;
+                    this.OnPropertyChanged(nameof(TransformToDevice));
+                    this.OnPropertyChanged(nameof(TransformFromDevice));
+                }
+
                 this.dirty = true;
                 return;
             }
@@ -155,6 +162,7 @@
             }
         }
 
+        double lastToDeviceScale = 1;
         double ToDeviceScale => this.WindowToDeviceScale(this.HwndSource);
 
         public double WindowToDeviceScale(HwndSource windowHandleSource) {
