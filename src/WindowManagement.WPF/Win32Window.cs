@@ -9,7 +9,6 @@
     using LostTech.Stack.WindowManagement.WinApi;
     using PInvoke;
     using static PInvoke.User32;
-
     using Win32Exception = System.ComponentModel.Win32Exception;
     using Rect = System.Drawing.RectangleF;
 
@@ -36,6 +35,9 @@
 
             if (this.SuppressSystemMargin && !this.excludeFromMargin.Value) {
                 RECT systemMargin = GetSystemMargin(this.Handle);
+#if DEBUG
+                Debug.WriteLine($"{this.Title} compensating system margin {systemMargin.left},{systemMargin.top},{systemMargin.right},{systemMargin.bottom}");
+#endif
                 targetBounds.X -= systemMargin.left;
                 targetBounds.Y -= systemMargin.top;
                 targetBounds.Width = Math.Max(0, targetBounds.Width + systemMargin.left + systemMargin.right);
@@ -53,6 +55,9 @@
             } else {
                 // TODO: option to not activate on move
                 await Task.Yield();
+#if DEBUG
+                Debug.WriteLine($"{this.Title} final rect: {targetBounds}");
+#endif
                 MoveWindow(this.Handle, (int)targetBounds.Left, (int)targetBounds.Top, (int)targetBounds.Width,
                     (int)targetBounds.Height, bRepaint: RepaintOnMove);
             }
@@ -228,7 +233,14 @@
             if (processID == 0)
                 return false;
             try {
-                return Process.GetProcessById(processID).ProcessName == "explorer";
+                Process process = Process.GetProcessById(processID);
+                switch (process.ProcessName) {
+                case "explorer":
+                case "Everything":
+                    return true;
+                default:
+                    return false;
+                }
             } catch (ArgumentException) { } catch (InvalidOperationException) { }
             catch (Exception e) {
                 Debug.WriteLine(e);
