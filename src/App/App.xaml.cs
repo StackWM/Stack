@@ -47,6 +47,8 @@
     using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
     using static System.FormattableString;
     using static PInvoke.User32;
+    using Brushes = System.Windows.Media.Brushes;
+    using Color = System.Windows.Media.Color;
     using MessageBox = System.Windows.MessageBox;
     using XmlDocument = global::Windows.Data.Xml.Dom.XmlDocument;
     using Rect = System.Drawing.RectangleF;
@@ -679,6 +681,7 @@
                 this.screenLayouts.Add(layout);
             }
 
+            var layoutBounds = new Dictionary<ScreenLayout, Rect>();
             void RemoveLayoutForScreen(Win32Screen screen) {
                 ScreenLayout layout = this.screenLayouts.FirstOrDefault(l => l.Screen?.ID == screen.ID);
                 if (layout != null) {
@@ -688,6 +691,7 @@
                     try {
                         layout.Close();
                     } catch (InvalidOperationException) { }
+                    layoutBounds.Remove(layout);
                     this.screenLayouts.Remove(layout);
                 }
             }
@@ -700,6 +704,10 @@
                 await delay;
                 if (changeGroupTasks.TryGetValue(layout, out var changeGroupTask) && delay.Equals(changeGroupTask)) {
                     changeGroupTasks.Remove(layout);
+                    Rect newBounds = layout.GetPhysicalBounds();
+                    if (layoutBounds.TryGetValue(layout, out var bounds) && newBounds.Equals(bounds))
+                        return;
+                    layoutBounds[layout] = newBounds;
                     await this.ReloadLayout(layout);
                 } else
                     Debug.WriteLine("grouped updates!");
