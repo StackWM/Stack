@@ -12,8 +12,9 @@
     using System.Windows.Forms;
     using LostTech.App;
     using LostTech.Stack.DataBinding;
-    using LostTech.Stack.Models;
     using LostTech.Stack.Settings;
+    using LostTech.Stack.Utils;
+    using LostTech.Stack.WindowManagement;
     using LostTech.Windows;
     using Microsoft.VisualBasic;
     using PCLStorage;
@@ -28,7 +29,7 @@
         public NotifyIcon Icon { get; }
         readonly StackSettings stackSettings;
         readonly IFolder layoutsFolder;
-        readonly About aboutWindow = new About();
+        readonly Lazy<About> aboutWindow = new Lazy<About>(() => new About(), isThreadSafe: false);
 
         TrayIcon(NotifyIcon trayIcon, StackSettings stackSettings, IFolder layoutsFolder)
         {
@@ -96,7 +97,10 @@
             help.DropDownItems.Add(Link("Telegram Community","https://t.me/joinchat/HCVquw4yDSmwxky5pxxKZw"));
             help.DropDownItems.Add(Link("Ask a Question", "https://www.allanswered.com/community/s/stack-wm/"));
             help.DropDownItems.Add(Link("What's New", "https://losttech.software/stack-whatsnew-free.html"));
-            help.DropDownItems.Add("About", image: null, onClick: (_, __) => this.aboutWindow.Show());
+            help.DropDownItems.Add("About", image: null, onClick: (_, __) => {
+                this.aboutWindow.Value.Show();
+                this.aboutWindow.Value.TryGetNativeWindow()?.BringToFront().ReportAsWarning(prefix: "Warning: Can't bring About to front: ");
+            });
             return help;
         }
 
