@@ -17,7 +17,7 @@
                     [nameof(exception.StackTrace)] = exception.StackTrace,
                     [nameof(exception.Source)] = exception.Source,
                     [nameof(exception.HResult)] = exception.HResult.ToString(CultureInfo.InvariantCulture),
-                    [nameof(exception.InnerException)] = exception.InnerException.ToString(),
+                    [nameof(exception.InnerException)] = exception.InnerException?.ToString(),
                 });
             }
         }
