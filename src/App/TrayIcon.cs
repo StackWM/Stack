@@ -31,7 +31,7 @@
         public NotifyIcon Icon { get; }
         readonly StackSettings stackSettings;
         readonly IFolder layoutsFolder;
-        readonly About aboutWindow = new About();
+        readonly Lazy<About> aboutWindow = new Lazy<About>(() => new About(), isThreadSafe: false);
 
         TrayIcon(NotifyIcon trayIcon, StackSettings stackSettings, IFolder layoutsFolder)
         {
@@ -110,8 +110,8 @@
             help.DropDownItems.Add(Link("Ask a Question", "https://www.allanswered.com/community/s/stack-wm/"));
             help.DropDownItems.Add(Link("What's New", "https://losttech.software/stack-whatsnew.html"));
             help.DropDownItems.Add("About", image: null, onClick: (_, __) => {
-                this.aboutWindow.Show();
-                this.aboutWindow.TryGetNativeWindow()?.BringToFront().ReportAsWarning();
+                this.aboutWindow.Value.Show();
+                this.aboutWindow.Value.TryGetNativeWindow()?.BringToFront().ReportAsWarning();
             });
             return help;
         }
