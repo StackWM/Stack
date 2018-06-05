@@ -75,7 +75,7 @@
             Title = nameof(winApiHandler),
         };
 
-        SettingsWindow SettingsWindow { get; set; }
+        Lazy<SettingsWindow> settingsWindow;
 
         DragHook dragHook;
         StackSettings stackSettings;
@@ -189,7 +189,7 @@
                 return;
             }
 
-            this.SettingsWindow = new SettingsWindow{ DataContext = settings };
+            this.settingsWindow = new Lazy<SettingsWindow>(() => new SettingsWindow{ DataContext = settings }, isThreadSafe: false);
 
             this.SetupScreenHooks();
 
@@ -757,7 +757,7 @@
         }
 
         async Task<NotifyIcon> StartTrayIcon(StackSettings settings) {
-            var trayIcon = (await TrayIcon.StartTrayIcon(this.layoutsFolder, this.layoutsDirectory, settings, this.screenProvider, this.SettingsWindow)).Icon;
+            var trayIcon = (await TrayIcon.StartTrayIcon(this.layoutsFolder, this.layoutsDirectory, settings, this.screenProvider, this.settingsWindow)).Icon;
             trayIcon.BalloonTipClicked += (sender, args) => MessageBox.Show(this.trayIcon.BalloonTipText,
                 trayIcon.BalloonTipTitle,
                 MessageBoxButton.OK,

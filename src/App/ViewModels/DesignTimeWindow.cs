@@ -8,6 +8,7 @@
     {
         public string Title { get; } = nameof(DesignTimeWindow);
         public Rect Bounds => new Rect();
+        public Task<Rect> GetBounds() => Task.FromResult(this.Bounds);
         public bool IsMinimized { get; } = false;
         public bool IsResizable { get; } = true;
         public bool IsVisible { get; } = true;

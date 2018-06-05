@@ -96,6 +96,8 @@
             }
         }
 
+        public Task<Rect> GetBounds() => Task.Run(() => this.Bounds);
+
         public string Title {
             get {
                 try {
@@ -117,10 +119,21 @@
         }
 
         public bool IsMinimized => IsIconic(this.Handle);
-        public bool IsVisible => IsWindowVisible(this.Handle)
-                                 && (!VirtualDesktop.IsSupported
-                                     // see https://stackoverflow.com/questions/32149880/how-to-identify-windows-10-background-store-processes-that-have-non-displayed-wi
-                                     || VirtualDesktop.IdFromHwnd(this.Handle) != null && VirtualDesktop.IdFromHwnd(this.Handle) != Guid.Empty);
+        public bool IsVisible {
+            get {
+                if (!IsWindowVisible(this.Handle))
+                    return false;
+                if (!VirtualDesktop.HasMinimalSupport)
+                    return true;
+                var desktopId = VirtualDesktop.IdFromHwnd(this.Handle);
+                if (desktopId == null) {
+                    this.Closed?.Invoke(this, EventArgs.Empty);
+                    throw new WindowNotFoundException();
+                }
+                return desktopId != null && desktopId != Guid.Empty;
+            }
+        }
+
         public bool IsValid => IsWindow(this.Handle);
         public bool IsOnCurrentDesktop {
             get {

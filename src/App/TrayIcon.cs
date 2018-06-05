@@ -40,7 +40,11 @@
             this.layoutsFolder = layoutsFolder ?? throw new ArgumentNullException(nameof(layoutsFolder));
         }
 
-        public static async Task<TrayIcon> StartTrayIcon(IFolder layoutsFolder, ObservableDirectory layoutsDirectory, StackSettings stackSettings, IScreenProvider screenProvider, SettingsWindow settingsWindow)
+        public static async Task<TrayIcon> StartTrayIcon(
+            IFolder layoutsFolder, ObservableDirectory layoutsDirectory,
+            StackSettings stackSettings,
+            IScreenProvider screenProvider, 
+            Lazy<SettingsWindow> settingsWindow)
         {
             var contextMenu = new ContextMenuStrip();
 
@@ -53,13 +57,13 @@
             }, stackSettings, layoutsFolder);
 
             contextMenu.Items.Add("Settings", image: null, onClick: (_, __) => {
-                settingsWindow.Show();
-                settingsWindow.TryGetNativeWindow()?.BringToFront().ReportAsWarning();
+                settingsWindow.Value.Show();
+                settingsWindow.Value.TryGetNativeWindow()?.BringToFront().ReportAsWarning();
             })
                 .Font = new Font(contextMenu.Font, FontStyle.Bold);
             trayIcon.Icon.DoubleClick += delegate {
-                settingsWindow.Show();
-                settingsWindow.TryGetNativeWindow()?.BringToFront().ReportAsWarning();
+                settingsWindow.Value.Show();
+                settingsWindow.Value.TryGetNativeWindow()?.BringToFront().ReportAsWarning();
             };
 
             contextMenu.Items.Add(trayIcon.CreateHelpMenu());

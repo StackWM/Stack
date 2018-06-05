@@ -115,15 +115,16 @@
                 throw new ArgumentNullException(nameof(window));
 
             try {
-                Rect bounds = window.Bounds;
+                Rect bounds = Rect.Empty;
 
                 TimeSpan retryDelay = TimeSpan.FromMilliseconds(500);
                 int retryAttempts = 5;
                 while (retryAttempts > 0) {
                     if (window.IsMinimized || !window.IsVisible
-                                           || !window.IsResizable || bounds.IsEmpty
+                                           || !window.IsResizable
                                            || !window.CanMove
                                            || string.IsNullOrEmpty(window.Title)
+                                           || (bounds = await window.GetBounds()).IsEmpty
                                            || !window.IsOnCurrentDesktop
                                            ) {
                         await Task.Delay(retryDelay).ConfigureAwait(false);
