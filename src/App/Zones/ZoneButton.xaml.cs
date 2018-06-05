@@ -41,11 +41,13 @@
             if (first == null)
                 return;
 
+#if !PROFILE
             if (!App.IsUwp) {
                 ErrorEventArgs error = ExtraFeatures.PaidFeature("Tabs: Zone Buttons");
                 this.problems.Add(error.GetException().Message);
                 this.ProblemOccurred?.Invoke(this, error);
             }
+#endif
 
             await first.Window.Activate();
 

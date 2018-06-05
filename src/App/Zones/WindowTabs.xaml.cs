@@ -32,6 +32,9 @@
                 new PropertyMetadata(new ArrayList()) { CoerceValueCallback = CoerceSource });
 
         static object CoerceSource(DependencyObject d, object baseValue) {
+#if PROFILE
+            return baseValue;
+#else
             if (App.IsUwp)
                 return baseValue;
 
@@ -40,6 +43,7 @@
             tabs?.ProblemOccurred?.Invoke(tabs, error);
             tabs?.problems.Add(error.GetException().Message);
             return null;
+#endif
         }
 
         #region Visibility Condition

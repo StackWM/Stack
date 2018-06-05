@@ -113,15 +113,18 @@
             this.winApiHandler.Show();
 
             if (!IsUwp) {
+#if !PROFILE
                 this.BeginCheckForUpdates();
                 this.updateTimer = new DispatcherTimer(DispatcherPriority.Background) {
                     Interval = TimeSpan.FromDays(1),
                     IsEnabled = true,
                 };
                 this.updateTimer.Tick += (_, __) => this.BeginCheckForUpdates();
+#endif
             } else {
                 DesktopNotificationManagerCompat.RegisterActivator<UrlNotificationActivator>();
             }
+
 
             if (await Expiration.HasExpired()) {
                 this.Shutdown(2);
@@ -310,6 +313,7 @@
         }
 
         static void TelemetryHeartbeat(object sender, EventArgs e) {
+#if !PROFILE
             HockeyClient.Current.TrackEvent("Heartbeat", new Dictionary<string, string> {
                 [nameof(HeartbeatIntervalMinutes)] = Invariant($"{HeartbeatIntervalMinutes}"),
                 [nameof(Expiration.IsDomainUser)] = Invariant($"{Expiration.IsDomainUser()}"),
@@ -317,6 +321,7 @@
                 [nameof(Uptime)] = Invariant($"{Uptime}"),
                 [nameof(IsUwp)] = Invariant($"{IsUwp}"),
             });
+#endif
         }
 
         static void EnableJitDebugging()
@@ -896,6 +901,9 @@
                 } else {
                     string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                     path = Path.Combine(appData, "Lost Tech LLC", nameof(Stack));
+#if PROFILE
+                    path = Path.Combine(path, "PROFILING");
+#endif
                 }
                 return Directory.CreateDirectory(path);
             }
@@ -913,6 +921,9 @@
                 } else {
                     var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                     path = Path.Combine(appData, "Lost Tech LLC", nameof(Stack));
+#if PROFILE
+                    path = Path.Combine(path, "PROFILING");
+#endif
                 }
                 return Directory.CreateDirectory(path);
             }

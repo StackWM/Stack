@@ -29,14 +29,18 @@
         public IAppWindow Window => this.ViewModel?.Window;
 
         void Window_OnClick(object sender, RoutedEventArgs e) {
+#if !PROFILE
             if (App.IsUwp) {
+#endif
                 this.Window?.Activate();
                 return;
+#if !PROFILE
             }
 
             ErrorEventArgs error = ExtraFeatures.PaidFeature("Tabs: Window Buttons");
             this.problems.Add(error.GetException().Message);
             this.ProblemOccurred?.Invoke(this, error);
+#endif
         }
 
         public bool IsForeground => (bool)this.GetValue(IsForegroundPropertyKey.DependencyProperty);

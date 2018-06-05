@@ -46,8 +46,10 @@
         public ItemsPanelTemplate Layout {
             get => (ItemsPanelTemplate)this.GetValue(LayoutProperty);
             set {
+#if !PROFILE
                 if (!App.IsUwp)
                     return;
+#endif
 
                 this.SetValue(LayoutProperty, value);
             }
@@ -63,6 +65,9 @@
                     coerceValueCallback: CoerceLayout));
 
         static object CoerceLayout(DependencyObject d, object baseValue) {
+#if PROFILE
+            return baseValue;
+#else
             if (App.IsUwp)
                 return baseValue;
 
@@ -71,6 +76,7 @@
             zone?.ProblemOccurred?.Invoke(zone, error);
             zone?.loadProblems.Add(error.GetException().Message);
             return DefaultItemsPanelTemplate;
+#endif
         }
 
         readonly List<string> loadProblems = new List<string>();
