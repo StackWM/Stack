@@ -49,6 +49,7 @@
                 Height = 1,
             };
             this.detectorWindow.Show();
+            this.detectorWindow.DpiChanged += delegate { this.BeginUpdateWorkingArea(); };
             try {
                 this.presentationSource = PresentationSource.FromVisual(this.detectorWindow);
                 this.SetPosition();
