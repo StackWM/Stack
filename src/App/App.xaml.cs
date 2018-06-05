@@ -381,10 +381,11 @@
         volatile bool disableDragHandler = false;
         void ShowLayoutGrid() {
             foreach (ScreenLayout screenLayout in this.screenLayouts.Active()) {
-                if (Layout.GetVersion(screenLayout.Layout) < Layout.Version.Min.PermanentlyVisible)
+                if (screenLayout.Layout == null || Layout.GetVersion(screenLayout.Layout) < Layout.Version.Min.PermanentlyVisible)
                     screenLayout.Show();
                 //screenLayout.TryEnableGlassEffect();
-                screenLayout.ViewModel.ShowHints = true;
+                if (screenLayout.ViewModel != null)
+                    screenLayout.ViewModel.ShowHints = true;
                 screenLayout.Background = LayoutBackground;
                 screenLayout.Opacity = 0.7;
 
@@ -434,10 +435,11 @@
 
         void HideLayoutGrid() {
             foreach (var screenLayout in this.screenLayouts) {
-                if (Layout.GetVersion(screenLayout.Layout) < Layout.Version.Min.PermanentlyVisible)
+                if (screenLayout.Layout == null || Layout.GetVersion(screenLayout.Layout) < Layout.Version.Min.PermanentlyVisible)
                     screenLayout.Hide();
                 screenLayout.Topmost = false;
-                screenLayout.ViewModel.ShowHints = false;
+                if (screenLayout.ViewModel != null)
+                    screenLayout.ViewModel.ShowHints = false;
                 screenLayout.Background = Brushes.Transparent;
                 screenLayout.Opacity = 1;
                 //screenLayout.TryDisableGlassEffect();
