@@ -72,6 +72,7 @@
             ShowInTaskbar = false,
             WindowStyle = WindowStyle.None,
             Width=0,Height=0,
+            ResizeMode = ResizeMode.NoResize,
             Title = nameof(stackInstanceWindow),
         };
 
@@ -111,6 +112,7 @@
 
             this.MainWindow = this.stackInstanceWindow;
             this.stackInstanceWindow.Show();
+            this.stackInstanceWindow.Hide();
 
             if (!IsUwp) {
 #if !PROFILE
