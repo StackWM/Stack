@@ -12,7 +12,7 @@
         Loaded="ScreenLayoutSelector_OnLoaded"
         Background="White"
         ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="Manual"
         FocusManager.FocusedElement="{Binding ElementName=Layouts}"
         MaxWidth="1366" MaxHeight="1600"
         Margin="120"
