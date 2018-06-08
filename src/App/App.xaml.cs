@@ -66,13 +66,13 @@
         NotifyIcon trayIcon;
         IFolder localSettingsFolder, roamingSettingsFolder;
 
-        readonly Window winApiHandler = new Window {
+        readonly Window stackInstanceWindow = new Window {
             Opacity = 0,
             AllowsTransparency = true,
             ShowInTaskbar = false,
             WindowStyle = WindowStyle.None,
             Width=0,Height=0,
-            Title = nameof(winApiHandler),
+            Title = nameof(stackInstanceWindow),
         };
 
         Lazy<SettingsWindow> settingsWindow;
@@ -109,8 +109,8 @@
 
             StopRunningInstances();
 
-            this.MainWindow = this.winApiHandler;
-            this.winApiHandler.Show();
+            this.MainWindow = this.stackInstanceWindow;
+            this.stackInstanceWindow.Show();
 
             if (!IsUwp) {
 #if !PROFILE
@@ -183,7 +183,7 @@
             }
             settings.Notifications.WhatsNewVersionSeen = Version.Major;
 
-            if (!this.winApiHandler.IsLoaded) {
+            if (!this.stackInstanceWindow.IsLoaded) {
                 if (termsVersionMismatch)
                     Restart();
                 return;
@@ -191,9 +191,7 @@
 
             this.settingsWindow = new Lazy<SettingsWindow>(() => new SettingsWindow{ DataContext = settings }, isThreadSafe: false);
 
-            this.SetupScreenHooks();
-
-            this.winApiHandler.Closed += (sender, args) => this.BeginShutdown();
+            this.stackInstanceWindow.Closed += (sender, args) => this.BeginShutdown();
 
             await this.StartLayout(settings);
 
@@ -252,7 +250,7 @@
         {
             var currentWindow = IntPtr.Zero;
             while (true) {
-                currentWindow = FindWindowEx(IntPtr.Zero, currentWindow, null, nameof(winApiHandler));
+                currentWindow = FindWindowEx(IntPtr.Zero, currentWindow, null, nameof(stackInstanceWindow));
                 if (currentWindow != IntPtr.Zero)
                     PostMessage(currentWindow, WindowMessage.WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
                 else
@@ -933,20 +931,6 @@
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         static string GetUwpRoamingAppData() => global::Windows.Storage.ApplicationData.Current.RoamingFolder.Path;
-
-        private void SetupScreenHooks()
-        {
-            this.winApiHandler.Show();
-            var hwnd = (HwndSource) PresentationSource.FromVisual(this.winApiHandler);
-            hwnd.AddHook(this.OnWindowMessage);
-            this.winApiHandler.Hide();
-        }
-
-        private IntPtr OnWindowMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            //switch ((WindowMessage)msg) {}
-            return IntPtr.Zero;
-        }
 
         public static Version Version => IsUwp
             ? GetUwpVersion()
