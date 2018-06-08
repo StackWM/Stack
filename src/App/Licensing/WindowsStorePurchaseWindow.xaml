@@ -1,0 +1,51 @@
+﻿<Window x:Class="LostTech.Stack.Licensing.WindowsStorePurchaseWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:valueConverters="clr-namespace:ValueConverters;assembly=ValueConverters"
+        mc:Ignorable="d"
+        Padding="8"
+        WindowStartupLocation="CenterScreen"
+        Title="WindowsStorePurchaseWindow" Height="450" Width="600">
+  <Window.Resources>
+    <valueConverters:BoolToStringConverter x:Key="HasTrialConverter" TrueValue="Try/" FalseValue=""/>
+    <Style x:Key="onmouseover" TargetType="{x:Type Grid}">
+      <Style.Triggers>
+        <Trigger Property="IsMouseOver" Value="True">
+          <Setter Property="Background" Value="Turquoise"/>
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+  </Window.Resources>
+  <Grid Margin="8">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    <TextBlock x:Name="TextBlock" Margin="2" FontSize="20" TextWrapping="Wrap" />
+    <ItemsControl ItemsSource="{Binding}" Grid.Row="1" Margin="2">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <Grid Style="{StaticResource onmouseover}">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Title}" VerticalAlignment="Center" Margin="4" FontSize="18"/>
+            <Button Grid.Column="1" Margin="4" VerticalAlignment="Center"
+                    MinWidth="120" Padding="16,4"
+                    FontWeight="Bold"
+                    Command="{Binding Purchase}">
+              <Button.Content>
+                <TextBlock>
+                  <Run Text="{Binding HasTrial, Converter={StaticResource HasTrialConverter}}"/><Run Text="{Binding Price}"/>
+                </TextBlock>
+              </Button.Content>
+            </Button>
+          </Grid>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+  </Grid>
+</Window>

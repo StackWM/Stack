@@ -274,6 +274,10 @@
     </Compile>
     <Compile Include="Licensing\Expiration.cs" />
     <Compile Include="Licensing\ExtraFeatures.cs" />
+    <Compile Include="Licensing\WindowsStorePurchaseViewModel.cs" />
+    <Compile Include="Licensing\WindowsStorePurchaseWindow.xaml.cs">
+      <DependentUpon>WindowsStorePurchaseWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Models\IObjectWithProblems.cs" />
     <Compile Include="Models\IWindowTracker.cs" />
     <Compile Include="Models\LayoutLoader.cs" />
@@ -413,6 +417,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <Page Include="Licensing\WindowsStorePurchaseWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ScreenLayout.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
