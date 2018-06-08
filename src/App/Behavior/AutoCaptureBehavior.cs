@@ -91,7 +91,7 @@
             if (this.settings.CaptureOnAppStart)
                 Task.Factory.StartNew(async () => {
                             await this.Capture(args.Subject);
-                            await Task.Delay(300);
+                            await Task.Delay(millisecondsDelay: 300);
                             await this.Capture(args.Subject);
                         })
                     .ReportAsWarning();
@@ -113,6 +113,9 @@
         async Task Capture([NotNull] IAppWindow window) {
             if (window == null)
                 throw new ArgumentNullException(nameof(window));
+
+            if (this.layoutManager.GetLocation(window, searchSuspended: true) != null)
+                return;
 
             try {
                 Rect bounds = Rect.Empty;
@@ -139,9 +142,6 @@
                     return;
 
                 await Task.Factory.StartNew(async () => {
-                    if (this.layoutManager.GetLocation(window, searchSuspended: true) != null)
-                        return;
-
                     await Task.WhenAll(this.layouts.ScreenLayouts.Active().Select(l => Layout.GetReady(l.Layout)));
 
                     Zone targetZone = this.layouts.ScreenLayouts.Active()
@@ -162,6 +162,9 @@
             // HACK: track foreground windows to see if they need to be captured
             // needed because OnWindowAppeared in unreliable for cloacked windows
             // see https://stackoverflow.com/questions/32149880/how-to-identify-windows-10-background-store-processes-that-have-non-displayed-wi
+            if (!this.settings.CaptureOnAppStart)
+                return;
+
             IAppWindow foreground = this.win32WindowFactory.Foreground;
             if (foreground != null)
                 await Task.Run(() => this.Capture(foreground)).ConfigureAwait(false);
