@@ -146,7 +146,7 @@
         public void AdjustToClientArea()
         {
             if (this.Screen != null)
-                this.AdjustToClientArea(this.Screen);
+                this.AdjustToClientArea(this.Screen).Wait();
             else
                 throw new InvalidOperationException();
         }
@@ -198,7 +198,7 @@
                 }
 
                 Debug.WriteLine($"adjusting {this.Title} to {this.Screen.WorkingArea}");
-                this.AdjustToClientArea(this.Screen);
+                await this.AdjustToClientArea(this.Screen);
                 this.Visibility = visibility;
                 this.Opacity = opacity;
                 this.windowPositioned = true;

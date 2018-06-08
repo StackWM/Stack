@@ -15,8 +15,8 @@
   </Resources>
   <Applications>
     <Application Id="Stack" Executable="$targetnametoken$.exe" EntryPoint="Windows.FullTrustApplication">
-      <uap:VisualElements DisplayName="Stack WM" Description="Tiling window manager" BackgroundColor="transparent" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" ShortName="Stack">
+      <uap:VisualElements DisplayName="Stack WM - DEBUG" Description="Tiling window manager" BackgroundColor="transparent" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" ShortName="Stack DEBUG">
           <uap:ShowNameOnTiles>
             <uap:ShowOn Tile="square150x150Logo" />
             <uap:ShowOn Tile="wide310x150Logo" />
@@ -25,7 +25,7 @@
       </uap:VisualElements>
       <Extensions>
         <desktop:Extension Category="windows.startupTask" Executable="App\Stack.exe" EntryPoint="Windows.FullTrustApplication">
-          <desktop:StartupTask TaskId="Stack" Enabled="true" DisplayName="Stack" />
+          <desktop:StartupTask TaskId="Stack" Enabled="true" DisplayName="Stack DEBUG" />
         </desktop:Extension>
 
         <com:Extension Category="windows.comServer">

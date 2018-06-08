@@ -25,6 +25,8 @@
 
         void SetPosition() {
             var topLeft = this.WorkingArea.TopLeft().Scale(1 / (float)this.ToDeviceScale);
+            if (topLeft.X > 0) topLeft.X = (int)topLeft.X + 0.5f;
+            if (topLeft.Y > 0) topLeft.Y = (int)topLeft.Y + 0.5f;
             this.detectorWindow.Left = topLeft.X;
             this.detectorWindow.Top = topLeft.Y;
         }
@@ -102,8 +104,10 @@
 
         unsafe void ResetMonitorInfo() {
             EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (monitor, hdcMonitor, lprcMonitor, data) => {
-                if (User32.GetMonitorInfoEx(monitor, out var info)
-                    && new string(info.DeviceName) == this.DeviceName) {
+                var info = User32.MONITORINFOEX.Create();
+                if (!User32.GetMonitorInfoEx(monitor, &info))
+                    throw new System.ComponentModel.Win32Exception();
+                if (new string(info.DeviceName) == this.DeviceName) {
                     this.hMonitor = monitor;
                     return false;
                 }
@@ -210,7 +214,7 @@
         [DllImport("User32.dll", SetLastError = true)]
         static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MONITORENUMPROC lpfnEnum, IntPtr dwData);
 
-        [DllImport("User32.dll")]
+        [DllImport("Shcore.dll")]
         static extern HResult GetDpiForMonitor(IntPtr hMonitor, MONITOR_DPI_TYPE dpiType, out uint dpiX, out uint dpiY);
 
         public delegate bool MONITORENUMPROC(IntPtr hMonitor, IntPtr hdcMonitor, IntPtr lprcMonitor, IntPtr dwData);

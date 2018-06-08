@@ -1,11 +1,11 @@
-﻿namespace LostTech.Stack.ViewModels
-{
+﻿namespace LostTech.Stack.ViewModels {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Windows;
+
     using JetBrains.Annotations;
+
     using LostTech.Stack.Models;
     using LostTech.Stack.ScreenCoordinates;
     using LostTech.Stack.Settings;
@@ -51,11 +51,16 @@
                 DataContext = selectorViewModel,
             };
             selector.Show();
-            selector.FitToMargin(screen);
+            Position(screen, selector);
+
+            return selector;
+        }
+
+        async static void Position(Win32Screen screen, ScreenLayoutSelector selector) {
             selector.TryGetNativeWindow()?.BringToFront().ReportAsWarning();
+            await selector.FitToMargin(screen);
             selector.UpdateLayout();
             selector.ScrollToSelection();
-            return selector;
         }
 
         public string GetPreferredLayoutFileName(Win32Screen screen) {
