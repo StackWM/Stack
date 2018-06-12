@@ -177,7 +177,7 @@
                 return toDevice;
             }
 
-            int windowDPI = User32.GetDpiForWindow(windowHandleSource.Handle);
+            int windowDPI = GetDpiForWindow?.Invoke(windowHandleSource.Handle) ?? checked((int)dpi);
             return toDevice * dpi / windowDPI;
         }
         public bool IsActive => this.Device.IsActive;
@@ -218,5 +218,17 @@
         static extern HResult GetDpiForMonitor(IntPtr hMonitor, MONITOR_DPI_TYPE dpiType, out uint dpiX, out uint dpiY);
 
         public delegate bool MONITORENUMPROC(IntPtr hMonitor, IntPtr hdcMonitor, IntPtr lprcMonitor, IntPtr dwData);
+
+        static readonly DpiForWindowFunction GetDpiForWindow;
+
+        delegate int DpiForWindowFunction(IntPtr hwnd);
+
+        static Win32Screen() {
+            var user32 = Kernel32.LoadLibrary("user32.dll");
+            GetDpiForWindow =
+                Kernel32.GetProcAddress(user32, nameof(User32.GetDpiForWindow)) != null
+                    ? new DpiForWindowFunction(User32.GetDpiForWindow)
+                    : null;
+        }
     }
 }
