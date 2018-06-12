@@ -884,6 +884,8 @@
                 layoutManager: this.layoutManager,
                 settings: settings.Behaviors.General,
                 layouts: this,
+                keyBindings: settings.Behaviors.KeyBindings,
+                keyboardHook: this.hook,
                 win32WindowFactory: this.win32WindowFactory);
 
             this.dragHook = new DragHook(settings.Behaviors.MouseMove.DragButton, this.hook);

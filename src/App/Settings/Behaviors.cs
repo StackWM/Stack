@@ -44,6 +44,8 @@
 
             new CommandKeyBinding(HotkeyBehavior.Commands.ReloadLayouts, new KeyStroke(Key.R, M.Windows | M.Control)),
             new CommandKeyBinding(HotkeyBehavior.Commands.ChooseLayout, new KeyStroke(Key.L, M.Windows | M.Control)),
+
+            new CommandKeyBinding(AutoCaptureBehavior.Commands.CaptureAll, new KeyStroke(Key.J, M.Windows | M.Control)),
         };
     }
 }

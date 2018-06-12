@@ -8,7 +8,9 @@
     using System.Threading.Tasks;
     using System.Windows;
     using EventHook.Hooks;
+    using Gma.System.MouseKeyHook;
     using JetBrains.Annotations;
+    using LostTech.App;
     using LostTech.Stack.Models;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
@@ -17,7 +19,7 @@
     using LostTech.Stack.Zones;
     using Rect = System.Drawing.RectangleF;
 
-    class AutoCaptureBehavior: IDisposable
+    sealed class AutoCaptureBehavior: GlobalHotkeyBehaviorBase
     {
         readonly GeneralBehaviorSettings settings;
         readonly LayoutManager layoutManager;
@@ -27,10 +29,13 @@
         readonly TaskScheduler taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
         public AutoCaptureBehavior(
+            [NotNull] IKeyboardEvents keyboardHook,
+            [NotNull] IEnumerable<CommandKeyBinding> keyBindings,
             [NotNull] GeneralBehaviorSettings settings,
             [NotNull] LayoutManager layoutManager,
             [NotNull] ILayoutsViewModel layouts,
             [NotNull] Win32WindowFactory win32WindowFactory)
+            : base(keyboardHook, keyBindings)
         {
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
             this.layoutManager = layoutManager ?? throw new ArgumentNullException(nameof(layoutManager));
@@ -110,6 +115,21 @@
                 .ReportAsWarning();
         }
 
+        protected override bool CanExecute(string commandName) {
+            switch (commandName) {
+            case Commands.CaptureAll:
+                return true;
+            default: return false;
+            }
+        }
+        protected override async Task ExecuteCommand(string commandName) {
+            switch (commandName) {
+            case Commands.CaptureAll:
+                await Task.Factory.StartNew(this.Capture).ConfigureAwait(false);
+                return;
+            }
+        }
+
         async Task Capture([NotNull] IAppWindow window) {
             if (window == null)
                 throw new ArgumentNullException(nameof(window));
@@ -179,11 +199,22 @@
                 .Sum();
         }
 
-        public void Dispose() {
+        public override void Dispose() {
             this.layoutManager.WindowAppeared -= this.OnWindowAppeared;
             this.layoutManager.DesktopSwitched -= this.OnDesktopSwitched;
             this.layouts.LayoutLoaded -= this.OnLayoutLoaded;
             this.activationHook.Activated -= this.OnWindowActivated;
+            
+            base.Dispose();
+        }
+
+        protected override bool IsCommandSupported(string commandName) => Commands.All.Contains(commandName);
+
+        public static class Commands
+        {
+            public const string CaptureAll = "Capture all windows";
+
+            public static readonly IEnumerable<string> All = new[] {CaptureAll};
         }
     }
 }
