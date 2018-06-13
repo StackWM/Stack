@@ -62,7 +62,7 @@
             }
 
             var products = durables.Products.Values
-                .Where(product => product.Skus.Any(sku => sku.CustomDeveloperData.Split('\n').Contains("enterprise")))
+                .Where(product => product.Skus.Any(sku => sku.CustomDeveloperData?.Split('\n')?.Contains("enterprise") == true))
                 .ToArray();
 
             if (products.Length == 0) {
