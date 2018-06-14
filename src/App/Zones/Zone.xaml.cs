@@ -19,7 +19,6 @@
         public Zone() {
             this.ViewModel.Windows = this.Windows;
             this.InitializeComponent();
-            this.AllowDrop = true;
         }
 
         public bool IsDragMouseOver {
