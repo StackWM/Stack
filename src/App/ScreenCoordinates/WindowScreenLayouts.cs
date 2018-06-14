@@ -12,13 +12,16 @@
 
     static class WindowScreenLayouts
     {
-        public static Task AdjustToClientArea([NotNull] this Window window, [NotNull] Win32Screen screen) {
+        public static async Task<bool> AdjustToClientArea([NotNull] this Window window, [NotNull] Win32Screen screen) {
             Vector wpfScreenSize = screen.TransformFromDevice.Transform(screen.WorkingArea.Size.AsWPFVector());
+            if (wpfScreenSize.X <= 1 || wpfScreenSize.Y <= 1)
+                return false;
             // this is a hack to force layout recompute. InvalidateMeasure does not help
             window.Width = wpfScreenSize.X + 1;
             window.Width = wpfScreenSize.X;
             window.Height = wpfScreenSize.Y;
-            return MoveToScreen(window, screen);
+            await MoveToScreen(window, screen).ConfigureAwait(false);
+            return true;
         }
 
         public static async Task MoveToScreen([NotNull] Window window, [NotNull] Win32Screen screen) {

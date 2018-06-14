@@ -7,7 +7,6 @@
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
-    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Interop;
@@ -198,7 +197,10 @@
                 }
 
                 Debug.WriteLine($"adjusting {this.Title} to {this.Screen.WorkingArea}");
-                await this.AdjustToClientArea(this.Screen);
+                if (!this.Screen.IsActive || !await this.AdjustToClientArea(this.Screen)) {
+                    await Task.Delay(400);
+                    continue;
+                }
                 this.Visibility = visibility;
                 this.Opacity = opacity;
                 this.windowPositioned = true;
