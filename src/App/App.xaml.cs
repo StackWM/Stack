@@ -195,6 +195,8 @@
 
             this.stackInstanceWindow.Closed += (sender, args) => this.BeginShutdown();
 
+            EnableCustomWidgetLoading();
+
             await this.StartLayout(settings);
 
             this.trayIcon = await this.StartTrayIcon(settings);
@@ -949,6 +951,22 @@
         {
             var startInfo = new ProcessStartInfo(Process.GetCurrentProcess().MainModule.FileName) { Verb = "runas" };
             Process.Start(startInfo);
+        }
+
+        static void EnableCustomWidgetLoading() {
+            AppDomain.CurrentDomain.AssemblyResolve += CustomWidgetsLoader;
+        }
+
+        static Assembly CustomWidgetsLoader(object sender, ResolveEventArgs args) {
+            string fileName = $"{args.Name}.dll";
+            if (Path.GetFileName(fileName) != fileName)
+                return null;
+
+            fileName = Path.Combine(RoamingAppData.FullName, "CustomWidgets", fileName);
+            if (!File.Exists(fileName))
+                return null;
+
+            return Assembly.LoadFrom(fileName);
         }
     }
 }
