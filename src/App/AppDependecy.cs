@@ -31,6 +31,7 @@
             new AppDependecy(nameof(EventHook), uri: "https://github.com/justcoding121/Windows-User-Action-Hook", license: "MIT"),
             new AppDependecy("Nito.AsyncEx", uri: "https://github.com/StephenCleary/AsyncEx", license: "MIT"),
             new AppDependecy("DesktopBridge.Helpers", uri: "https://github.com/qmatteoq/DesktopBridgeHelpers", license: "MIT"),
+            new AppDependecy(nameof(CalcBinding), uri: "https://github.com/Alex141/CalcBinding", license: "Apache 2.0"),
         }.OrderBy(dependency => dependency.Name).ToArray();
     }
 }
