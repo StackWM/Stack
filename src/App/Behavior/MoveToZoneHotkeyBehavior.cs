@@ -20,8 +20,10 @@
         }
 
         protected override void OnKeyDown(KeyStroke stroke, HandledEventArgs @event) {
-            if (!Hotkey.moveHotkeys.TryGetValue(stroke, out var targetZone)
-                || targetZone == null)
+            if (!Hotkey.moveHotkeys.TryGetValue(stroke, out var targetZone) || targetZone == null)
+                return;
+                
+            if (targetZone.TryGetTarget(out var target) && target?.IsLoaded != true)
                 return;
 
             var window = this.windowFactory.Foreground;
@@ -29,7 +31,7 @@
                 return;
 
             @event.Handled = true;
-            this.layoutManager.Move(window, targetZone);
+            this.layoutManager.Move(window, target);
         }
     }
 }
