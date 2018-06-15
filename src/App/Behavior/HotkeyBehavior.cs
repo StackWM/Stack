@@ -15,7 +15,7 @@
     using LostTech.Windows;
     using PInvoke;
 
-    sealed class HotkeyBehavior: GlobalHotkeyBehaviorBase
+    sealed class HotkeyBehavior: GlobalCommandBehaviorBase
     {
         readonly ILayoutsViewModel layoutsViewModel;
         readonly ILayoutMappingViewModel layoutMapping;

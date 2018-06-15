@@ -259,9 +259,12 @@
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
     <Compile Include="Behavior\AutoCaptureBehavior.cs" />
+    <Compile Include="Behavior\GlobalCommandBehaviorBase.cs" />
     <Compile Include="Behavior\GlobalHotkeyBehaviorBase.cs" />
     <Compile Include="Behavior\HotkeyBehavior.cs" />
     <Compile Include="Behavior\KeyboardArrowBehavior.cs" />
+    <Compile Include="Behavior\Hotkey.cs" />
+    <Compile Include="Behavior\MoveToZoneHotkeyBehavior.cs" />
     <Compile Include="Commands\MoveCurrentWindowInDirectionCommand.cs" />
     <Compile Include="Compat\DesktopNotificationManagerCompat.cs" />
     <Compile Include="Compat\UrlNotificationActivator.cs" />

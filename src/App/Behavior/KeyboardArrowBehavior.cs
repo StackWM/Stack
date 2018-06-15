@@ -12,7 +12,7 @@
     using LostTech.Stack.Settings;
     using LostTech.Stack.WindowManagement;
 
-    sealed class KeyboardArrowBehavior : GlobalHotkeyBehaviorBase
+    sealed class KeyboardArrowBehavior : GlobalCommandBehaviorBase
     {
         readonly KeyboardMoveBehaviorSettings settings;
         readonly IEnumerable<WindowGroup> windowGroups;

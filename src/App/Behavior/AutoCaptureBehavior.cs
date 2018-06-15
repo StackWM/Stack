@@ -19,7 +19,7 @@
     using LostTech.Stack.Zones;
     using Rect = System.Drawing.RectangleF;
 
-    sealed class AutoCaptureBehavior: GlobalHotkeyBehaviorBase
+    sealed class AutoCaptureBehavior: GlobalCommandBehaviorBase
     {
         readonly GeneralBehaviorSettings settings;
         readonly LayoutManager layoutManager;

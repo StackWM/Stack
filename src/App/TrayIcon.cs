@@ -26,17 +26,19 @@
     using FontStyle = System.Drawing.FontStyle;
     using MessageBox = System.Windows.MessageBox;
 
-    class TrayIcon
+    class TrayIcon: IDisposable
     {
         public NotifyIcon Icon { get; }
         readonly StackSettings stackSettings;
         readonly IFolder layoutsFolder;
         readonly Lazy<About> aboutWindow = new Lazy<About>(() => new About(), isThreadSafe: false);
+        readonly Lazy<SettingsWindow> settingsWindow;
 
-        TrayIcon(NotifyIcon trayIcon, StackSettings stackSettings, IFolder layoutsFolder)
+        TrayIcon(NotifyIcon trayIcon, StackSettings stackSettings, IFolder layoutsFolder, Lazy<SettingsWindow> settingsWindow)
         {
             this.Icon = trayIcon;
             this.stackSettings = stackSettings;
+            this.settingsWindow = settingsWindow ?? throw new ArgumentNullException(nameof(settingsWindow));
             this.layoutsFolder = layoutsFolder ?? throw new ArgumentNullException(nameof(layoutsFolder));
         }
 
@@ -54,7 +56,7 @@
                 Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/StackTrayIcon.ico")).Stream),
                 Text = nameof(Stack),
                 Visible = true,
-            }, stackSettings, layoutsFolder);
+            }, stackSettings, layoutsFolder, settingsWindow);
 
             contextMenu.Items.Add("Settings", image: null, onClick: (_, __) => {
                 settingsWindow.Value.Show();
@@ -330,6 +332,17 @@
         enum OpenAsFlags
         {
             Exec = 0x00000004,
+        }
+
+        static void Close<T>(Lazy<T> lazyWindow) where T : Window {
+            if (lazyWindow?.IsValueCreated == true)
+                lazyWindow.Value.Close();
+        }
+
+        public void Dispose() {
+            this.Icon?.Dispose();
+            Close(this.aboutWindow);
+            Close(this.settingsWindow);
         }
     }
 }

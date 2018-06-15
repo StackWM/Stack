@@ -63,7 +63,7 @@
         WindowDragOperation dragOperation;
         ICollection<ScreenLayout> screenLayouts;
         IEnumerable<ScreenLayout> ILayoutsViewModel.ScreenLayouts => this.screenLayouts;
-        NotifyIcon trayIcon;
+        TrayIcon trayIcon;
         IFolder localSettingsFolder, roamingSettingsFolder;
 
         readonly Window stackInstanceWindow = new Window {
@@ -82,6 +82,7 @@
         StackSettings stackSettings;
         KeyboardArrowBehavior keyboardArrowBehavior;
         HotkeyBehavior hotkeyBehavior;
+        MoveToZoneHotkeyBehavior moveToZoneBehavior;
         AutoCaptureBehavior autoCaptureBehavior;
         LayoutManager layoutManager;
         DispatcherTimer updateTimer;
@@ -202,10 +203,10 @@
             this.trayIcon = await this.StartTrayIcon(settings);
 
             if (this.layoutLoader.Problems.Count > 0) {
-                this.trayIcon.BalloonTipTitle = "Some layouts were not loaded";
-                this.trayIcon.BalloonTipText = string.Join("\n", this.layoutLoader.Problems);
-                this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
-                this.trayIcon.ShowBalloonTip(30);
+                this.trayIcon.Icon.BalloonTipTitle = "Some layouts were not loaded";
+                this.trayIcon.Icon.BalloonTipText = string.Join("\n", this.layoutLoader.Problems);
+                this.trayIcon.Icon.BalloonTipIcon = ToolTipIcon.Error;
+                this.trayIcon.Icon.ShowBalloonTip(30);
             }
 
             if (WindowsDesktop.VirtualDesktop.IsPresent && !WindowsDesktop.VirtualDesktop.HasMinimalSupport) {
@@ -514,10 +515,10 @@
                 if (this.trayIcon == null)
                     return;
 
-                this.trayIcon.BalloonTipIcon = ToolTipIcon.None;
-                this.trayIcon.BalloonTipTitle = title;
-                this.trayIcon.BalloonTipText = message;
-                this.trayIcon.ShowBalloonTip(1000);
+                this.trayIcon.Icon.BalloonTipIcon = ToolTipIcon.None;
+                this.trayIcon.Icon.BalloonTipTitle = title;
+                this.trayIcon.Icon.BalloonTipText = message;
+                this.trayIcon.Icon.ShowBalloonTip(1000);
             }
         }
 
@@ -532,10 +533,10 @@
                 return;
             #endif
 
-            this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
-            this.trayIcon.BalloonTipTitle = "Stack";
-            this.trayIcon.BalloonTipText = error.GetException().Message;
-            this.trayIcon.ShowBalloonTip(1000);
+            this.trayIcon.Icon.BalloonTipIcon = ToolTipIcon.Error;
+            this.trayIcon.Icon.BalloonTipTitle = "Stack";
+            this.trayIcon.Icon.BalloonTipText = error.GetException().Message;
+            this.trayIcon.Icon.ShowBalloonTip(1000);
         }
 
         static Point GetCursorPos()
@@ -627,6 +628,7 @@
             this.dragHook = null;
             this.keyboardArrowBehavior?.Dispose();
             this.hotkeyBehavior?.Dispose();
+            this.moveToZoneBehavior?.Dispose();
             this.autoCaptureBehavior?.Dispose();
             this.trayIcon?.Dispose();
 
@@ -760,21 +762,21 @@
             settings.LayoutMap.Map.CollectionChanged += this.MapOnCollectionChanged;
         }
 
-        async Task<NotifyIcon> StartTrayIcon(StackSettings settings) {
-            var trayIcon = (await TrayIcon.StartTrayIcon(this.layoutsFolder, this.layoutsDirectory, settings, this.screenProvider, this.settingsWindow)).Icon;
-            trayIcon.BalloonTipClicked += (sender, args) => MessageBox.Show(this.trayIcon.BalloonTipText,
-                trayIcon.BalloonTipTitle,
+        async Task<TrayIcon> StartTrayIcon(StackSettings settings) {
+            var trayIcon = await TrayIcon.StartTrayIcon(this.layoutsFolder, this.layoutsDirectory, settings, this.screenProvider, this.settingsWindow);
+            trayIcon.Icon.BalloonTipClicked += (sender, args) => MessageBox.Show(this.trayIcon.Icon.BalloonTipText,
+                trayIcon.Icon.BalloonTipTitle,
                 MessageBoxButton.OK,
-                trayIcon.BalloonTipIcon == ToolTipIcon.Error
+                trayIcon.Icon.BalloonTipIcon == ToolTipIcon.Error
                     ? MessageBoxImage.Error
                     : MessageBoxImage.Information);
             
             if (!settings.Notifications.IamInTrayDone) {
                 settings.Notifications.IamInTrayDone = true;
-                trayIcon.BalloonTipTitle = "Stack";
-                trayIcon.BalloonTipText = "You can now move windows around using middle mouse button or Win+Arrow";
-                trayIcon.BalloonTipIcon = ToolTipIcon.Info;
-                trayIcon.ShowBalloonTip(30);
+                trayIcon.Icon.BalloonTipTitle = "Stack";
+                trayIcon.Icon.BalloonTipText = "You can now move windows around using middle mouse button or Win+Arrow";
+                trayIcon.Icon.BalloonTipIcon = ToolTipIcon.Info;
+                trayIcon.Icon.ShowBalloonTip(30);
             }
 
             return trayIcon;
@@ -881,6 +883,7 @@
                 this.win32WindowFactory);
 
             this.hotkeyBehavior = new HotkeyBehavior(this.hook, settings.Behaviors.KeyBindings, this, this.screenProvider, this.layoutMapping);
+            this.moveToZoneBehavior = new MoveToZoneHotkeyBehavior(this.hook, this.layoutManager, this.win32WindowFactory);
 
             this.autoCaptureBehavior = new AutoCaptureBehavior(
                 layoutManager: this.layoutManager,
