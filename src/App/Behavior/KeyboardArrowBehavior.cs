@@ -1,29 +1,22 @@
-﻿namespace LostTech.Stack.Behavior
-{
+﻿namespace LostTech.Stack.Behavior {
     using System;
     using System.Collections.Generic;
     using System.Drawing;
     using System.Linq;
     using System.Threading.Tasks;
-    using System.Windows;
-    using System.Windows.Input;
     using Gma.System.MouseKeyHook;
     using JetBrains.Annotations;
     using LostTech.App;
-    using LostTech.App.Input;
     using LostTech.Stack.Commands;
     using LostTech.Stack.Models;
     using LostTech.Stack.Settings;
     using LostTech.Stack.WindowManagement;
-    using LostTech.Stack.Zones;
-    using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 
     sealed class KeyboardArrowBehavior : GlobalHotkeyBehaviorBase
     {
         readonly KeyboardMoveBehaviorSettings settings;
         readonly IEnumerable<WindowGroup> windowGroups;
         readonly ICollection<ScreenLayout> screenLayouts;
-        readonly Action<IntPtr, Zone> move;
         readonly LayoutManager layoutManager;
         readonly Win32WindowFactory win32WindowFactory;
 
@@ -32,14 +25,13 @@
             IEnumerable<CommandKeyBinding> keyBindings,
             [NotNull] KeyboardMoveBehaviorSettings settings,
             [NotNull] IEnumerable<WindowGroup> windowGroups,
-            Action<IntPtr, Zone> move, [NotNull] Win32WindowFactory win32WindowFactory)
+            [NotNull] Win32WindowFactory win32WindowFactory)
         : base(keyboardHook, keyBindings)
         {
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
             this.windowGroups = windowGroups ?? throw new ArgumentNullException(nameof(windowGroups));
             this.screenLayouts = screenLayouts ?? throw new ArgumentNullException(nameof(screenLayouts));
             this.layoutManager = layoutManager ?? throw new ArgumentNullException(nameof(layoutManager));
-            this.move = move ?? throw new ArgumentNullException(nameof(move));
             this.win32WindowFactory = win32WindowFactory ?? throw new ArgumentNullException(nameof(win32WindowFactory));
         }
 
@@ -59,7 +51,7 @@
             if (!Directions.TryGetValue(commandName, out var direction))
                 return null;
 
-            var moveCommand = new MoveCurrentWindowInDirectionCommand(this.move, this.screenLayouts,
+            var moveCommand = new MoveCurrentWindowInDirectionCommand(this.screenLayouts,
                 this.layoutManager, this.settings, this.windowGroups,
                 this.win32WindowFactory);
             if (!moveCommand.CanExecute(direction))

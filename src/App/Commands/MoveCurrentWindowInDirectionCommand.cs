@@ -5,7 +5,6 @@
     using System.Diagnostics;
     using System.Drawing;
     using System.Linq;
-    using System.Windows;
     using System.Windows.Input;
     using JetBrains.Annotations;
     using LostTech.Stack.Models;
@@ -20,12 +19,11 @@
     {
         [NotNull] readonly KeyboardMoveBehaviorSettings settings;
         [NotNull] readonly IEnumerable<WindowGroup> windowGroups;
-        [NotNull] readonly Action<IntPtr, Zone> move;
         [NotNull] readonly ICollection<ScreenLayout> screenLayouts;
         [NotNull] readonly LayoutManager layoutManager;
         [NotNull] readonly Win32WindowFactory win32WindowFactory;
 
-        public MoveCurrentWindowInDirectionCommand([NotNull] Action<IntPtr, Zone> move,
+        public MoveCurrentWindowInDirectionCommand(
             [NotNull] ICollection<ScreenLayout> screenLayouts,
             [NotNull] LayoutManager layoutManager,
             [NotNull] KeyboardMoveBehaviorSettings settings,
@@ -34,7 +32,6 @@
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
             this.windowGroups = windowGroups ?? throw new ArgumentNullException(nameof(windowGroups));
             this.win32WindowFactory = win32WindowFactory ?? throw new ArgumentNullException(nameof(win32WindowFactory));
-            this.move = move ?? throw new ArgumentNullException(nameof(move));
             this.screenLayouts = screenLayouts ?? throw new ArgumentNullException(nameof(screenLayouts));
             this.layoutManager = layoutManager ?? throw new ArgumentNullException(nameof(layoutManager));
         }
@@ -177,7 +174,7 @@
             Debug.WriteLine("");
 #endif
             if (next != null)
-                this.move(windowHandle, next);
+                this.layoutManager.Move(window, next);
             else
                 Debug.WriteLine($"nowhere to move {window.Title}");
 

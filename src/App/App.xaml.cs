@@ -878,7 +878,7 @@
                 this.hook, this.screenLayouts, this.layoutManager, settings.Behaviors.KeyBindings,
                 settings.Behaviors.KeyboardMove,
                 settings.WindowGroups,
-                this.Move, this.win32WindowFactory);
+                this.win32WindowFactory);
 
             this.hotkeyBehavior = new HotkeyBehavior(this.hook, settings.Behaviors.KeyBindings, this, this.screenProvider, this.layoutMapping);
 
