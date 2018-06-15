@@ -107,11 +107,15 @@
             </DockPanel>
         </TabItem>
         <TabItem Header="Hotkeys">
+          <Grid Margin="8">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="*"/>
+              <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             <app:KeySettingsEditor x:Name="KeySettingsEditor"
                                    DataContext="{Binding Behaviors.KeyBindings}"
                                    ExtendedCapture="True"
                                    Background="{StaticResource ControlBackgroundBrush}"
-                                   Margin="8"
                                    >
                 <app:KeySettingsEditor.Resources>
                     <Style TargetType="Button">
@@ -121,11 +125,38 @@
                         <Style.Triggers>
                             <Trigger Property="IsCapturingGesture" Value="True">
                                 <Setter Property="Background" Value="{x:Static SystemColors.InfoBrush}"/>
+                                <Setter Property="Foreground" Value="{x:Static SystemColors.InfoTextBrush}"/>
                             </Trigger>
                         </Style.Triggers>
                     </Style>
                 </app:KeySettingsEditor.Resources>
             </app:KeySettingsEditor>
+
+            <Grid Grid.Row="1" Margin="0,8,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <TextBlock VerticalAlignment="Center" Text="Use this field to get shortcut text for layouts:" FontSize="14"/>
+              <app:KeyboardShortcutBox ExtendedCapture="True"
+                Grid.Column="1" Margin="8,0,0,0"
+                MinWidth="100"
+                HorizontalAlignment="Left"
+                FlowDirection="RightToLeft"
+                >
+                <app:KeyboardShortcutBox.Style>
+                  <Style TargetType="app:KeyboardShortcutBox">
+                    <Style.Triggers>
+                        <Trigger Property="IsCapturingGesture" Value="True">
+                            <Setter Property="Background" Value="{x:Static SystemColors.InfoBrush}"/>
+                            <Setter Property="Foreground" Value="{x:Static SystemColors.InfoTextBrush}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                  </Style>
+                </app:KeyboardShortcutBox.Style>
+              </app:KeyboardShortcutBox>
+            </Grid>
+          </Grid>
         </TabItem>
         <TabItem Header="Window Groups">
             <views:WindowGroupsEditor Margin="8" ItemsSource="{Binding WindowGroups}"/>
