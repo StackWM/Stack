@@ -384,20 +384,21 @@
         volatile bool disableDragHandler = false;
         void ShowLayoutGrid() {
             foreach (ScreenLayout screenLayout in this.screenLayouts.Active()) {
-                if (screenLayout.Layout == null || Layout.GetVersion(screenLayout.Layout) < Layout.Version.Min.PermanentlyVisible)
-                    screenLayout.Show();
-                //screenLayout.TryEnableGlassEffect();
                 if (screenLayout.ViewModel != null)
                     screenLayout.ViewModel.ShowHints = true;
+                if (screenLayout.Layout == null || Layout.GetVersion(screenLayout.Layout) < Layout.Version.Min.PermanentlyVisible)
+                    screenLayout.Show();
                 screenLayout.Background = LayoutBackground;
                 screenLayout.Opacity = 0.7;
 
-                // for some reason Topmost below is unreliable
-                // so we have to manually bring the grid up. See Bug #287
-                if (screenLayout.IsHandleInitialized)
-                    this.win32WindowFactory.Create(screenLayout.handle.Handle).BringToFront();
+                this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => {
+                    // for some reason Topmost below is unreliable
+                    // so we have to manually bring the grid up. See Bug #287
+                    if (screenLayout.IsHandleInitialized)
+                        this.win32WindowFactory.Create(screenLayout.handle.Handle).BringToFront();
 
-                screenLayout.Topmost = true;
+                    screenLayout.Topmost = true;
+                }));
             }
         }
 
@@ -720,6 +721,7 @@
                         return;
                     layoutBounds[layout] = newBounds;
                     await this.ReloadLayout(layout);
+                    layout.TryGetNativeWindow()?.SendToBottom().ReportAsWarning();
                 } else
                     Debug.WriteLine("grouped updates!");
             }
