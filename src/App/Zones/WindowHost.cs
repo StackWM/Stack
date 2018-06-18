@@ -1,15 +1,15 @@
-﻿namespace LostTech.Stack.Zones
-{
+﻿namespace LostTech.Stack.Zones {
     using System;
     using System.Diagnostics;
     using System.IO;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
-    using LostTech.Stack.Models;
     using LostTech.Stack.Utils;
     using LostTech.Stack.ViewModels;
     using LostTech.Stack.WindowManagement;
+    using Microsoft.Win32;
     using Rect = System.Drawing.RectangleF;
 
     sealed class WindowHost: Control
@@ -20,6 +20,7 @@
             this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
             this.VerticalContentAlignment = VerticalAlignment.Stretch;
             this.LayoutUpdated += delegate { this.AdjustWindow(); };
+            SystemEvents.SessionSwitch += this.OnSessionSwitch;
         }
 
         public AppWindowViewModel Window {
@@ -55,6 +56,7 @@
         async void AdjustWindow() {
             await Task.Yield();
             Rect? rect = this.TryGetPhysicalBounds();
+            Thread.MemoryBarrier();
             if (rect.Equals(this.lastRect) || rect == null)
                 return;
 
@@ -71,6 +73,17 @@
             } catch (WindowNotFoundException) {
             } catch (Exception error) {
                 this.NonFatalErrorOccurred?.Invoke(this, new ErrorEventArgs(error));
+            }
+        }
+
+        void OnSessionSwitch(object sender, SessionSwitchEventArgs e) {
+            switch (e.Reason) {
+            case SessionSwitchReason.ConsoleConnect:
+            case SessionSwitchReason.RemoteConnect:
+            case SessionSwitchReason.SessionUnlock:
+                this.lastRect = Rect.Empty;
+                Thread.MemoryBarrier();
+                break;
             }
         }
     }

@@ -205,6 +205,7 @@
                 this.Opacity = opacity;
                 this.windowPositioned = true;
                 this.InvalidateMeasure();
+                this.Layout?.InvalidateMeasure();
 
                 if (Math.Abs(this.RenderSize.Width - this.Width) < 10
                     && Math.Abs(this.RenderSize.Height - this.Height) < 10) {
