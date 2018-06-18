@@ -714,7 +714,8 @@
                 Task delay = Task.Delay(millisecondsDelay: 15);
                 changeGroupTasks[layout] = delay;
                 await delay;
-                if (changeGroupTasks.TryGetValue(layout, out var changeGroupTask) && delay.Equals(changeGroupTask)) {
+                if (changeGroupTasks.TryGetValue(layout, out var changeGroupTask) && delay.Equals(changeGroupTask)
+                    && layout.IsLoaded) {
                     changeGroupTasks.Remove(layout);
                     Rect newBounds = layout.GetPhysicalBounds();
                     if (layoutBounds.TryGetValue(layout, out var bounds) && newBounds.Equals(bounds))
