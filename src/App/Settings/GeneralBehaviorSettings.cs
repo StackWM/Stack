@@ -4,10 +4,10 @@
     public sealed class GeneralBehaviorSettings: NotifyPropertyChangedBase, ICopyable<GeneralBehaviorSettings>
     {
         bool suppressSystemMargin = true;
-        bool captureOnStackStart;
-        bool captureOnDesktopSwitch;
-        bool captureOnAppStart;
-        bool captureOnLayoutChange;
+        bool? captureOnStackStart;
+        bool? captureOnDesktopSwitch;
+        bool? captureOnAppStart;
+        bool? captureOnLayoutChange;
 
         public bool SuppressSystemMargin {
             get => this.suppressSystemMargin;
@@ -17,7 +17,7 @@
             }
         }
 
-        public bool CaptureOnStackStart {
+        public bool? CaptureOnStackStart {
             get => this.captureOnStackStart;
             set {
                 this.captureOnStackStart = value;
@@ -25,7 +25,7 @@
             }
         }
 
-        public bool CaptureOnDesktopSwitch {
+        public bool? CaptureOnDesktopSwitch {
             get => this.captureOnDesktopSwitch;
             set {
                 this.captureOnDesktopSwitch = value;
@@ -33,7 +33,7 @@
             }
         }
 
-        public bool CaptureOnAppStart {
+        public bool? CaptureOnAppStart {
             get => this.captureOnAppStart;
             set {
                 this.captureOnAppStart = value;
@@ -41,7 +41,7 @@
             }
         }
 
-        public bool CaptureOnLayoutChange {
+        public bool? CaptureOnLayoutChange {
             get => this.captureOnLayoutChange;
             set {
                 this.captureOnLayoutChange = value;

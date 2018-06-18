@@ -67,7 +67,7 @@
             <metro:ToggleSwitch Visibility="Collapsed"/>
         <metro:ToggleSwitch Header="Suppress empty area around windows (experimental)"
                                 IsChecked="{Binding Behaviors.General.SuppressSystemMargin}"/>
-            <metro:ToggleSwitch Header="Capture windows on startup"
+            <metro:ToggleSwitch Header="Capture windows when Stack starts"
                                 IsChecked="{Binding Behaviors.General.CaptureOnStackStart}"/>
             <metro:ToggleSwitch Header="Re-capture windows on layout change/reload"
                                 IsChecked="{Binding Behaviors.General.CaptureOnLayoutChange}"/>
