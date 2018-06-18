@@ -6,7 +6,7 @@
     {
         string acceptedTerms = null;
         bool iamInTrayDone = false;
-        int? whatsNewVersionSeen = null;
+        string whatsNewVersionSeen = null;
 
         public string AcceptedTerms
         {
@@ -17,7 +17,7 @@
             }
         }
 
-        public int? WhatsNewVersionSeen {
+        public string WhatsNewVersionSeen {
             get => this.whatsNewVersionSeen;
             set {
                 this.whatsNewVersionSeen = value;
