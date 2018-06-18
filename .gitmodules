@@ -19,3 +19,6 @@
 [submodule "External/MouseKeyHook"]
 	path = External/MouseKeyHook
 	url = https://github.com/losttech/globalmousekeyhook.git
+[submodule "External/Widgets"]
+	path = External/Widgets
+	url = https://github.com/losttech/Stack.Widgets.git
