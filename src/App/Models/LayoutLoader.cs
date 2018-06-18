@@ -78,10 +78,14 @@
         public IList<string> Problems => new ReadOnlyCollection<string>(this.problems);
         public event EventHandler<ErrorEventArgs> ProblemOccurred;
 
-        public static FrameworkElement MakeDefaultLayout() => new Grid {
-            Children = {
-                new Zone {},
-            }
-        };
+        public static FrameworkElement MakeDefaultLayout() {
+            var defaultLayout = new Grid {
+                Children = {
+                    new Zone { },
+                }
+            };
+            Layout.SetVersion(defaultLayout, Layout.Version.Current);
+            return defaultLayout;
+        }
     }
 }
