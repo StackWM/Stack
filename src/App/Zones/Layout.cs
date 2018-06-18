@@ -10,6 +10,8 @@
     public sealed class Layout
     {
         #region IsHint
+        static readonly BoolToVisibilityConverter boolToVisibility = new BoolToVisibilityConverter();
+
         public static bool GetIsHint(DependencyObject obj) => (bool)obj.GetValue(IsHintProperty);
         public static void SetIsHint(DependencyObject obj, bool value) => obj.SetValue(IsHintProperty, value);
 
@@ -24,7 +26,34 @@
 
             if (true.Equals(e.NewValue)) {
                 var binding = new Binding(nameof(ScreenLayoutViewModel.ShowHints)) {
-                    Converter = new BoolToVisibilityConverter(),
+                    Converter = boolToVisibility,
+                    Mode = BindingMode.OneWay,
+                };
+                element.SetBinding(UIElement.VisibilityProperty, binding);
+            } else {
+                BindingOperations.ClearBinding(element, UIElement.VisibilityProperty);
+            }
+        }
+        #endregion
+
+        #region IsHint
+        static readonly BoolToVisibilityConverter boolToVisibilityInv = new BoolToVisibilityConverter{IsInverted = true};
+
+        public static bool GetIsUnderlay(DependencyObject obj) => (bool)obj.GetValue(IsUnderlayProperty);
+        public static void SetIsUnderlay(DependencyObject obj, bool value) => obj.SetValue(IsUnderlayProperty, value);
+
+        public static readonly DependencyProperty IsUnderlayProperty =
+            DependencyProperty.RegisterAttached("IsUnderlay", typeof(bool), typeof(Layout),
+                new PropertyMetadata(defaultValue: false,
+                    propertyChangedCallback: OnIsUnderlayChanged));
+
+        static void OnIsUnderlayChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (!(d is FrameworkElement element))
+                return;
+
+            if (true.Equals(e.NewValue)) {
+                var binding = new Binding(nameof(ScreenLayoutViewModel.ShowHints)) {
+                    Converter = boolToVisibilityInv,
                     Mode = BindingMode.OneWay,
                 };
                 element.SetBinding(UIElement.VisibilityProperty, binding);
