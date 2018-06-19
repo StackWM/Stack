@@ -50,8 +50,8 @@
                 LayoutLoader = this.layoutLoader,
                 DataContext = selectorViewModel,
             };
+            selector.Loaded += delegate { Position(screen, selector); };
             selector.Show();
-            Position(screen, selector);
 
             return selector;
         }
