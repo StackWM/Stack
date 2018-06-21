@@ -10,6 +10,7 @@
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Markup;
+    using System.Windows.Media;
     using System.Xml;
     using LostTech.Stack.InternalExtensions;
     using LostTech.Stack.Zones;
@@ -43,7 +44,7 @@
             var file = await this.layoutDirectory.GetFileOrNull(fileName);
             if (file == null) {
                 Debug.WriteLine($"layout {fileName} was not found. loading default");
-                return MakeDefaultLayout();
+                return MakeDefaultLayout(fileName, new FileNotFoundException());
             }
 
             FrameworkElement layout;
@@ -54,7 +55,7 @@
                 } catch (XamlParseException e) {
                     this.problems.Add($"{file.Name}: {e.Message}");
                     this.ProblemOccurred?.Invoke(this, new ErrorEventArgs(e));
-                    return MakeDefaultLayout();
+                    return MakeDefaultLayout(file.Name, e);
                 }
             }
 
@@ -78,10 +79,25 @@
         public IList<string> Problems => new ReadOnlyCollection<string>(this.problems);
         public event EventHandler<ErrorEventArgs> ProblemOccurred;
 
-        public static FrameworkElement MakeDefaultLayout() {
+        public static FrameworkElement MakeDefaultLayout(string fileName, Exception e) {
+            var error = new TextBox {
+                Text = $"{fileName}: {e.Message}",
+                FontSize = 40,
+                Foreground = Brushes.Red,
+                TextAlignment = TextAlignment.Center,
+                TextWrapping = TextWrapping.Wrap,
+                IsReadOnly = true,
+                IsReadOnlyCaretVisible = true,
+                
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                MaxWidth = 1366,
+            };
+            Layout.SetIsHint(error, true);
+            error.Loaded += delegate { error.SelectAll(); };
             var defaultLayout = new Grid {
                 Children = {
                     new Zone { },
+                    error,
                 }
             };
             Layout.SetVersion(defaultLayout, Layout.Version.Current);
@@ -89,3 +105,4 @@
         }
     }
 }
+
