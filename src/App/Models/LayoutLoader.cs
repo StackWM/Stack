@@ -9,6 +9,7 @@
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Markup;
+    using System.Windows.Media;
     using System.Xml;
     using LostTech.Stack.InternalExtensions;
     using LostTech.Stack.Zones;
@@ -42,7 +43,7 @@
             var file = await this.layoutDirectory.GetFileOrNull(fileName);
             if (file == null) {
                 Debug.WriteLine($"layout {fileName} was not found. loading default");
-                return MakeDefaultLayout();
+                return MakeDefaultLayout(fileName, new FileNotFoundException());
             }
 
             FrameworkElement layout;
@@ -52,7 +53,7 @@
                     layout = (FrameworkElement)XamlReader.Load(xmlReader);
                 } catch (XamlParseException e) {
                     this.problems.AppendLine($"{file.Name}: {e.Message}");
-                    return MakeDefaultLayout();
+                    return MakeDefaultLayout(file.Name, e);
                 }
             }
             Debug.WriteLine($"loaded layout {fileName} in {this.loadTimer.ElapsedMilliseconds}ms");
@@ -61,10 +62,29 @@
 
         public string Problems => this.problems.ToString();
 
-        public static FrameworkElement MakeDefaultLayout() => new Grid {
-            Children = {
-                new Zone {},
-            }
-        };
+        public static FrameworkElement MakeDefaultLayout(string fileName, Exception e) {
+            var error = new TextBox {
+                Text = $"{fileName}: {e.Message}",
+                FontSize = 40,
+                Foreground = Brushes.Red,
+                TextAlignment = TextAlignment.Center,
+                TextWrapping = TextWrapping.Wrap,
+                IsReadOnly = true,
+                IsReadOnlyCaretVisible = true,
+                
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                MaxWidth = 1366,
+            };
+            error.Loaded += delegate { error.SelectAll(); };
+            var defaultLayout = new Grid {
+                Children = {
+                    new Zone { },
+                    error,
+                }
+            };
+
+            return defaultLayout;
+        }
     }
 }
+
