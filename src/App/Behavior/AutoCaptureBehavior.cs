@@ -59,7 +59,7 @@
         }
 
         async void OnLayoutLoaded(object sender, EventArgs<ScreenLayout> args) {
-            if (!this.settings.CaptureOnLayoutChange == true)
+            if (this.settings.CaptureOnLayoutChange.GetValueOrDefault(false) != true)
                 return;
 
             if (args.Subject?.Layout == null)
@@ -182,7 +182,7 @@
             // HACK: track foreground windows to see if they need to be captured
             // needed because OnWindowAppeared in unreliable for cloacked windows
             // see https://stackoverflow.com/questions/32149880/how-to-identify-windows-10-background-store-processes-that-have-non-displayed-wi
-            if (!this.settings.CaptureOnAppStart == true)
+            if (this.settings.CaptureOnAppStart.GetValueOrDefault(false) != true)
                 return;
 
             IAppWindow foreground = this.win32WindowFactory.Foreground;
