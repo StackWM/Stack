@@ -6,7 +6,6 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Windows;
     using EventHook.Hooks;
     using Gma.System.MouseKeyHook;
     using JetBrains.Annotations;
