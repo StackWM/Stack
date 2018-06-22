@@ -273,6 +273,7 @@
     <Compile Include="DataBinding\MinimumNumberToVisibilityConverter.cs" />
     <Compile Include="DataBinding\PercentageConverter.cs" />
     <Compile Include="DataBinding\PropertyHelper.cs" />
+    <Compile Include="DataBinding\RoundtripValueToBoolConverter.cs" />
     <Compile Include="DataBinding\TransformObservableCollection.cs" />
     <Compile Include="DataBinding\UniformThicknessConverter.cs" />
     <Compile Include="DebugHelper.cs" />
