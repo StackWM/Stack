@@ -63,7 +63,10 @@
         }
 
         readonly TaskCompletionSource<bool> loaded = new TaskCompletionSource<bool>();
-        void OnLoaded(object sender, EventArgs e) => this.loaded.TrySetResult(true);
+        void OnLoaded(object sender, EventArgs e) {
+            this.AdjustToScreenWhenIdle();
+            this.loaded.TrySetResult(true);
+        }
 
         protected override void OnClosed(EventArgs e)
         {
