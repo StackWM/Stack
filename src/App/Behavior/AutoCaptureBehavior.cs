@@ -142,17 +142,21 @@
                 TimeSpan retryDelay = TimeSpan.FromMilliseconds(500);
                 int retryAttempts = 5;
                 while (retryAttempts > 0) {
-                    if (window.IsMinimized || !window.IsVisible
-                                           || !window.IsResizable
-                                           || !window.CanMove
-                                           || string.IsNullOrEmpty(window.Title)
-                                           || (bounds = await window.GetBounds()).IsEmpty
-                                           || !window.IsOnCurrentDesktop
-                                           ) {
-                        await Task.Delay(retryDelay).ConfigureAwait(false);
-                        retryDelay = new TimeSpan(retryDelay.Ticks * 2);
-                    } else
-                        break;
+                    try {
+                        if (window.IsMinimized || !window.IsVisible
+                                               || !window.IsResizable
+                                               || !window.CanMove
+                                               || string.IsNullOrEmpty(window.Title)
+                                               || (bounds = await window.GetBounds()).IsEmpty
+                                               || !window.IsOnCurrentDesktop
+                        ) {
+                            await Task.Delay(retryDelay).ConfigureAwait(false);
+                            retryDelay = new TimeSpan(retryDelay.Ticks * 2);
+                        } else
+                            break;
+                    } catch (ShellUnresponsiveException) {
+                        retryDelay = TimeSpan.FromTicks(retryDelay.Ticks * 2);
+                    }
 
                     retryAttempts--;
                 }

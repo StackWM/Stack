@@ -125,8 +125,24 @@
                     return false;
                 if (!VirtualDesktop.HasMinimalSupport)
                     return true;
-                var desktopId = VirtualDesktop.IdFromHwnd(this.Handle);
+                Guid? desktopId = null;
+
+                var timer = Stopwatch.StartNew();
+                COMException e = null;
+                while (timer.Elapsed < this.ShellUnresposivenessTimeout) {
+                    try {
+                        desktopId = VirtualDesktop.IdFromHwnd(this.Handle);
+                        e = null;
+                        break;
+                    } catch (COMException ex) {
+                        e = ex;
+                    }
+                }
+
                 if (desktopId == null) {
+                    if (e != null)
+                        throw new ShellUnresponsiveException(e);
+
                     this.Closed?.Invoke(this, EventArgs.Empty);
                     throw new WindowNotFoundException();
                 }
@@ -310,5 +326,7 @@
         static readonly IntPtr HWND_TOP = IntPtr.Zero;
         static readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
         // ReSharper restore InconsistentNaming
+
+        public TimeSpan ShellUnresposivenessTimeout { get; set; } = TimeSpan.FromMilliseconds(300);
     }
 }
