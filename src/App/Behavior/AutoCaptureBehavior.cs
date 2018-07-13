@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows;
     using EventHook.Hooks;
     using Gma.System.MouseKeyHook;
     using JetBrains.Annotations;
@@ -61,12 +62,17 @@
             if (this.settings.CaptureOnLayoutChange.GetValueOrDefault(false) != true)
                 return;
 
-            if (args.Subject?.Layout == null)
+            FrameworkElement layout = args.Subject?.Layout;
+            if (layout == null)
                 return;
 
             await Task.Yield();
 
-            await Layout.GetReady(args.Subject.Layout);
+            try {
+                await Layout.GetReady(layout);
+            } catch (OperationCanceledException) {
+                return;
+            }
 
             Rect bounds = args.Subject.Layout.GetPhysicalBounds();
             await Task.Factory.StartNew(() =>
