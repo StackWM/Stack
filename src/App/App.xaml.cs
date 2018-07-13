@@ -745,19 +745,19 @@
             }
 
             foreach (Win32Screen screen in screens) {
+                screen.PropertyChanged += ScreenPropertyChanged;
                 if (ScreenExtensions.IsValidScreen(screen)) {
                     await AddLayoutForScreen(screen);
 
                     if (settings.LayoutMap.NeedsUpdate(screen))
                         this.layoutMapping.ShowLayoutSelector(screen);
                 }
-                screen.PropertyChanged += ScreenPropertyChanged;
             }
 
             screens.OnChange<Win32Screen>(onAdd: async s => {
+                s.PropertyChanged += ScreenPropertyChanged;
                 if (ScreenExtensions.IsValidScreen(s))
                     await AddLayoutForScreen(s);
-                s.PropertyChanged += ScreenPropertyChanged;
             }, onRemove: s => {
                 s.PropertyChanged -= ScreenPropertyChanged;
                 RemoveLayoutForScreen(s);
