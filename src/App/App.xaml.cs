@@ -484,6 +484,8 @@
         {
             var window = this.win32WindowFactory.Create(windowHandle);
             Exception problem = await window.Activate();
+            if (problem is WindowNotFoundException)
+                return;
             if (problem != null)
                 this.NonCriticalErrorHandler(this, new ErrorEventArgs(problem));
             this.layoutManager.Move(window, zone);
@@ -525,15 +527,15 @@
         }
 
         void NonCriticalErrorHandler(object sender, ErrorEventArgs error) {
-            HockeyClient.Current.TrackException(error.GetException(), properties: new Dictionary<string, string> {
-                ["warning"] = "true",
-                ["user-visible"] = "true",
-            });
-
             #if !DEBUG
             if (error.GetException() is WindowNotFoundException)
                 return;
             #endif
+
+            HockeyClient.Current.TrackException(error.GetException(), properties: new Dictionary<string, string> {
+                ["warning"] = "true",
+                ["user-visible"] = "true",
+            });
 
             this.trayIcon.Icon.BalloonTipIcon = ToolTipIcon.Error;
             this.trayIcon.Icon.BalloonTipTitle = "Stack";
