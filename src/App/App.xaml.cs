@@ -720,10 +720,12 @@
                 if (changeGroupTasks.TryGetValue(layout, out var changeGroupTask) && delay.Equals(changeGroupTask)
                     && layout.IsLoaded) {
                     changeGroupTasks.Remove(layout);
-                    Rect newBounds = layout.GetPhysicalBounds();
-                    if (layoutBounds.TryGetValue(layout, out var bounds) && newBounds.Equals(bounds))
+                    Rect? newBounds = layout.TryGetPhysicalBounds();
+                    if (newBounds == null)
                         return;
-                    layoutBounds[layout] = newBounds;
+                    if (layoutBounds.TryGetValue(layout, out var bounds) && newBounds.Value.Equals(bounds))
+                        return;
+                    layoutBounds[layout] = newBounds.Value;
                     await this.ReloadLayout(layout);
                     layout.TryGetNativeWindow()?.SendToBottom().ReportAsWarning();
                 } else
