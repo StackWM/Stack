@@ -204,9 +204,16 @@
                     await Task.Delay(400);
                     continue;
                 }
-                this.Visibility = visibility;
+
+                try {
+                    this.Visibility = visibility;
+                } catch (InvalidOperationException) {
+                    await Task.Delay(400);
+                    continue;
+                }
+
                 this.Opacity = opacity;
-                this.windowPositioned = true;
+                this.window.Positioned = true;
                 this.InvalidateMeasure();
                 this.Layout?.InvalidateMeasure();
 
