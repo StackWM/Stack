@@ -213,7 +213,7 @@
                 }
 
                 this.Opacity = opacity;
-                this.window.Positioned = true;
+                this.windowPositioned = true;
                 this.InvalidateMeasure();
                 this.Layout?.InvalidateMeasure();
 
