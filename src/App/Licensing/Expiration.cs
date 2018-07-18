@@ -40,7 +40,7 @@
                     return false;
 
                 if (DateTimeOffset.UtcNow > EnterpriseStoreExpirationDate) {
-                    MessageBox.Show("You must purchase a subscription. Trial options are be available", "Stack Evaluation",
+                    MessageBox.Show("You must purchase a subscription. Trial options are available", "Stack Evaluation",
                         MessageBoxButton.OK, MessageBoxImage.Error);
                     return true;
                 }
