@@ -890,7 +890,9 @@
                 settings.WindowGroups,
                 this.win32WindowFactory);
 
-            this.hotkeyBehavior = new HotkeyBehavior(this.hook, settings.Behaviors.KeyBindings, this, this.screenProvider, this.layoutMapping);
+            this.hotkeyBehavior = new HotkeyBehavior(this.hook, settings.Behaviors.KeyBindings,
+                this, this.screenProvider, this.win32WindowFactory,
+                this.layoutManager, this.layoutMapping);
             this.moveToZoneBehavior = new MoveToZoneHotkeyBehavior(this.hook, this.layoutManager, this.win32WindowFactory);
 
             this.autoCaptureBehavior = new AutoCaptureBehavior(

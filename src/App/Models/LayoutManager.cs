@@ -18,11 +18,13 @@
     using LostTech.Stack.WindowManagement;
     using LostTech.Stack.Zones;
     using Microsoft.HockeyApp;
+    using RectangleF = System.Drawing.RectangleF;
 
-    class LayoutManager : IDisposable, IWindowTracker
+    class LayoutManager : IDisposable, IWindowTracker, IWindowManager
     {
         readonly ICollection<ScreenLayout> screenLayouts;
         readonly Dictionary<IAppWindow, Zone> locations = new Dictionary<IAppWindow, Zone>();
+        readonly Dictionary<IAppWindow, Task<RectangleF>> origins = new Dictionary<IAppWindow, Task<RectangleF>>();
         readonly TaskScheduler taskScheduler;
         readonly Win32WindowFactory windowFactory;
         readonly EventHookFactory eventHookFactory = new EventHookFactory();
@@ -74,13 +76,19 @@
             appWindow.PropertyChanged += this.AppWindowOnPropertyChanged;
             appWindow.Window.Closed += this.OnWindowClosed;
 
-            this.StopTracking(appWindow);
+            this.StopTrackingInternal(appWindow);
 
             bool isOnCurrentDesktop;
             try {
                 isOnCurrentDesktop = window.IsOnCurrentDesktop;
             } catch (WindowNotFoundException) {
                 return;
+            }
+
+            if (!this.origins.ContainsKey(window)) {
+                try {
+                    this.origins[window] = window.GetBounds().IgnoreUnobservedExceptions();
+                } catch (WindowNotFoundException) { }
             }
 
             if (!isOnCurrentDesktop) {
@@ -98,7 +106,27 @@
             }
         }
 
-        void StopTracking(AppWindowViewModel appWindow) {
+        public async Task<bool?> Detach([NotNull] IAppWindow window, bool restoreBounds = false) {
+            if (window == null) throw new ArgumentNullException(nameof(window));
+
+            bool result = this.StopTrackingInternal(window);
+            if (!this.origins.TryGetValue(window, out var originalBounds))
+                return result;
+
+            this.origins.Remove(window);
+            if (!restoreBounds)
+                return result;
+
+            try {
+                var bounds = await originalBounds.ConfigureAwait(false);
+                if (!bounds.IsEmpty)
+                    await window.Move(bounds).ConfigureAwait(false);
+            } catch (WindowNotFoundException) { }
+
+            return result;
+        }
+
+        void StopTrackingInternal(AppWindowViewModel appWindow) {
             this.RemoveFromSuspended(appWindow.Window, dispose: true);
             Zone previousZone;
             lock (this.locations)
@@ -155,7 +183,7 @@
                     HockeyClient.Current.TrackException(exception);
         }
 
-        bool StopTracking(IAppWindow window) {
+        bool StopTrackingInternal(IAppWindow window) {
             this.StartOnParentThread(() => this.RemoveFromSuspended(window, dispose: true))
                 .ContinueWith(this.ReportTaskException);
             lock (this.locations) {
@@ -175,15 +203,22 @@
             }
         }
 
-        void OnWindowClosed(object sender, EventArgs _) => this.StopTracking((IAppWindow)sender);
+        void OnWindowClosed(object sender, EventArgs _) {
+            var window = (IAppWindow)sender;
+            this.StopTrackingInternal(window);
+            this.origins.Remove(window);
+            this.WindowDestroyed?.Invoke(this, new EventArgs<IAppWindow>(window));
+        }
 
         void OnApplicationWindowChange(object sender, ApplicationEventArgs applicationEventArgs)
         {
             var app = applicationEventArgs.ApplicationData;
             var window = this.windowFactory.Create(app.HWnd);
             if (applicationEventArgs.Event != ApplicationEvents.Launched) {
-                bool wasTracked = this.StopTracking(window);
+                bool wasTracked = this.StopTrackingInternal(window);
+                this.origins.Remove(window);
                 Debug.WriteLine($"Disappeared: {app.AppTitle} traked: {wasTracked}");
+                this.WindowDestroyed?.Invoke(this, new EventArgs<IAppWindow>(window));
                 return;
             }
 
@@ -329,7 +364,7 @@
                 .Where(location => location.Value != null && Window.GetWindow(location.Value) == null)
                 .ToList();
             foreach (var entry in remove)
-                this.StopTracking(entry.Key);
+                this.StopTrackingInternal(entry.Key);
         }
 
         private Task<Zone> GetZoneByID(string layoutID) => this.StartOnParentThread(() => this.screenLayouts
@@ -360,10 +395,11 @@
                         desktopWindows.Values.SelectMany(windowList => windowList))).ToList();
 
             foreach (var window in windows)
-                this.StopTracking(window);
+                this.StopTrackingInternal(window);
         }
 
         public event EventHandler<EventArgs<IAppWindow>> WindowAppeared;
+        public event EventHandler<EventArgs<IAppWindow>> WindowDestroyed;
         public event EventHandler DesktopSwitched;
     }
 }

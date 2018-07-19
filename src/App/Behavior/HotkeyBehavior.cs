@@ -19,18 +19,23 @@
     {
         readonly ILayoutsViewModel layoutsViewModel;
         readonly ILayoutMappingViewModel layoutMapping;
-        readonly Win32WindowFactory windowFactory = new Win32WindowFactory();
+        readonly Win32WindowFactory windowFactory;
         readonly IScreenProvider screenProvider;
+        readonly IWindowManager windowManager;
 
         public HotkeyBehavior(
             [NotNull] IKeyboardEvents keyboardHook,
             [NotNull] IEnumerable<CommandKeyBinding> keyBindings,
             [NotNull] ILayoutsViewModel layoutsViewModel,
             [NotNull] IScreenProvider screenProvider,
+            [NotNull] Win32WindowFactory windowFactory,
+            [NotNull] IWindowManager windowManager,
             [NotNull] ILayoutMappingViewModel layoutMapping)
             : base(keyboardHook, keyBindings) {
             this.layoutsViewModel = layoutsViewModel ?? throw new ArgumentNullException(nameof(layoutsViewModel));
             this.screenProvider = screenProvider ?? throw new ArgumentNullException(nameof(screenProvider));
+            this.windowFactory = windowFactory ?? throw new ArgumentNullException(nameof(windowFactory));
+            this.windowManager = windowManager ?? throw new ArgumentNullException(nameof(windowManager));
             this.layoutMapping = layoutMapping ?? throw new ArgumentNullException(nameof(layoutMapping));
         }
 
@@ -39,6 +44,8 @@
             case Commands.ReloadLayouts:
             case Commands.ChooseLayout:
                 return true;
+            case Commands.DetachWindow:
+                return this.windowFactory.Foreground != null;
             default: return false;
             }
         }
@@ -56,6 +63,11 @@
                 Win32Screen currentScreen = this.GetCurrentScreen();
                 var selector = this.layoutMapping.ShowLayoutSelector(currentScreen);
                 selector.Topmost = true;
+                break;
+            case Commands.DetachWindow:
+                var foreground = this.windowFactory.Foreground;
+                if (foreground != null)
+                    await this.windowManager.Detach(foreground, restoreBounds: true);
                 break;
             }
         }
@@ -88,8 +100,9 @@
         {
             public const string ReloadLayouts = "Reload Layouts";
             public const string ChooseLayout = "Select Layout";
+            public const string DetachWindow = "Detach window, and restore its bounds";
 
-            public static readonly IEnumerable<string> All = new[] { ReloadLayouts, ChooseLayout };
+            public static readonly IEnumerable<string> All = new[] { ReloadLayouts, ChooseLayout, DetachWindow };
         }
     }
 }

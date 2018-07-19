@@ -1,6 +1,7 @@
 ﻿namespace LostTech.Stack.Behavior
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -27,6 +28,7 @@
         readonly Win32WindowFactory win32WindowFactory;
         readonly WindowHookEx activationHook = WindowHookExFactory.Instance.GetHook();
         readonly TaskScheduler taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+        readonly ConcurrentDictionary<IAppWindow, bool> alreadyCatpured = new ConcurrentDictionary<IAppWindow, bool>();
 
         public AutoCaptureBehavior(
             [NotNull] IKeyboardEvents keyboardHook,
@@ -53,6 +55,7 @@
                 this.Capture();
 
             this.layoutManager.WindowAppeared += this.OnWindowAppeared;
+            this.layoutManager.WindowDestroyed += this.OnWindowDestroyed;
             this.layoutManager.DesktopSwitched += this.OnDesktopSwitched;
             this.layouts.LayoutLoaded += this.OnLayoutLoaded;
             this.activationHook.Activated += this.OnWindowActivated;
@@ -107,6 +110,10 @@
                     .ReportAsWarning();
         }
 
+        void OnWindowDestroyed(object sender, EventArgs<IAppWindow> e) {
+            this.alreadyCatpured.TryRemove(e.Subject, out bool _);
+        }
+
         void Capture() {
             this.win32WindowFactory
                 .ForEachTopLevel(async window => {
@@ -139,8 +146,10 @@
             if (window == null)
                 throw new ArgumentNullException(nameof(window));
 
-            if (this.layoutManager.GetLocation(window, searchSuspended: true) != null)
+            if (this.layoutManager.GetLocation(window, searchSuspended: true) != null) {
+                this.alreadyCatpured[window] = true;
                 return;
+            }
 
             try {
                 Rect bounds = Rect.Empty;
@@ -182,6 +191,7 @@
                     if (targetBounds != null) {
                         this.layoutManager.Move(window, targetZone);
                         Debug.WriteLine($"move {window.Title} to {targetZone.GetPhysicalBounds()}");
+                        this.alreadyCatpured[window] = true;
                     }
                 }, CancellationToken.None, TaskCreationOptions.None, this.taskScheduler).Unwrap();
             } catch (WindowNotFoundException) { } catch (OperationCanceledException) { }
@@ -195,7 +205,7 @@
                 return;
 
             IAppWindow foreground = this.win32WindowFactory.Foreground;
-            if (foreground != null)
+            if (foreground != null && !this.alreadyCatpured.ContainsKey(foreground))
                 await Task.Run(() => this.Capture(foreground)).ConfigureAwait(false);
         }
 
