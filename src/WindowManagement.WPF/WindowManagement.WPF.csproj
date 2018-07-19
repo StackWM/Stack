@@ -8,8 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
-    <PackageReference Include="PInvoke.DwmApi" Version="0.5.152" />
-    <PackageReference Include="PInvoke.User32" Version="0.5.152" />
+    <PackageReference Include="PInvoke.DwmApi" Version="0.5.155" />
+    <PackageReference Include="PInvoke.User32" Version="0.5.155" />
   </ItemGroup>
 
   <ItemGroup>
