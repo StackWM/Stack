@@ -6,11 +6,11 @@
              xmlns:local="clr-namespace:LostTech.Stack.Views"
              mc:Ignorable="d"
              x:Name="LayoutRoot"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
@@ -18,12 +18,15 @@
         </Grid.ColumnDefinitions>
 
         <ListView x:Name="GroupsView"
+                  Grid.Row="1" Grid.Column="0"
+                  Margin="0,0,4,0"
                   ItemsSource="{Binding ItemsSource, ElementName=LayoutRoot}" DisplayMemberPath="Name"
                   />
-        <StackPanel Grid.Row="1" Grid.Column="0"
+        <StackPanel Grid.Row="0" Grid.Column="0"
                     Orientation="Horizontal"
+                    Margin="0,0,4,4"
                     >
-            <Button Click="AddGroupClick" Margin="0,0,6,0">Add Group</Button>
+            <Button Click="AddGroupClick" Margin="0,0,6,0">Create Group</Button>
             <Button Click="RemoveGroupClick"
                     IsEnabled="{Binding SelectedItem, ElementName=GroupsView, Converter={StaticResource NullIsFalseConverter}}"
                     >
@@ -32,7 +35,7 @@
 
         <local:WindowGroupEditor Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
               x:Name="GroupEditor"
-              Margin="6,0,0,0"
+              Margin="4,0,0,0"
               WindowGroup="{Binding SelectedItem, ElementName=GroupsView}"
               IsEnabled="{Binding SelectedItem, ElementName=GroupsView, Converter={StaticResource NullIsFalseConverter}}"
               />
