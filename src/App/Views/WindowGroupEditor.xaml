@@ -15,12 +15,15 @@
 
         <DockPanel>
             <TextBlock DockPanel.Dock="Left" Margin="6">Name:</TextBlock>
-            <TextBox x:Name="NameEditor" Text="{Binding WindowGroup.Name, UpdateSourceTrigger=PropertyChanged, ElementName=LayoutRoot}"/>
+            <TextBox x:Name="NameEditor"
+                     VerticalContentAlignment="Center"
+                     Text="{Binding WindowGroup.Name, UpdateSourceTrigger=PropertyChanged, ElementName=LayoutRoot}"
+                     />
         </DockPanel>
 
         <local:WindowFiltersEditor Filters="{Binding WindowGroup.Filters, ElementName=LayoutRoot}"
                                    Grid.Row="1"
-                                   Margin="0,6,0,0"
+                                   Margin="0,8,0,0"
         />
     </Grid>
 </UserControl>

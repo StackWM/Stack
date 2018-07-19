@@ -28,15 +28,17 @@
         </Style>
     </UserControl.Resources>
     <DockPanel>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom"
-                    Margin="0,4,0,0"
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top"
+                    Margin="0,0,0,8"
                     >
             <Button Click="AddButtonClick"
-                    Margin="0,0,6,0"
-                    >Add Filter</Button>
+                    Margin="0,0,8,0"
+                    MinWidth="{StaticResource ButtonMinWidth}"
+                    >Add Window(s)</Button>
             <Button IsEnabled="{Binding SelectedItem, ElementName=FiltersView, Converter={StaticResource NullIsFalseConverter}}"
                     Click="RemoveButtonClick"
-                    >Remove Filter</Button>
+                    MinWidth="{StaticResource ButtonMinWidth}"
+                    >Remove</Button>
         </StackPanel>
         <ListView x:Name="FiltersView"
                   ItemContainerStyle="{StaticResource FilterContainerStyle}"
