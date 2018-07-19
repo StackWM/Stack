@@ -63,6 +63,17 @@
               </Setter.Value>
             </Setter>
           </Style>
+          <DataTemplate x:Key="GroupListHeader">
+              <Grid>
+                  <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="*"/>
+                      <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+
+                  <TextBlock Text="{Binding}"/>
+                  <Button Grid.Column="1" Click="CreateGroupClick">Create Group</Button>
+              </Grid>
+          </DataTemplate>
         </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -95,10 +106,13 @@
                             ItemsSource="{StaticResource MouseButtonOptions}"
                   />
                 </HeaderedContentControl>
-                <HeaderedContentControl Header="Disable for these windows:" VerticalContentAlignment="Stretch" Margin="0">
-                <views:WindowGroupListEditor AvailableGroups="{Binding WindowGroups}"
-                                             VerticalAlignment="Stretch"
-                                             Groups="{Binding Behaviors.MouseMove.WindowGroupIgnoreList}"/>
+                <HeaderedContentControl VerticalContentAlignment="Stretch" Margin="0"
+                                        Header="Disable for these windows:"
+                                        HeaderTemplate="{StaticResource GroupListHeader}"
+                                        >
+                    <views:WindowGroupListEditor AvailableGroups="{Binding WindowGroups}"
+                                                 VerticalAlignment="Stretch"
+                                                 Groups="{Binding Behaviors.MouseMove.WindowGroupIgnoreList}"/>
                 </HeaderedContentControl>
             </DockPanel>
         </TabItem>
@@ -107,9 +121,13 @@
                 <metro:ToggleSwitch Header="Use keyboard to move windows horizontally or vertically"
                                     DockPanel.Dock="Top"
                                     IsChecked="{Binding Behaviors.KeyboardMove.Enabled}"/>
-                <TextBlock DockPanel.Dock="Top">Disable for these windows:</TextBlock>
-                <views:WindowGroupListEditor AvailableGroups="{Binding WindowGroups}"
-                                             Groups="{Binding Behaviors.KeyboardMove.WindowGroupIgnoreList}" />
+                <HeaderedContentControl VerticalContentAlignment="Stretch" Margin="0"
+                                        Header="Disable for these windows:"
+                                        HeaderTemplate="{StaticResource GroupListHeader}"
+                                        >
+                    <views:WindowGroupListEditor AvailableGroups="{Binding WindowGroups}"
+                                                 Groups="{Binding Behaviors.KeyboardMove.WindowGroupIgnoreList}" />
+                </HeaderedContentControl>
             </DockPanel>
         </TabItem>
         <TabItem Header="Hotkeys">
@@ -164,8 +182,8 @@
             </Grid>
           </Grid>
         </TabItem>
-        <TabItem Header="Window Groups">
-            <views:WindowGroupsEditor Margin="8" ItemsSource="{Binding WindowGroups}"/>
+        <TabItem x:Name="WindowGroupsTab" Header="Window Groups">
+            <views:WindowGroupsEditor x:Name="WindowGroupsEditor" Margin="8" ItemsSource="{Binding WindowGroups}"/>
         </TabItem>
     </metro:MetroAnimatedSingleRowTabControl>
 </metro:MetroWindow>
