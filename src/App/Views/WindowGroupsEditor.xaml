@@ -1,5 +1,6 @@
 ﻿<UserControl x:Class="LostTech.Stack.Views.WindowGroupsEditor"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -19,25 +20,40 @@
 
         <ListView x:Name="GroupsView"
                   Grid.Row="1" Grid.Column="0"
-                  Margin="0,0,4,0"
+                  Margin="0,0,8,0"
+                  FontSize="15"
                   ItemsSource="{Binding ItemsSource, ElementName=LayoutRoot}" DisplayMemberPath="Name"
                   />
         <StackPanel Grid.Row="0" Grid.Column="0"
                     Orientation="Horizontal"
-                    Margin="0,0,4,4"
+                    Margin="0,0,8,8"
                     >
-            <Button Click="AddGroupClick" Margin="0,0,6,0">Create Group</Button>
+            <Button Click="AddGroupClick" Margin="0,0,8,0" MinWidth="{StaticResource ButtonMinWidth}">Create Group</Button>
             <Button Click="RemoveGroupClick"
+                    MinWidth="{StaticResource ButtonMinWidth}"
                     IsEnabled="{Binding SelectedItem, ElementName=GroupsView, Converter={StaticResource NullIsFalseConverter}}"
                     >
                 Remove Group</Button>
         </StackPanel>
 
-        <local:WindowGroupEditor Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
-              x:Name="GroupEditor"
-              Margin="4,0,0,0"
-              WindowGroup="{Binding SelectedItem, ElementName=GroupsView}"
-              IsEnabled="{Binding SelectedItem, ElementName=GroupsView, Converter={StaticResource NullIsFalseConverter}}"
-              />
+        <Border Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
+                BorderThickness="1,0,0,0"
+                BorderBrush="Gray"
+                >
+            <Grid>
+                <local:WindowGroupEditor x:Name="GroupEditor"
+                                         Margin="4,0,0,0"
+                                         FontSize="15"
+                                         WindowGroup="{Binding SelectedItem, ElementName=GroupsView}"
+                                         IsEnabled="{Binding SelectedItem, ElementName=GroupsView, Converter={StaticResource NullIsFalseConverter}}"
+                                         Visibility="{c:Binding 'SelectedItem != null', ElementName=GroupsView, FalseToVisibility=Collapsed}"
+                                         />
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center"
+                           FontSize="24"
+                           Text="Click on a group to edit it"
+                           Visibility="{c:Binding 'SelectedItem == null', ElementName=GroupsView, FalseToVisibility=Collapsed}"
+                           />
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>

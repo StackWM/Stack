@@ -6,6 +6,7 @@
              xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
              xmlns:valueConverters="clr-namespace:ValueConverters;assembly=ValueConverters"
              xmlns:binding="clr-namespace:LostTech.Stack.DataBinding"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="options"
              >
     <Application.Resources>
@@ -22,6 +23,7 @@
                     <binding:UniformThicknessConverter x:Key="ThicknessConverter"/>
                     <binding:MinimumNumberToVisibilityConverter x:Key="MultipleItemsToVisibilityConverter" Minimum="2"/>
                     <binding:PercentageConverter x:Key="PercentageConverter"/>
+                    <system:Double x:Key="ButtonMinWidth">100</system:Double>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
