@@ -85,8 +85,8 @@
     <Reference Include="LostTech.Checkpoint, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LostTech.Checkpoint.0.2.0\lib\netstandard1.0\LostTech.Checkpoint.dll</HintPath>
     </Reference>
-    <Reference Include="LostTech.Stack.Extensibility, Version=0.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LostTech.Stack.Extensibility.0.1.1\lib\net462\LostTech.Stack.Extensibility.dll</HintPath>
+    <Reference Include="LostTech.Stack.Extensibility, Version=0.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LostTech.Stack.Extensibility.0.1.2\lib\net462\LostTech.Stack.Extensibility.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro, Version=1.6.5.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MahApps.Metro.1.6.5\lib\net47\MahApps.Metro.dll</HintPath>
