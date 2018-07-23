@@ -53,9 +53,6 @@
     <Reference Include="DesktopBridge.Helpers, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\DesktopBridge.Helpers.1.1\lib\net45\DesktopBridge.Helpers.dll</HintPath>
     </Reference>
-    <Reference Include="EventHook, Version=1.4.79.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\EventHook.1.4.79\lib\net45\EventHook.dll</HintPath>
-    </Reference>
     <Reference Include="JetBrains.Annotations, Version=11.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\..\packages\JetBrains.Annotations.11.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
@@ -77,11 +74,11 @@
     <Reference Include="MahApps.Metro, Version=1.6.5.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MahApps.Metro.1.6.5\lib\net46\MahApps.Metro.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.HockeyApp.Core45, Version=4.1.6.1005, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HockeySDK.WPF.4.1.6\lib\net45\Microsoft.HockeyApp.Core45.dll</HintPath>
+    <Reference Include="Microsoft.HockeyApp.Core45, Version=4.1.7.29788, Culture=neutral, PublicKeyToken=5179ea9e4cdf308e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HockeySDK.Community.WPF.4.1.7-pre0\lib\net45\Microsoft.HockeyApp.Core45.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.HockeyApp.Kit, Version=4.1.6.1005, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HockeySDK.WPF.4.1.6\lib\net45\Microsoft.HockeyApp.Kit.dll</HintPath>
+    <Reference Include="Microsoft.HockeyApp.Kit, Version=4.1.7.29788, Culture=neutral, PublicKeyToken=5179ea9e4cdf308e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HockeySDK.Community.WPF.4.1.7-pre0\lib\net45\Microsoft.HockeyApp.Kit.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.Win32.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -465,17 +462,21 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\App\KeySettings\src\WPF\WPF.csproj">
+    <ProjectReference Include="..\..\External\EventHook\EventHook\EventHook.csproj">
+      <Project>{3847a7f4-3f6b-4626-af4c-8fdfba6165f2}</Project>
+      <Name>EventHook</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\KeySettings\src\WPF\WPF.csproj">
       <Project>{f0f57d7c-f2aa-4046-9692-e30d896e8515}</Project>
       <Name>WPF</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\App\ObservableFileSystem\src\ObservableFileSystem.csproj">
-      <Project>{b8ad0753-625f-41e0-a90d-05d587cf0780}</Project>
-      <Name>ObservableFileSystem</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\OSS\MouseKeyHook\MouseKeyHook\MouseKeyHook.csproj">
-      <Project>{f52aa97e-180a-40ed-8f2b-09080171d6c7}</Project>
+    <ProjectReference Include="..\..\External\MouseKeyHook\MouseKeyHook\MouseKeyHook.csproj">
+      <Project>{242980ad-9a79-4cec-9b22-7d39c602cd31}</Project>
       <Name>MouseKeyHook</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\ObservableFileSystem\src\ObservableFileSystem.csproj">
+      <Project>{5af1c55b-ffe9-41e3-968e-d294759333dc}</Project>
+      <Name>ObservableFileSystem</Name>
     </ProjectReference>
     <ProjectReference Include="..\Screen\Screen.csproj">
       <Project>{adea0e3b-e6af-403b-b293-f3bc88f426ba}</Project>

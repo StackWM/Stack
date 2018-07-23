@@ -15,10 +15,14 @@
         readonly ICollection<ScreenLayout> screenLayouts;
         readonly Dictionary<IAppWindow, Zone> locations = new Dictionary<IAppWindow, Zone>();
         readonly TaskScheduler taskScheduler;
+        readonly EventHookFactory eventHookFactory = new EventHookFactory();
+        readonly ApplicationWatcher applicationWatcher;
 
         public LayoutManager([NotNull] ICollection<ScreenLayout> screenLayouts) {
             this.screenLayouts = screenLayouts ?? throw new ArgumentNullException(nameof(screenLayouts));
-            ApplicationWatcher.OnApplicationWindowChange += this.OnApplicationWindowChange;
+            this.applicationWatcher = this.eventHookFactory.GetApplicationWatcher();
+            this.applicationWatcher.OnApplicationWindowChange += this.OnApplicationWindowChange;
+            this.applicationWatcher.Start();
             this.taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
         }
 
@@ -88,7 +92,9 @@
         Task<T> StartOnParentThread<T>(Func<T> action) => Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.None, this.taskScheduler);
 
         public void Dispose() {
-            ApplicationWatcher.OnApplicationWindowChange -= this.OnApplicationWindowChange;
+            this.applicationWatcher.OnApplicationWindowChange -= this.OnApplicationWindowChange;
+            this.applicationWatcher.Stop();
+            this.eventHookFactory.Dispose();
         }
     }
 }

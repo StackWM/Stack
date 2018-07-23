@@ -63,7 +63,6 @@
         SettingsWindow SettingsWindow { get; set; }
 
         DragHook dragHook;
-        bool applicationWatcherStarted;
         StackSettings stackSettings;
         KeyboardArrowBehavior keyboardArrowBehavior;
         LayoutManager layoutManager;
@@ -90,8 +89,6 @@
 
             this.MainWindow = this.winApiHandler;
             this.winApiHandler.Show();
-            ApplicationWatcher.Start();
-            this.applicationWatcherStarted = true;
 
             if (!IsUwp) {
                 this.BeginCheckForUpdates();
@@ -400,10 +397,6 @@
         {
             this.layoutManager?.Dispose();
             this.layoutManager = null;
-            if (this.applicationWatcherStarted) {
-                this.applicationWatcherStarted = false;
-                ApplicationWatcher.Stop();
-            }
             this.hook?.Dispose();
             this.dragHook?.Dispose();
             this.dragHook = null;
