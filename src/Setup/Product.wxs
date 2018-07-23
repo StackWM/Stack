@@ -211,6 +211,9 @@
       <Component Id="DesktopBridge.Helpers.dll" Guid="6b146cff-e2d6-4a6e-8552-1c085126bda2">
         <File Id="DesktopBridge.Helpers.dll" Name="DesktopBridge.Helpers.dll" Source="$(var.App_TargetDir)DesktopBridge.Helpers.dll" />
       </Component>
+      <Component Id="ControlzEx.dll" Guid="20ca21c6-3841-42fb-85b0-29d6397c2fb2">
+        <File Id="ControlzEx.dll" Name="ControlzEx.dll" Source="$(var.App_TargetDir)ControlzEx.dll" />
+      </Component>
     </ComponentGroup>
     <ComponentGroup Id="Shortcuts" Directory="ApplicationProgramsFolder">
       <Component Id="Stack.exe.lnk.Component" Guid="c218d8d9-3dcf-4c6a-a6b1-6ea368f61bf6">
