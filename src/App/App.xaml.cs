@@ -490,8 +490,6 @@
                 await delay;
                 if (delay.Equals(changeGroupTask))
                     layout.SetLayout(await this.GetLayoutForScreen(layout.Screen, settings, this.layoutsFolder));
-                else
-                    Debug.WriteLine("grouped updates!");
             }
 
             async void ScreenPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
