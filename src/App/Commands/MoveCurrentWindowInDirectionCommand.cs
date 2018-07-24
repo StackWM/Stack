@@ -42,6 +42,9 @@
 
         public bool CanExecute(IntPtr window)
         {
+            if (!this.settings.Enabled)
+                return false;
+
             if (!Win32.GetWindowInfo(window, out var _)) {
                 Debug.WriteLine("can't move: window inaccessible");
                 return false;

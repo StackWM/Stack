@@ -362,12 +362,17 @@
 
         void OnDragStart(object sender, DragHookEventArgs @event)
         {
+            if (!this.stackSettings.Behaviors.MouseMove.Enabled)
+                return;
             this.dragOperation = this.DragStart();
             @event.Handled = this.dragOperation != null;
         }
 
         void OnDragStartPreview(object sender, DragHookEventArgs args)
         {
+            if (!this.stackSettings.Behaviors.MouseMove.Enabled)
+                return;
+
             args.Handled = this.DragStart() != null;
         }
 
