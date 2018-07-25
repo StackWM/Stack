@@ -10,6 +10,8 @@
     using LostTech.Stack.Models;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
+    using LostTech.Stack.WindowManagement;
+    using LostTech.Stack.WindowManagement.WinApi;
     using LostTech.Stack.Zones;
     using PInvoke;
 
@@ -53,7 +55,7 @@
             if (User32.IsIconic(window))
                 return false;
 
-            var bounds = new Win32Window(window).Bounds;
+            var bounds = new Win32Window(window, suppressSystemMargin: false).Bounds;
             if (bounds.IsEmpty || bounds.Inflated(-1, -1).IsEmpty)
                 return false;
 
@@ -71,8 +73,8 @@
 
         public event EventHandler CanExecuteChanged;
 
-        const double Epsilon = 2;
-        const double LargeValue = 1e9;
+        const float Epsilon = 2;
+        const float LargeValue = 1e9f;
 
         bool MoveCurrentWindow(Vector direction)
         {
@@ -80,7 +82,7 @@
             if (!this.CanExecute(windowHandle))
                 return false;
 
-            Win32Window window = new Win32Window(windowHandle);
+            Win32Window window = new Win32Window(windowHandle, suppressSystemMargin: false);
             var windowCenter = window.Bounds.Center();
             var allZones = this.screenLayouts.Active().SelectMany(screen => screen.Zones)
                 .Where(zone => zone.Target == null || zone.Equals(zone.Target))
@@ -140,9 +142,9 @@
                     zone.GetPhysicalBounds().Area().AtLeast(1)
                     / zone.GetPhysicalBounds().Intersection(strip).Area().AtLeast(1);
 
-                double centerTravelDistance = (windowCenter - zone.GetPhysicalBounds().Center()).Length;
+                double centerTravelDistance = (windowCenter.ToWPF() - zone.GetPhysicalBounds().Center().ToWPF()).Length;
 
-                return DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction)
+                return DistanceAlongDirection(windowCenter.ToWPF(), zone.GetPhysicalBounds().Center().ToWPF(), direction)
                        * centerTravelDistance
                        * intersectionPercentage;
             }
@@ -152,7 +154,7 @@
                    ?? allZones.Where(zone =>
                            zone.GetPhysicalBounds().IntersectsWith(strip)
                            && !sameCenter.Contains(zone)
-                           && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction) > 0)
+                           && DistanceAlongDirection(windowCenter.ToWPF(), zone.GetPhysicalBounds().Center().ToWPF(), direction) > 0)
                        .OrderBy(GetRank)
                        .FirstOrDefault();
 
@@ -160,7 +162,7 @@
             var targets = allZones.Where(zone =>
                     zone.GetPhysicalBounds().IntersectsWith(strip)
                     && !sameCenter.Contains(zone)
-                    && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction) > 0)
+                    && DistanceAlongDirection(windowCenter.ToWPF(), zone.GetPhysicalBounds().Center().ToWPF(), direction) > 0)
                 .ToArray();
             Debug.WriteLine("potential targets:");
             foreach (var zone in targets) {

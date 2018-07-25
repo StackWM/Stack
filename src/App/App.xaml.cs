@@ -28,6 +28,7 @@
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
     using LostTech.Stack.ViewModels;
+    using LostTech.Stack.WindowManagement;
     using LostTech.Stack.Windows;
     using LostTech.Stack.Zones;
     using LostTech.Windows;
@@ -39,10 +40,10 @@
     using DragAction = System.Windows.DragAction;
     using FileAccess = PCLStorage.FileAccess;
     using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
+    using MessageBox = System.Windows.MessageBox;
+    using Point = System.Drawing.PointF;
     using static System.FormattableString;
     using static PInvoke.User32;
-    using MessageBox = System.Windows.MessageBox;
-    using global::Windows.UI.Notifications;
 
     /// <summary>
     /// Interaction logic for App.xaml
@@ -303,7 +304,7 @@
             }
 
 
-            var relativeDropPoint = screen.PointFromScreen(currentPosition);
+            var relativeDropPoint = screen.PointFromScreen(currentPosition.ToWPF());
             var zone = screen.GetZone(relativeDropPoint)?.GetFinalTarget();
             if (zone == null) {
                 if (this.dragOperation.CurrentZone != null) {
@@ -346,7 +347,7 @@
                 .FirstOrDefault(layout => layout.GetPhysicalBounds().Contains(dropPoint));
             if (screen == null)
                 return;
-            var relativeDropPoint = screen.PointFromScreen(dropPoint);
+            var relativeDropPoint = screen.PointFromScreen(dropPoint.ToWPF());
             var zone = screen.GetZone(relativeDropPoint)?.GetFinalTarget();
             if (zone == null)
                 return;
@@ -355,7 +356,7 @@
 
         void Move(IntPtr windowHandle, Zone zone)
         {
-            var window = new Win32Window(windowHandle);
+            var window = new Win32Window(windowHandle, suppressSystemMargin: false);
             this.layoutManager.Move(window, zone);
         }
 
@@ -374,7 +375,7 @@
 
             var contentXml = new global::Windows.Data.Xml.Dom.XmlDocument();
             contentXml.LoadXml(content.GetContent());
-            var toast = new ToastNotification(contentXml) {
+            var toast = new global::Windows.UI.Notifications.ToastNotification(contentXml) {
                 // DTO + null == null
                 ExpirationTime = DateTimeOffset.Now + duration,
             };
@@ -650,7 +651,7 @@
                                .OrderBy(s => s.WorkingArea.Left)
                                .Select(s => s.ID).ToArray();
             bool isOnTheRight = screens.Length > 1 && screens.Last() == screen.ID;
-            bool isBig = screen.TransformFromDevice.Transform((Vector)screen.WorkingArea.Size).X > 2000;
+            bool isBig = screen.TransformFromDevice.Transform(screen.WorkingArea.Size.AsWPFVector()).X > 2000;
             bool isWide = screen.WorkingArea.Width > 2.1 * screen.WorkingArea.Height;
             string leftOrRight = isOnTheRight ? "Right" : "Left";
             string kind = isWide ? "Wide" : isBig ? "Large Horizontal" : "Small Horizontal";
