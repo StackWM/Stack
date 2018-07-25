@@ -8,6 +8,7 @@
     using System.Threading.Tasks;
     using EventHook;
     using JetBrains.Annotations;
+    using LostTech.Stack.WindowManagement;
     using LostTech.Stack.Zones;
 
     class LayoutManager : IDisposable

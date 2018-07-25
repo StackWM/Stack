@@ -36,6 +36,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowManagement.WPF", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Screen", "src\Screen.WPF\Screen.csproj", "{ADEA0E3B-E6AF-403B-B293-F3BC88F426BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualDesktop", "External\VirtualDesktop\source\VirtualDesktop\VirtualDesktop.csproj", "{AB848ECD-76AA-41C0-B63D-86A8591B25AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +80,10 @@ Global
 		{ADEA0E3B-E6AF-403B-B293-F3BC88F426BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADEA0E3B-E6AF-403B-B293-F3BC88F426BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ADEA0E3B-E6AF-403B-B293-F3BC88F426BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB848ECD-76AA-41C0-B63D-86A8591B25AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB848ECD-76AA-41C0-B63D-86A8591B25AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB848ECD-76AA-41C0-B63D-86A8591B25AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB848ECD-76AA-41C0-B63D-86A8591B25AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -90,6 +96,7 @@ Global
 		{86FEB922-9161-4427-B17E-6735647D3A94} = {BB7ED621-C15D-4699-9966-5C1238DB7E8E}
 		{561BEF41-CE2A-4617-84C2-DC81308F51EA} = {BB7ED621-C15D-4699-9966-5C1238DB7E8E}
 		{ADEA0E3B-E6AF-403B-B293-F3BC88F426BA} = {BB7ED621-C15D-4699-9966-5C1238DB7E8E}
+		{AB848ECD-76AA-41C0-B63D-86A8591B25AA} = {30516558-7C3B-4FE9-BDA4-8343329FA665}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F54A1371-0D5C-4D9D-8930-6B78A7F725A5}

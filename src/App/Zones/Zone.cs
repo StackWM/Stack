@@ -10,6 +10,7 @@
     using System.Windows;
     using System.Windows.Controls;
     using LostTech.Stack.Models;
+    using LostTech.Stack.WindowManagement;
 
     public class Zone : ContentControl
     {
