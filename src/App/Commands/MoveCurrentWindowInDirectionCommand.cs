@@ -73,9 +73,9 @@
 
         public bool Execute(PointF direction) => this.MoveCurrentWindow(direction);
 
-#pragma warning disable CS0169
+#pragma warning disable CS0067
         public event EventHandler CanExecuteChanged;
-#pragma warning restore CS0169
+#pragma warning restore CS0067
 
         const float Epsilon = 2;
         const float LargeValue = 1e9f;

@@ -331,7 +331,6 @@
     <Compile Include="Utils\EventArgs.cs" />
     <Compile Include="Utils\ExceptionExtensions.cs" />
     <Compile Include="Utils\GlassEffect.cs" />
-    <Compile Include="Utils\ListInTaskSwitcher.cs" />
     <Compile Include="Utils\MathUtils.cs" />
     <Compile Include="Utils\ScreenExtensions.cs" />
     <Compile Include="Utils\Throttle.cs" />
@@ -580,6 +579,10 @@
     <ProjectReference Include="..\Screen.WPF\Screen.csproj">
       <Project>{adea0e3b-e6af-403b-b293-f3bc88f426ba}</Project>
       <Name>Screen</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ScreenTracking\ScreenTracking.csproj">
+      <Project>{2cfa01e9-cbd1-4c70-8d02-7c8773cde925}</Project>
+      <Name>ScreenTracking</Name>
     </ProjectReference>
     <ProjectReference Include="..\WindowManagement.WPF\WindowManagement.WPF.csproj">
       <Project>{f050a999-37fc-4e1c-a1c0-ee2212e49904}</Project>

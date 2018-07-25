@@ -395,8 +395,7 @@
                 this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => {
                     // for some reason Topmost below is unreliable
                     // so we have to manually bring the grid up. See Bug #287
-                    if (screenLayout.IsHandleInitialized)
-                        this.win32WindowFactory.Create(screenLayout.handle.Handle).BringToFront();
+                    screenLayout.TryGetNativeWindow()?.BringToFront();
 
                     screenLayout.Topmost = true;
                 }));
@@ -448,8 +447,7 @@
                 screenLayout.Background = Brushes.Transparent;
                 screenLayout.Opacity = 1;
                 //screenLayout.TryDisableGlassEffect();
-                if (screenLayout.IsHandleInitialized)
-                    this.win32WindowFactory.Create(screenLayout.handle.Handle).SendToBottom();
+                screenLayout.TryGetNativeWindow()?.SendToBottom();
             }
         }
 

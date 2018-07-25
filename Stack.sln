@@ -47,6 +47,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowManagement.WPF", "src
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deps", "Deps", "{8BC95EF1-8738-4841-9A17-A93824EAF4E1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScreenTracking", "src\ScreenTracking\ScreenTracking.csproj", "{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -316,6 +318,24 @@ Global
 		{F050A999-37FC-4E1C-A1C0-EE2212E49904}.ReleaseProfile|x64.Build.0 = Release|Any CPU
 		{F050A999-37FC-4E1C-A1C0-EE2212E49904}.ReleaseProfile|x86.ActiveCfg = Release|Any CPU
 		{F050A999-37FC-4E1C-A1C0-EE2212E49904}.ReleaseProfile|x86.Build.0 = Release|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.Debug|x64.Build.0 = Debug|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.Debug|x86.Build.0 = Debug|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.Release|x64.ActiveCfg = Release|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.Release|x64.Build.0 = Release|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.Release|x86.ActiveCfg = Release|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.Release|x86.Build.0 = Release|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.ReleaseProfile|Any CPU.ActiveCfg = Release|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.ReleaseProfile|Any CPU.Build.0 = Release|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.ReleaseProfile|x64.ActiveCfg = Release|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.ReleaseProfile|x64.Build.0 = Release|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.ReleaseProfile|x86.ActiveCfg = Release|Any CPU
+		{2CFA01E9-CBD1-4C70-8D02-7C8773CDE925}.ReleaseProfile|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

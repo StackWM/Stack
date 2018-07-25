@@ -1,8 +1,9 @@
 ﻿namespace LostTech.Stack.ViewModels
 {
+    using LostTech.Stack.ScreenTracking;
     using LostTech.Windows;
 
-    sealed class ScreenLayoutViewModel : SimpleViewModel
+    sealed class ScreenLayoutViewModel : SimpleViewModel, IScreenLayoutViewModel
     {
         Win32Screen screen;
         public Win32Screen Screen {
