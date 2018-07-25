@@ -579,7 +579,7 @@
       <Project>{ab848ecd-76aa-41c0-b63d-86a8591b25aa}</Project>
       <Name>VirtualDesktop</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Screen\Screen.csproj">
+    <ProjectReference Include="..\Screen.WPF\Screen.csproj">
       <Project>{adea0e3b-e6af-403b-b293-f3bc88f426ba}</Project>
       <Name>Screen</Name>
     </ProjectReference>

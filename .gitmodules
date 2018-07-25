@@ -25,3 +25,9 @@
 [submodule "src/WindowManagement"]
 	path = src/WindowManagement
 	url = https://losttech.visualstudio.com/DefaultCollection/Stack/_git/WindowManagement
+[submodule "src/WindowManagement.WPF"]
+	path = src/WindowManagement.WPF
+	url = https://losttech.visualstudio.com/DefaultCollection/Stack/_git/WindowManagement.WPF
+[submodule "src/Screen.WPF"]
+	path = src/Screen.WPF
+	url = https://losttech.visualstudio.com/DefaultCollection/Stack/_git/Screen.WPF
