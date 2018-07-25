@@ -492,7 +492,7 @@
       <Project>{5af1c55b-ffe9-41e3-968e-d294759333dc}</Project>
       <Name>ObservableFileSystem</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Screen\Screen.csproj">
+    <ProjectReference Include="..\Screen.WPF\Screen.csproj">
       <Project>{adea0e3b-e6af-403b-b293-f3bc88f426ba}</Project>
       <Name>Screen</Name>
     </ProjectReference>
