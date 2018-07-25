@@ -22,3 +22,6 @@
 [submodule "External/Widgets"]
 	path = External/Widgets
 	url = https://github.com/losttech/Stack.Widgets.git
+[submodule "src/WindowManagement"]
+	path = src/WindowManagement
+	url = https://losttech.visualstudio.com/DefaultCollection/Stack/_git/WindowManagement
