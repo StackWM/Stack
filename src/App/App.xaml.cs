@@ -24,7 +24,6 @@
     using LostTech.Stack.Models;
     using LostTech.Stack.Extensibility.Filters;
     using LostTech.Stack.Licensing;
-    using LostTech.Stack.ScreenCoordinates;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
     using LostTech.Stack.ViewModels;
@@ -524,7 +523,7 @@
                 var layoutTask = this.GetLayoutForScreen(screen, settings, this.layoutsFolder);
                 var layout = new ScreenLayout {
                     Opacity = 0.7,
-                    Screen = screen,
+                    ViewModel = new ScreenLayoutViewModel{Screen = screen},
                     Title = $"{screen.ID}: {ScreenLayouts.GetDesignation(screen)}"
                 };
                 layout.Closed += this.OnLayoutClosed;
@@ -538,7 +537,7 @@
                     zone.Id = zone.Id ?? $"{zoneIndex++}";
                 }
                 this.screenLayouts.Add(layout);
-                layout.SetLayout(await layoutTask);
+                await layout.SetLayout(await layoutTask);
             }
 
             void RemoveLayoutForScreen(Win32Screen screen) {
@@ -561,7 +560,7 @@
                 changeGroupTask = delay;
                 await delay;
                 if (delay.Equals(changeGroupTask))
-                    layout.SetLayout(await this.GetLayoutForScreen(layout.Screen, settings, this.layoutsFolder));
+                    await layout.SetLayout(await this.GetLayoutForScreen(layout.Screen, settings, this.layoutsFolder));
             }
 
             async void ScreenPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {

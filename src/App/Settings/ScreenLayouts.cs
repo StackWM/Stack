@@ -7,7 +7,6 @@ namespace LostTech.Stack.Settings
     using System.IO;
     using System.Linq;
     using System.Runtime.Serialization;
-    using System.Windows;
     using JetBrains.Annotations;
     using LostTech.App.DataBinding;
     using LostTech.Stack.Models;
@@ -81,7 +80,7 @@ namespace LostTech.Stack.Settings
         }
 
         public static string GetDesignation(Win32Screen screen) {
-            Rect area = screen.WorkingArea;
+            var area = screen.WorkingArea;
             return FormattableString.Invariant(
                 $"{(int)area.Width}x{(int)area.Height} @ {(int)area.Left},{(int)area.Top}");
         }

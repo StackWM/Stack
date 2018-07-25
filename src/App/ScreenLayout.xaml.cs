@@ -2,130 +2,21 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
-    using System.Threading.Tasks;
     using System.Windows;
-    using System.Windows.Interop;
     using System.Windows.Media;
-    using LostTech.Stack.ScreenCoordinates;
     using LostTech.Stack.Zones;
-    using LostTech.Windows;
-    using PInvoke;
 
     /// <summary>
     /// Interaction logic for ScreenLayout.xaml
     /// </summary>
     public partial class ScreenLayout
     {
-        HwndSource handle;
-
         public ScreenLayout()
         {
             this.InitializeComponent();
             this.Show();
             this.Hide();
-        }
-
-        public void SetLayout(FrameworkElement layout) {
-            layout.Width = layout.Height = double.NaN;
-            this.Content = layout;
-        }
-
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            base.OnSourceInitialized(e);
-            this.handle = (HwndSource)PresentationSource.FromVisual(this);
-            // ReSharper disable once PossibleNullReferenceException
-            this.handle.AddHook(this.OnWindowMessage);
-        }
-
-        protected override void OnClosed(EventArgs e)
-        {
-            this.handle?.RemoveHook(this.OnWindowMessage);
-            this.handle = null;
-            base.OnClosed(e);
-        }
-
-        protected bool IsHandleInitialized => this.handle != null;
-
-        private IntPtr OnWindowMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            switch ((User32.WindowMessage) msg) {
-            case User32.WindowMessage.WM_SETTINGCHANGE:
-                this.AdjustToScreenWhenIdle();
-                break;
-            }
-            return IntPtr.Zero;
-        }
-
-        public Win32Screen Screen {
-            get => (Win32Screen) this.DataContext;
-            set => this.DataContext = value;
-        }
-
-        void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
-            if (e.OldValue is Win32Screen old)
-                old.PropertyChanged -= this.OnScreenPropertyChanged;
-            if (e.NewValue is Win32Screen @new) {
-                @new.PropertyChanged += this.OnScreenPropertyChanged;
-                this.AdjustToScreenWhenIdle();
-            }
-        }
-
-        void OnScreenPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            switch (e.PropertyName) {
-            case nameof(this.Screen.WorkingArea):
-            case nameof(this.Screen.TransformFromDevice):
-                this.AdjustToScreenWhenIdle();
-                break;
-            }
-        }
-
-        public void AdjustToClientArea()
-        {
-            if (this.DataContext is Win32Screen screen)
-                this.AdjustToClientArea(screen);
-            else
-                throw new InvalidOperationException();
-        }
-
-        protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
-        {
-            base.OnDpiChanged(oldDpi, newDpi);
-
-            this.AdjustToScreenWhenIdle();
-        }
-
-        Task idleAdjustDelay;
-        async void AdjustToScreenWhenIdle() {
-            var delay = Task.Delay(millisecondsDelay: 1000);
-            this.idleAdjustDelay = delay;
-            await delay;
-            if (delay == this.idleAdjustDelay && this.IsLoaded)
-                this.AdjustToScreen();
-        }
-
-        async void AdjustToScreen()
-        {
-            for (int retry = 0; retry < 8; retry++) {
-                if (this.Screen == null || !this.IsHandleInitialized)
-                    return;
-
-                var opacity = this.Opacity;
-                var visibility = this.Visibility;
-                this.Opacity = 0;
-                try {
-                    this.Show();
-                } catch (InvalidOperationException) {
-                    await Task.Delay(400);
-                    continue;
-                }
-                this.AdjustToClientArea(this.Screen);
-                this.Visibility = visibility;
-                this.Opacity = opacity;
-                return;
-            }
         }
 
         public IEnumerable<Zone> Zones

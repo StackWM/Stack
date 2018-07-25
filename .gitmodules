@@ -31,3 +31,6 @@
 [submodule "src/Screen.WPF"]
 	path = src/Screen.WPF
 	url = https://losttech.visualstudio.com/DefaultCollection/Stack/_git/Screen.WPF
+[submodule "src/ScreenTracking"]
+	path = src/ScreenTracking
+	url = https://losttech.visualstudio.com/DefaultCollection/Stack/_git/ScreenTracking
