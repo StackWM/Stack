@@ -78,8 +78,8 @@
             error.Loaded += delegate { error.SelectAll(); };
             var defaultLayout = new Grid {
                 Children = {
-                    new Zone { },
                     error,
+                    new Zone { },
                 }
             };
 
