@@ -537,7 +537,9 @@
                     zone.Id = zone.Id ?? $"{zoneIndex++}";
                 }
                 this.screenLayouts.Add(layout);
-                await layout.SetLayout(await layoutTask);
+                try {
+                    await layout.SetLayout(await layoutTask);
+                } catch (OperationCanceledException) {}
             }
 
             void RemoveLayoutForScreen(Win32Screen screen) {
@@ -560,7 +562,10 @@
                 changeGroupTask = delay;
                 await delay;
                 if (delay.Equals(changeGroupTask))
-                    await layout.SetLayout(await this.GetLayoutForScreen(layout.Screen, settings, this.layoutsFolder));
+                    try {
+                        await layout.SetLayout(await this.GetLayoutForScreen(layout.Screen,
+                            settings, this.layoutsFolder));
+                    } catch (OperationCanceledException) { }
             }
 
             async void ScreenPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {

@@ -4,9 +4,6 @@
 [submodule "External/EventHook"]
 	path = External/EventHook
 	url = https://github.com/losttech/Windows-User-Action-Hook.git
-[submodule "External/HockeySDK"]
-	path = External/HockeySDK
-	url = https://github.com/losttech/HockeySDK-Windows.git
 [submodule "External/ObservableFileSystem"]
 	path = External/ObservableFileSystem
 	url = https://github.com/losttech/ObservableFileSystem.git
