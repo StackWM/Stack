@@ -3,6 +3,7 @@
     using System;
     using System.Windows;
     using LostTech.Stack.Utils;
+    using LostTech.Stack.WindowManagement;
     using Rect = System.Drawing.RectangleF;
     using Size = System.Drawing.SizeF;
 

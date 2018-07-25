@@ -7,7 +7,6 @@
     using JetBrains.Annotations;
 
     using LostTech.Stack.Models;
-    using LostTech.Stack.ScreenCoordinates;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
     using LostTech.Stack.WindowManagement;

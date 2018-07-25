@@ -11,7 +11,6 @@
     using System.Windows;
     using System.Windows.Interop;
     using System.Windows.Media;
-    using LostTech.Stack.ScreenCoordinates;
     using LostTech.Stack.ViewModels;
     using LostTech.Stack.Utils;
     using LostTech.Stack.Zones;
@@ -145,14 +144,6 @@
             }
         }
 
-        public void AdjustToClientArea()
-        {
-            if (this.Screen != null)
-                this.AdjustToClientArea(this.Screen).Wait();
-            else
-                throw new InvalidOperationException();
-        }
-
         protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
         {
             base.OnDpiChanged(oldDpi, newDpi);
@@ -187,7 +178,7 @@
                 if (this.Screen == null || !this.IsHandleInitialized)
                     return;
 
-                var opacity = this.Opacity;
+                double opacity = this.Opacity;
                 var visibility = this.Visibility;
                 if (visibility != Visibility.Visible) {
                     this.Opacity = 0;
