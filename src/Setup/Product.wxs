@@ -43,29 +43,26 @@
       <Component Id="StackAutostart" Guid="a6cecb09-7db8-4d0a-8d18-6542830f3a2e">
         <RegistryValue Id="Stack.Start" Root="HKCU" Action="write" Key="Software\Microsoft\Windows\CurrentVersion\Run" Name="Stack" Value="&quot;[INSTALLFOLDER]Stack.exe&quot;" Type="string" />
       </Component>
-      <Component Id="System.Console.dll" Guid="aa212e8d-c7eb-46c9-b34d-ca184e2a8219">
-        <File Id="System.Console.dll" Name="System.Console.dll" Source="$(var.App_TargetDir)System.Console.dll" />
+      <Component Id="CalcBinding.dll" Guid="87989C7F-1383-49B1-8A75-B131531EEBF8">
+        <File Id="CalcBinding.dll" Name="CalcBinding.dll" Source="$(var.App_TargetDir)CalcBinding.dll" />
+      </Component>
+      <Component Id="DynamicExpresso.Core.dll" Guid="0A033237-10F6-4CD0-AD36-AB73F6893FC0">
+        <File Id="DynamicExpresso.Core.dll" Name="DynamicExpresso.Core.dll" Source="$(var.App_TargetDir)DynamicExpresso.Core.dll" />
+      </Component>
+      <Component Id="System.Data.Common.dll" Guid="56F72C30-EEE6-4EAF-8E3C-4E3890A8CCE8">
+        <File Id="System.Data.Common.dll" Name="System.Data.Common.dll" Source="$(var.App_TargetDir)System.Data.Common.dll" />
       </Component>
       <Component Id="System.Diagnostics.DiagnosticSource.dll" Guid="e20f2352-fc9e-4310-8f61-e7dbf4c76cb4">
         <File Id="System.Diagnostics.DiagnosticSource.dll" Name="System.Diagnostics.DiagnosticSource.dll" Source="$(var.App_TargetDir)System.Diagnostics.DiagnosticSource.dll" />
       </Component>
-      <Component Id="System.Globalization.Calendars.dll" Guid="e2488aa6-7953-4620-b7de-731bc03d1846">
-        <File Id="System.Globalization.Calendars.dll" Name="System.Globalization.Calendars.dll" Source="$(var.App_TargetDir)System.Globalization.Calendars.dll" />
+      <Component Id="System.Diagnostics.StackTrace.dll" Guid="31254F4D-1AB1-4154-82DE-20632DE5E49C">
+        <File Id="System.Diagnostics.StackTrace.dll" Name="System.Diagnostics.StackTrace.dll" Source="$(var.App_TargetDir)System.Diagnostics.StackTrace.dll" />
       </Component>
-      <Component Id="System.IO.dll" Guid="5338e405-fe81-401f-84ee-58494a382f72">
-        <File Id="System.IO.dll" Name="System.IO.dll" Source="$(var.App_TargetDir)System.IO.dll" />
+      <Component Id="System.Globalization.Extensions.dll" Guid="7E3C9D3A-AC8E-4970-A674-7850FFC33923">
+        <File Id="System.Globalization.Extensions.dll" Name="System.Globalization.Extensions.dll" Source="$(var.App_TargetDir)System.Globalization.Extensions.dll" />
       </Component>
       <Component Id="System.IO.Compression.dll" Guid="5551f4fd-881f-44a0-be9a-3d0ee7bc2f6e">
         <File Id="System.IO.Compression.dll" Name="System.IO.Compression.dll" Source="$(var.App_TargetDir)System.IO.Compression.dll" />
-      </Component>
-      <Component Id="System.IO.Compression.ZipFile.dll" Guid="728ff729-1a77-4ea3-918f-b26f99c85093">
-        <File Id="System.IO.Compression.ZipFile.dll" Name="System.IO.Compression.ZipFile.dll" Source="$(var.App_TargetDir)System.IO.Compression.ZipFile.dll" />
-      </Component>
-      <Component Id="System.IO.FileSystem.dll" Guid="64912458-07ea-48f7-9bb2-642f614f6893">
-        <File Id="System.IO.FileSystem.dll" Name="System.IO.FileSystem.dll" Source="$(var.App_TargetDir)System.IO.FileSystem.dll" />
-      </Component>
-      <Component Id="System.IO.FileSystem.Primitives.dll" Guid="5bf46719-06e3-4f71-a69e-4fc738fc07ba">
-        <File Id="System.IO.FileSystem.Primitives.dll" Name="System.IO.FileSystem.Primitives.dll" Source="$(var.App_TargetDir)System.IO.FileSystem.Primitives.dll" />
       </Component>
       <Component Id="System.Net.Http.dll" Guid="431827a8-5c95-4103-81b9-565c62d1bbb7">
         <File Id="System.Net.Http.dll" Name="System.Net.Http.dll" Source="$(var.App_TargetDir)System.Net.Http.dll" />
@@ -73,44 +70,23 @@
       <Component Id="System.Net.Sockets.dll" Guid="94970e55-3f3a-4eb2-b04c-a1d6846525fe">
         <File Id="System.Net.Sockets.dll" Name="System.Net.Sockets.dll" Source="$(var.App_TargetDir)System.Net.Sockets.dll" />
       </Component>
-      <Component Id="System.Reflection.dll" Guid="93584c28-8d64-42d9-bc7b-cfbd91186018">
-        <File Id="System.Reflection.dll" Name="System.Reflection.dll" Source="$(var.App_TargetDir)System.Reflection.dll" />
-      </Component>
-      <Component Id="System.Runtime.dll" Guid="9b84f388-9f02-47bb-ac29-40f6996f6268">
-        <File Id="System.Runtime.dll" Name="System.Runtime.dll" Source="$(var.App_TargetDir)System.Runtime.dll" />
-      </Component>
-      <Component Id="System.Runtime.Extensions.dll" Guid="70e7a78c-3dde-43f1-b142-7d8c63c0075f">
-        <File Id="System.Runtime.Extensions.dll" Name="System.Runtime.Extensions.dll" Source="$(var.App_TargetDir)System.Runtime.Extensions.dll" />
-      </Component>
-      <Component Id="System.Runtime.InteropServices.dll" Guid="d2e7d77d-1340-4883-bc26-395089b75e1f">
-        <File Id="System.Runtime.InteropServices.dll" Name="System.Runtime.InteropServices.dll" Source="$(var.App_TargetDir)System.Runtime.InteropServices.dll" />
-      </Component>
-      <Component Id="System.Runtime.InteropServices.RuntimeInformation.dll" Guid="5c67a12d-b2cd-4474-a2c2-46990ea18a15">
-        <File Id="System.Runtime.InteropServices.RuntimeInformation.dll" Name="System.Runtime.InteropServices.RuntimeInformation.dll" Source="$(var.App_TargetDir)System.Runtime.InteropServices.RuntimeInformation.dll" />
-      </Component>
       <Component Id="System.Security.Cryptography.Algorithms.dll" Guid="d66b2a38-ec26-4a61-a8a4-08a4c468717b">
         <File Id="System.Security.Cryptography.Algorithms.dll" Name="System.Security.Cryptography.Algorithms.dll" Source="$(var.App_TargetDir)System.Security.Cryptography.Algorithms.dll" />
       </Component>
-      <Component Id="System.Security.Cryptography.Encoding.dll" Guid="ff2ae83e-47cb-4c5c-9b79-56c74029476f">
-        <File Id="System.Security.Cryptography.Encoding.dll" Name="System.Security.Cryptography.Encoding.dll" Source="$(var.App_TargetDir)System.Security.Cryptography.Encoding.dll" />
+      <Component Id="System.Security.SecureString.dll" Guid="57C0A202-34A9-452E-A346-B4A374488380">
+        <File Id="System.Security.SecureString.dll" Name="System.Security.SecureString.dll" Source="$(var.App_TargetDir)System.Security.SecureString.dll" />
       </Component>
-      <Component Id="System.Security.Cryptography.Primitives.dll" Guid="27d8776b-4011-48ee-9260-ede6e3b31721">
-        <File Id="System.Security.Cryptography.Primitives.dll" Name="System.Security.Cryptography.Primitives.dll" Source="$(var.App_TargetDir)System.Security.Cryptography.Primitives.dll" />
-      </Component>
-      <Component Id="System.Security.Cryptography.X509Certificates.dll" Guid="9a7f4451-3348-496e-908a-47857fddca80">
-        <File Id="System.Security.Cryptography.X509Certificates.dll" Name="System.Security.Cryptography.X509Certificates.dll" Source="$(var.App_TargetDir)System.Security.Cryptography.X509Certificates.dll" />
+      <Component Id="System.Threading.Overlapped.dll" Guid="B5038CA2-2ED9-492E-8661-BA59E61ED74F">
+        <File Id="System.Threading.Overlapped.dll" Name="System.Threading.Overlapped.dll" Source="$(var.App_TargetDir)System.Threading.Overlapped.dll" />
       </Component>
       <Component Id="System.Diagnostics.Tracing.dll" Guid="36c42dae-e72f-4233-80f4-0417bcaf0fa0">
         <File Id="System.Diagnostics.Tracing.dll" Name="System.Diagnostics.Tracing.dll" Source="$(var.App_TargetDir)System.Diagnostics.Tracing.dll" />
       </Component>
-      <Component Id="System.Xml.ReaderWriter.dll" Guid="717e12b2-493f-4d13-88e1-8e76ec591b55">
-        <File Id="System.Xml.ReaderWriter.dll" Name="System.Xml.ReaderWriter.dll" Source="$(var.App_TargetDir)System.Xml.ReaderWriter.dll" />
+      <Component Id="System.Xml.XPath.XDocument.dll" Guid="D946E70E-78D7-4AB3-8C4E-BAD42F2A9835">
+        <File Id="System.Xml.XPath.XDocument.dll" Name="System.Xml.XPath.XDocument.dll" Source="$(var.App_TargetDir)System.Xml.XPath.XDocument.dll" />
       </Component>
       <Component Id="Validation.dll" Guid="c1586e58-ae0e-43fa-b8eb-77c27dc408ac">
         <File Id="Validation.dll" Name="Validation.dll" Source="$(var.App_TargetDir)Validation.dll" />
-      </Component>
-      <Component Id="System.AppContext.dll" Guid="3e296746-2a56-4529-a737-01e1207b3180">
-        <File Id="System.AppContext.dll" Name="System.AppContext.dll" Source="$(var.App_TargetDir)System.AppContext.dll" />
       </Component>
       <Component Id="Stack.exe.config" Guid="f2008f69-a17c-4cd4-9c5d-510fadee504a">
         <File Id="Stack.exe.config" Name="Stack.exe.config" Source="$(var.App_TargetDir)Stack.exe.config" />
@@ -133,14 +109,20 @@
       <Component Id="LostTech.Checkpoint.dll" Guid="1e2b4c4c-c094-4d2b-99a7-cacb86983ee6">
         <File Id="LostTech.Checkpoint.dll" Name="LostTech.Checkpoint.dll" Source="$(var.App_TargetDir)LostTech.Checkpoint.dll" />
       </Component>
+      <Component Id="LostTech.Stack.ScreenTracking.dll" Guid="B41E7C4B-A65A-42BD-AFA8-98CFBCA9E7CB">
+        <File Id="LostTech.Stack.ScreenTracking.dll" Name="LostTech.Stack.ScreenTracking.dll" Source="$(var.App_TargetDir)LostTech.Stack.ScreenTracking.dll" />
+      </Component>
+      <Component Id="LostTech.Stack.WindowManagement.dll" Guid="7B2D4EF8-0F8A-4045-9D88-54034F81A41A">
+        <File Id="LostTech.Stack.WindowManagement.dll" Name="LostTech.Stack.WindowManagement.dll" Source="$(var.App_TargetDir)LostTech.Stack.WindowManagement.dll" />
+      </Component>
       <Component Id="Microsoft.HockeyApp.Core45.dll" Guid="75d37abf-f1f8-474b-9982-a9ab612ae3fe">
         <File Id="Microsoft.HockeyApp.Core45.dll" Name="Microsoft.HockeyApp.Core45.dll" Source="$(var.App_TargetDir)Microsoft.HockeyApp.Core45.dll" />
       </Component>
       <Component Id="Microsoft.HockeyApp.Kit.dll" Guid="a252fba1-1322-4f32-91b1-1db31f61a5b1">
         <File Id="Microsoft.HockeyApp.Kit.dll" Name="Microsoft.HockeyApp.Kit.dll" Source="$(var.App_TargetDir)Microsoft.HockeyApp.Kit.dll" />
       </Component>
-      <Component Id="Microsoft.Win32.Primitives.dll" Guid="75f80659-4375-477e-b22a-c15ebaef1a88">
-        <File Id="Microsoft.Win32.Primitives.dll" Name="Microsoft.Win32.Primitives.dll" Source="$(var.App_TargetDir)Microsoft.Win32.Primitives.dll" />
+      <Component Id="Microsoft.Toolkit.Uwp.Notifications.dll" Guid="327D1841-1354-4FF2-ACEA-B86096B774F4">
+        <File Id="Microsoft.Toolkit.Uwp.Notifications.dll" Name="Microsoft.Toolkit.Uwp.Notifications.dll" Source="$(var.App_TargetDir)Microsoft.Toolkit.Uwp.Notifications.dll" />
       </Component>
       <Component Id="PCLStorage.Abstractions.dll" Guid="8c43b2a9-ac19-41b4-a371-0a4c57d8bea1">
         <File Id="PCLStorage.Abstractions.dll" Name="PCLStorage.Abstractions.dll" Source="$(var.App_TargetDir)PCLStorage.Abstractions.dll" />
@@ -148,11 +130,17 @@
       <Component Id="PCLStorage.Desktop.dll" Guid="a0a374bd-a416-4a2b-b5a9-5165b309d244">
         <File Id="PCLStorage.Desktop.dll" Name="PCLStorage.Desktop.dll" Source="$(var.App_TargetDir)PCLStorage.Desktop.dll" />
       </Component>
+      <Component Id="PInvoke.DwmApi.dll" Guid="110B40D8-FEBA-4D41-8436-E80DF49E9BA4">
+        <File Id="PInvoke.DwmApi.dll" Name="PInvoke.DwmApi.dll" Source="$(var.App_TargetDir)PInvoke.DwmApi.dll" />
+      </Component>
       <Component Id="PInvoke.Kernel32.dll" Guid="782518ad-bc40-4dcf-9ec2-38fa5505d6ef">
         <File Id="PInvoke.Kernel32.dll" Name="PInvoke.Kernel32.dll" Source="$(var.App_TargetDir)PInvoke.Kernel32.dll" />
       </Component>
       <Component Id="PInvoke.User32.dll" Guid="4ace578b-f79b-498b-8db6-6d834cb4cad8">
         <File Id="PInvoke.User32.dll" Name="PInvoke.User32.dll" Source="$(var.App_TargetDir)PInvoke.User32.dll" />
+      </Component>
+      <Component Id="PInvoke.UxTheme.dll" Guid="7277F7BF-53A2-4E6F-871D-F2BFF6D35B1D">
+        <File Id="PInvoke.UxTheme.dll" Name="PInvoke.UxTheme.dll" Source="$(var.App_TargetDir)PInvoke.UxTheme.dll" />
       </Component>
       <Component Id="PInvoke.Windows.Core.dll" Guid="a4a3436e-f698-432d-841f-193de2a55e55">
         <File Id="PInvoke.Windows.Core.dll" Name="PInvoke.Windows.Core.dll" Source="$(var.App_TargetDir)PInvoke.Windows.Core.dll" />
@@ -165,9 +153,6 @@
       </Component>
       <Component Id="LostTech.App.ObservableFileSystem.dll" Guid="0eb027b6-3b45-4a87-9fa9-40578aed2307">
         <File Id="LostTech.App.ObservableFileSystem.dll" Name="LostTech.App.ObservableFileSystem.dll" Source="$(var.App_TargetDir)LostTech.App.ObservableFileSystem.dll" />
-      </Component>
-      <Component Id="System.IO.FileSystem.Watcher.dll" Guid="01e12a06-e24b-4db1-ad36-c43d40cec1e0">
-        <File Id="System.IO.FileSystem.Watcher.dll" Name="System.IO.FileSystem.Watcher.dll" Source="$(var.App_TargetDir)System.IO.FileSystem.Watcher.dll" />
       </Component>
       <Component Id="System.Windows.Interactivity.dll" Guid="da6d8e70-0b59-4ca1-b0d1-6879f640724b">
         <File Id="System.Windows.Interactivity.dll" Name="System.Windows.Interactivity.dll" Source="$(var.App_TargetDir)System.Windows.Interactivity.dll" />
