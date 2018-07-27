@@ -37,17 +37,21 @@
             this.layoutsFolder = layoutsFolder ?? throw new ArgumentNullException(nameof(layoutsFolder));
         }
 
-        public static async Task<TrayIcon> StartTrayIcon(IFolder layoutsFolder, ObservableDirectory layoutsDirectory, StackSettings stackSettings, IScreenProvider screenProvider, SettingsWindow settingsWindow)
-        {
+        public static NotifyIcon CreateTrayIcon() {
             var contextMenu = new ContextMenuStrip();
-
-            var trayIcon = new TrayIcon(new NotifyIcon
-            {
+            return new NotifyIcon {
                 ContextMenuStrip = contextMenu,
                 Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/StackTrayIcon.ico")).Stream),
                 Text = nameof(Stack),
                 Visible = true,
-            }, stackSettings, layoutsFolder);
+            };
+        }
+
+        public static async Task<TrayIcon> InitializeMenu(NotifyIcon notificationIcon, IFolder layoutsFolder, ObservableDirectory layoutsDirectory, StackSettings stackSettings, IScreenProvider screenProvider, SettingsWindow settingsWindow)
+        {
+            var contextMenu = notificationIcon.ContextMenuStrip;
+
+            var trayIcon = new TrayIcon(notificationIcon, stackSettings, layoutsFolder);
 
             contextMenu.Items.Add("Settings", image: null, onClick: (_, __) => settingsWindow.Show())
                 .Font = new Font(contextMenu.Font, FontStyle.Bold);

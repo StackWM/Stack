@@ -15,8 +15,6 @@
     using System.Windows.Forms;
     using System.Windows.Interop;
     using System.Windows.Threading;
-    using DesktopNotifications;
-    using EventHook;
     using Gma.System.MouseKeyHook;
     using LostTech.App;
     using LostTech.Stack.Behavior;
@@ -32,7 +30,6 @@
     using LostTech.Stack.Zones;
     using LostTech.Windows;
     using Microsoft.HockeyApp;
-    using Microsoft.Toolkit.Uwp.Notifications;
     using PCLStorage;
     using PInvoke;
     using Application = System.Windows.Application;
@@ -52,7 +49,7 @@
         IKeyboardMouseEvents hook;
         WindowDragOperation dragOperation;
         ICollection<ScreenLayout> screenLayouts;
-        NotifyIcon trayIcon;
+        readonly NotifyIcon trayIcon = TrayIcon.CreateTrayIcon();
         IFolder localSettingsFolder, roamingSettingsFolder;
 
         readonly Window winApiHandler = new Window {
@@ -88,6 +85,8 @@
                 EnableJitDebugging();
 
             await EnableHockeyApp();
+
+            this.InitializeNotifications();
 
             StopRunningInstances();
 
@@ -172,8 +171,38 @@
 
             await this.StartLayout(settings);
 
+            await TrayIcon.InitializeMenu(this.trayIcon, this.layoutsFolder, this.layoutsDirectory, settings, this.screenProvider, this.SettingsWindow);
+            if (this.layoutLoader.Problems.Length > 0) {
+                this.trayIcon.BalloonTipTitle = "Some layouts were not loaded";
+                this.trayIcon.BalloonTipText = this.layoutLoader.Problems;
+                this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
+                this.trayIcon.ShowBalloonTip(30);
+            }
+            if (!settings.Notifications.IamInTrayDone) {
+                settings.Notifications.IamInTrayDone = true;
+                this.trayIcon.BalloonTipTitle = "Stack";
+                this.trayIcon.BalloonTipText = "You can now move windows around using middle mouse button or Win+Arrow";
+                this.trayIcon.BalloonTipIcon = ToolTipIcon.Info;
+                this.trayIcon.ShowBalloonTip(30);
+            }
+
             // this must be the last, so that mouse won't lag while we are loading
             this.BindHandlers(settings);
+        }
+
+        void InitializeNotifications() {
+            this.trayIcon.BalloonTipClicked += delegate {
+                if (!(this.trayIcon.Tag is Uri uri))
+                    return;
+
+                if (uri.Scheme == null)
+                    return;
+
+                if (uri.Scheme.ToLowerInvariant().Any(c => c < 'a' || c > 'z'))
+                    return;
+
+                Process.Start(uri.ToString());
+            };
         }
 
         async Task<T> InitializeSettingsSet<T>(string fileName)
@@ -359,46 +388,14 @@
             this.layoutManager.Move(window, zone);
         }
 
-        void ShowNotification(string title, string message, Uri navigateTo, TimeSpan? duration = null) {
-            var content = new ToastContent {
-                Launch = navigateTo.ToString(),
-
-                Header = title == null ? null : new ToastHeader(title, title, navigateTo.ToString()),
-
-                Visual = new ToastVisual {
-                    BindingGeneric = new ToastBindingGeneric {
-                        Children = { new AdaptiveText{Text = message} },
-                    }
-                }
-            };
-
-            var contentXml = new global::Windows.Data.Xml.Dom.XmlDocument();
-            contentXml.LoadXml(content.GetContent());
-            var toast = new global::Windows.UI.Notifications.ToastNotification(contentXml) {
-                // DTO + null == null
-                ExpirationTime = DateTimeOffset.Now + duration,
-            };
-            try {
-                DesktopNotificationManagerCompat.CreateToastNotifier().Show(toast);
-            } catch (Exception e) {
-                string retrying = this.trayIcon != null ? "retrying" : "no retry";
-                e.ReportAsWarning(prefix: $"Notification failed, {retrying}: ");
-
-                if (this.trayIcon == null)
-                    return;
-
-                this.trayIcon.BalloonTipIcon = ToolTipIcon.None;
-                this.trayIcon.BalloonTipTitle = title;
-                this.trayIcon.BalloonTipText = message;
-                this.trayIcon.ShowBalloonTip(1000);
-            }
+        void ShowNotification(string title, string message, Uri navigateTo, TimeSpan? duration = null, ToolTipIcon icon = ToolTipIcon.None) {
+            int timeout = (int)duration.GetValueOrDefault(TimeSpan.FromSeconds(1)).TotalMilliseconds;
+            this.trayIcon.Tag = navigateTo;
+            this.trayIcon.ShowBalloonTip(tipTitle: title, tipText: message, timeout: timeout, tipIcon: icon);
         }
 
         void NonCriticalErrorHandler(object sender, ErrorEventArgs error) {
-            this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
-            this.trayIcon.BalloonTipTitle = "Can't move";
-            this.trayIcon.BalloonTipText = error.GetException().Message;
-            this.trayIcon.ShowBalloonTip(1000);
+            this.ShowNotification(title: "Stack error", message: error.GetException().Message, navigateTo: null, icon: ToolTipIcon.Warning);
         }
 
         static Point GetCursorPos()
@@ -629,21 +626,6 @@
             });
 
             settings.LayoutMap.Map.CollectionChanged += this.MapOnCollectionChanged;
-
-            this.trayIcon = (await TrayIcon.StartTrayIcon(this.layoutsFolder, this.layoutsDirectory, settings, this.screenProvider, this.SettingsWindow)).Icon;
-            if (this.layoutLoader.Problems.Length > 0) {
-                this.trayIcon.BalloonTipTitle = "Some layouts were not loaded";
-                this.trayIcon.BalloonTipText = this.layoutLoader.Problems;
-                this.trayIcon.BalloonTipIcon = ToolTipIcon.Error;
-                this.trayIcon.ShowBalloonTip(30);
-            }
-            if (!settings.Notifications.IamInTrayDone) {
-                settings.Notifications.IamInTrayDone = true;
-                this.trayIcon.BalloonTipTitle = "Stack";
-                this.trayIcon.BalloonTipText = "You can now move windows around using middle mouse button or Win+Arrow";
-                this.trayIcon.BalloonTipIcon = ToolTipIcon.Info;
-                this.trayIcon.ShowBalloonTip(30);
-            }
         }
 
         string GetSuggestedLayout(Win32Screen screen) {
