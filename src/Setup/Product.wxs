@@ -115,6 +115,9 @@
       <Component Id="LostTech.Stack.WindowManagement.dll" Guid="7B2D4EF8-0F8A-4045-9D88-54034F81A41A">
         <File Id="LostTech.Stack.WindowManagement.dll" Name="LostTech.Stack.WindowManagement.dll" Source="$(var.App_TargetDir)LostTech.Stack.WindowManagement.dll" />
       </Component>
+      <Component Id="LostTech.Stack.WindowManagement.WPF.dll" Guid="A7399033-7A40-478B-A3D6-72A35EECC357">
+        <File Id="LostTech.Stack.WindowManagement.WPF.dll" Name="LostTech.Stack.WindowManagement.WPF.dll" Source="$(var.App_TargetDir)LostTech.Stack.WindowManagement.WPF.dll" />
+      </Component>
       <Component Id="Microsoft.HockeyApp.Core45.dll" Guid="75d37abf-f1f8-474b-9982-a9ab612ae3fe">
         <File Id="Microsoft.HockeyApp.Core45.dll" Name="Microsoft.HockeyApp.Core45.dll" Source="$(var.App_TargetDir)Microsoft.HockeyApp.Core45.dll" />
       </Component>
