@@ -49,7 +49,7 @@
         IKeyboardMouseEvents hook;
         WindowDragOperation dragOperation;
         ICollection<ScreenLayout> screenLayouts;
-        readonly NotifyIcon trayIcon = TrayIcon.CreateTrayIcon();
+        NotifyIcon trayIcon;
         IFolder localSettingsFolder, roamingSettingsFolder;
 
         readonly Window winApiHandler = new Window {
@@ -151,9 +151,9 @@
 
             string version = Invariant($"{Version.Major}.{Version.Minor}");
             if (settings.Notifications.WhatsNewVersionSeen != version) {
-                this.ShowNotification(title: "What's New in Stack Widgets Update (v2.1)", 
+                this.ShowNotification(title: "What's New in Stack v" + version, 
                     message: "You have received a Stack update. See what's new",
-                    navigateTo: new Uri("https://losttech.software/stack-whatsnew.html"));
+                    navigateTo: new Uri("https://losttech.software/stack-whatsnew-free.html"));
             }
             settings.Notifications.WhatsNewVersionSeen = version;
 
@@ -191,6 +191,7 @@
         }
 
         void InitializeNotifications() {
+            this.trayIcon = TrayIcon.CreateTrayIcon();
             this.trayIcon.BalloonTipClicked += delegate {
                 if (!(this.trayIcon.Tag is Uri uri))
                     return;
