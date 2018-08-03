@@ -39,7 +39,7 @@
             return false;
         }
 
-        static bool IsDomainUser() {
+        internal static bool IsDomainUser() {
             try {
                 Domain.GetCurrentDomain();
                 return true;

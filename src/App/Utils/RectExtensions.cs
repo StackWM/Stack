@@ -10,6 +10,13 @@
             return new Point(vector.X, vector.Y);
         }
 
+        public static Rect Intersection(this Rect rect, Rect otherRect) {
+            rect.Intersect(otherRect);
+            return rect;
+        }
+
+        public static double Area(this Rect rect) => rect.Width * rect.Height;
+
         public static bool Equals(this Point value, Point other, double epsilon)
         {
             return (value - other).LengthSquared < epsilon * epsilon;

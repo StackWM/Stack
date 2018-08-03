@@ -10,6 +10,8 @@
     using LostTech.Stack.Models;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
+    using LostTech.Stack.WindowManagement;
+    using LostTech.Stack.WindowManagement.WinApi;
     using LostTech.Stack.Zones;
     using PInvoke;
 
@@ -53,6 +55,10 @@
             if (User32.IsIconic(window))
                 return false;
 
+            var bounds = new Win32Window(window, suppressSystemMargin: false).Bounds;
+            if (bounds.IsEmpty || bounds.Inflated(-1, -1).IsEmpty)
+                return false;
+
             if (this.settings.WindowGroupIgnoreList.Contains(this.windowGroups, window)) {
                 Debug.WriteLine("won't move: ignore list");
                 return false;
@@ -67,18 +73,17 @@
 
         public event EventHandler CanExecuteChanged;
 
-        const double Epsilon = 2;
+        const float Epsilon = 2;
+        const float LargeValue = 1e9f;
 
         bool MoveCurrentWindow(Vector direction)
         {
             var windowHandle = User32.GetForegroundWindow();
-            if (!this.CanExecute(windowHandle) || !Win32.GetWindowInfo(windowHandle, out var info))
+            if (!this.CanExecute(windowHandle))
                 return false;
 
-            var windowBounds = new Rect(info.rcWindow.left, info.rcWindow.top,
-                info.rcWindow.right - info.rcWindow.left,
-                info.rcWindow.bottom - info.rcWindow.top);
-            var windowCenter = windowBounds.Center();
+            Win32Window window = new Win32Window(windowHandle, suppressSystemMargin: false);
+            var windowCenter = window.Bounds.Center();
             var allZones = this.screenLayouts.Active().SelectMany(screen => screen.Zones)
                 .Where(zone => zone.Target == null || zone.Equals(zone.Target))
                 .ToArray();
@@ -91,8 +96,10 @@
             var sameCenter = allZones.Where(zone => zone.GetPhysicalBounds().Center()
                 .Equals(windowCenter, epsilon: Epsilon)).ToArray();
 
-            var reducedWindowBounds = windowBounds.Inflated(-1,-1);
-            Win32Window window = new Win32Window(windowHandle);
+            var reducedWindowBounds = window.Bounds.Inflated(-1,-1);
+            if (reducedWindowBounds.IsEmpty)
+                return false;
+
             var currentZone = this.layoutManager.GetLocation(window);
 
             var next = currentZone == null
@@ -100,26 +107,74 @@
                 : sameCenter.SkipWhile(zone => !ReferenceEquals(zone, currentZone))
                     .FirstOrDefault(zone => !ReferenceEquals(zone, currentZone));
 
-            var strip = reducedWindowBounds;
-            var directionalInfinity = direction * 1e120;
-            strip.Inflate(Math.Abs(directionalInfinity.X), Math.Abs(directionalInfinity.Y));
+            Debug.WriteLineIf(next != null, "going to a zone with the same center");
 
-            var targets = allZones.Where(zone =>
-                    zone.GetPhysicalBounds().IntersectsWith(strip)
-                    && !sameCenter.Contains(zone)
-                    && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction) > 0)
-                .ToArray();
+            var strip = reducedWindowBounds;
+            var directionalInfinity = direction * LargeValue;
+            if (directionalInfinity.X > 1)
+                strip.Width += LargeValue;
+            if (directionalInfinity.X < -1) {
+                strip.Width += LargeValue;
+                strip.X -= LargeValue;
+            }
+
+            if (directionalInfinity.Y > 1)
+                strip.Height += LargeValue;
+            if (directionalInfinity.Y < -1) {
+                strip.Height += LargeValue;
+                strip.Y -= LargeValue;
+            }
+
+            //next = next
+            //    // enumerate intersecting zones with the same directional coordinate,
+            //    // that follow current zone in the global zone order
+            //    ?? allZones.Where(zone =>
+            //        zone.GetPhysicalBounds().IntersectsWith(strip)
+            //        && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction)
+            //            .IsBetween(-Epsilon, Epsilon))
+            //    .SkipWhile(zone => !ReferenceEquals(zone, currentZone))
+            //    .FirstOrDefault(zone => !ReferenceEquals(zone, currentZone));
+
+            Debug.WriteLineIf(next != null, "going to a zone with the same directional coordinate");
+
+            double GetRank(Zone zone) {
+                double intersectionPercentage =
+                    zone.GetPhysicalBounds().Area().AtLeast(1)
+                    / zone.GetPhysicalBounds().Intersection(strip).Area().AtLeast(1);
+
+                double centerTravelDistance = (windowCenter.ToWPF() - zone.GetPhysicalBounds().Center().ToWPF()).Length;
+
+                return DistanceAlongDirection(windowCenter.ToWPF(), zone.GetPhysicalBounds().Center().ToWPF(), direction)
+                       * centerTravelDistance
+                       * intersectionPercentage;
+            }
+
             next = next
-                   // there are no zones with the same center
+                   // if there are no zones with the same directional coordinate, continue along it
                    ?? allZones.Where(zone =>
                            zone.GetPhysicalBounds().IntersectsWith(strip)
                            && !sameCenter.Contains(zone)
-                           && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction) > 0)
-                       .OrderBy(zone => DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction))
+                           && DistanceAlongDirection(windowCenter.ToWPF(), zone.GetPhysicalBounds().Center().ToWPF(), direction) > 0)
+                       .OrderBy(GetRank)
                        .FirstOrDefault();
 
+#if DEBUG
+            var targets = allZones.Where(zone =>
+                    zone.GetPhysicalBounds().IntersectsWith(strip)
+                    && !sameCenter.Contains(zone)
+                    && DistanceAlongDirection(windowCenter.ToWPF(), zone.GetPhysicalBounds().Center().ToWPF(), direction) > 0)
+                .ToArray();
+            Debug.WriteLine("potential targets:");
+            foreach (var zone in targets) {
+                Debug.Write($"[{GetRank(zone)}]{zone.GetPhysicalBounds()},");
+            }
+            Debug.WriteLine("");
+#endif
             if (next != null)
                 this.move(windowHandle, next);
+            else
+                Debug.WriteLine($"nowhere to move {window.Title}");
+
             return true;
         }
 

@@ -2,18 +2,27 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Specialized;
     using System.ComponentModel;
     using System.Linq;
     using System.Xml.Serialization;
     using LostTech.App.DataBinding;
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.Extensibility.Filters;
+    using ThomasJaworski.ComponentModel;
 
     public sealed class WindowGroup : NotifyPropertyChangedBase, ICopyable<WindowGroup>
     {
         public const int LatestVersion = 1;
         string name;
         int version = LatestVersion;
+        readonly ChangeListener changeListener;
+
+        public WindowGroup() {
+            this.changeListener = ChangeListener.Create(this.Filters);
+            this.changeListener.CollectionChanged += this.UpdateFiltersStringHander;
+            this.changeListener.PropertyChanged += this.UpdateFiltersStringHander;
+        }
 
         internal bool VersionSetExplicitly { get; private set; }
 
@@ -43,13 +52,21 @@
         }
 
         [XmlElement("Filter")]
-        public CopyableObservableCollection<WindowFilter> Filters { get; private set; } =
+        public CopyableObservableCollection<WindowFilter> Filters { get; } =
             new CopyableObservableCollection<WindowFilter>();
 
-        public WindowGroup Copy() => new WindowGroup {
-            Name = this.Name,
-            Version = this.Version,
-            Filters = this.Filters.Copy(),
-        };
+        [XmlIgnore]
+        public string FiltersString => string.Join(Environment.NewLine, this.Filters);
+
+        public WindowGroup Copy() {
+            var copy = new WindowGroup {
+                Name = this.Name,
+                Version = this.Version,
+            };
+            this.Filters.CopyTo(copy.Filters);
+            return copy;
+        }
+
+        void UpdateFiltersStringHander(object sender, EventArgs e) => this.OnPropertyChanged(nameof(this.FiltersString));
     }
 }

@@ -1,12 +1,12 @@
-﻿<Window x:Class="LostTech.Stack.ScreenLayout"
+﻿<screenTracking:ScreenLayout x:Class="LostTech.Stack.ScreenLayout"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LostTech.Stack"
+        xmlns:screenTracking="clr-namespace:LostTech.Stack.ScreenTracking;assembly=LostTech.Stack.ScreenTracking"
         mc:Ignorable="d"
         AllowsTransparency="True"
-        DataContextChanged="OnDataContextChanged"
         ShowInTaskbar="False" ShowActivated="False"
         Topmost="True"
         Background="#80FFFFFF"
@@ -19,4 +19,5 @@
         <Button VerticalAlignment="Top" HorizontalAlignment="Right">X</Button>
         <Button VerticalAlignment="Bottom" HorizontalAlignment="Left">Y</Button>
     </Grid>
-</Window>
+</screenTracking:ScreenLayout>
+

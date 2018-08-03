@@ -7,48 +7,57 @@
              mc:Ignorable="d"
              x:Name="LayoutRoot"
              d:DesignHeight="300" d:DesignWidth="300">
-    <UserControl.Resources>
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.ContextMenu.xaml" />
-    </UserControl.Resources>
-    <DockPanel>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
-            <Button Content="Add" Click="AddGroupClick" Margin="0,0,6,0">
-                <Button.ContextMenu>
-                    <ContextMenu x:Name="AvaiableGroupsMenu"
-                                 ItemsSource="{Binding AvailableGroups, ElementName=LayoutRoot}"
-                                 DisplayMemberPath="Name"
-                                 >
-                        <ContextMenu.Resources>
-                            <ResourceDictionary>
-                                <ResourceDictionary.MergedDictionaries>
-                                    <!-- Accent and AppTheme setting -->
-                                    <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
-                                    <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
-                                </ResourceDictionary.MergedDictionaries>
-                            </ResourceDictionary>
-                        </ContextMenu.Resources>
-                        <ContextMenu.ItemContainerStyle>
-                            <Style TargetType="MenuItem" BasedOn="{StaticResource MetroMenuItem}">
-                                <Setter Property="Command" Value="{Binding AddGroupCommand, ElementName=LayoutRoot}"/>
-                                <Setter Property="CommandParameter" Value="{Binding}"/>
-                            </Style>
-                        </ContextMenu.ItemContainerStyle>
-                    </ContextMenu>
-                </Button.ContextMenu>
-            </Button>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <ListView x:Name="GroupList"
+                  ItemsSource="{Binding Groups, ElementName=LayoutRoot}"
+                  SelectionMode="Single"
+                  FontSize="15"
+                  />
+
+        <StackPanel Orientation="Vertical" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Button Content="&lt;"
+                    Margin="4,8"
+                    Width="20"
+                    ToolTip="Add to the list"
+                    Command="{Binding AddGroupCommand, ElementName=LayoutRoot}"
+                    CommandParameter="{Binding SelectedItem, ElementName=AvaiableGroupsList}"
+                    />
             <Button Click="RemoveGroupClick"
+                    Content="X"
+                    Margin="4,8"
+                    Width="20"
+                    ToolTip="Remove from the list"
+                    ToolTipService.ShowOnDisabled="True"
                     IsEnabled="{Binding SelectedItem, ElementName=GroupList, Converter={StaticResource NullIsFalseConverter}}"
-                    >Remove
-            </Button>
+                    />
         </StackPanel>
-        <ListView x:Name="GroupList" ItemsSource="{Binding Groups, ElementName=LayoutRoot}"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+
+        <ListView Grid.Column="2"
+                  x:Name="AvaiableGroupsList"
+                  ItemsSource="{Binding AvailableGroups, ElementName=LayoutRoot}"
+                  DisplayMemberPath="Name"
+                  SelectionMode="Single"
+                  FontSize="15"
+                  SelectionChanged="AvaiableGroupsList_OnSelectionChanged"
                   >
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel/>
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
+            <ListView.Resources>
+                <ResourceDictionary>
+                    <ResourceDictionary.MergedDictionaries>
+                        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                    </ResourceDictionary.MergedDictionaries>
+                </ResourceDictionary>
+            </ListView.Resources>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MetroListViewItem}">
+                    <Setter Property="ToolTip" Value="{Binding Path=FiltersString, Mode=OneWay}"/>
+                </Style>
+            </ListView.ItemContainerStyle>
         </ListView>
-    </DockPanel>
+    </Grid>
 </UserControl>

@@ -37,52 +37,37 @@
             this.layoutsFolder = layoutsFolder ?? throw new ArgumentNullException(nameof(layoutsFolder));
         }
 
-        public static async Task<TrayIcon> StartTrayIcon(IFolder layoutsFolder, ObservableDirectory layoutsDirectory, StackSettings stackSettings, IScreenProvider screenProvider, SettingsWindow settingsWindow)
-        {
+        public static NotifyIcon CreateTrayIcon() {
             var contextMenu = new ContextMenuStrip();
-
-            var trayIcon = new TrayIcon(new NotifyIcon
-            {
+            return new NotifyIcon {
                 ContextMenuStrip = contextMenu,
                 Icon = new Icon(Application.GetResourceStream(new Uri("pack://application:,,,/StackTrayIcon.ico")).Stream),
                 Text = nameof(Stack),
                 Visible = true,
-            }, stackSettings, layoutsFolder);
+            };
+        }
+
+        public static async Task<TrayIcon> InitializeMenu(NotifyIcon notificationIcon, IFolder layoutsFolder, ObservableDirectory layoutsDirectory, StackSettings stackSettings, IScreenProvider screenProvider, SettingsWindow settingsWindow)
+        {
+            var contextMenu = notificationIcon.ContextMenuStrip;
+
+            var trayIcon = new TrayIcon(notificationIcon, stackSettings, layoutsFolder);
 
             contextMenu.Items.Add("Settings", image: null, onClick: (_, __) => settingsWindow.Show())
                 .Font = new Font(contextMenu.Font, FontStyle.Bold);
             trayIcon.Icon.DoubleClick += delegate { settingsWindow.Show(); };
 
-            contextMenu.Items.Add("About", image: null, onClick: (_, __) => trayIcon.aboutWindow.Show());
-            contextMenu.Items.Add("Feedback...", image: null,
-                onClick: (_, __) => Process.Start("http://bit.ly/2o7Rxvr"));
+            contextMenu.Items.Add(trayIcon.CreateHelpMenu());
+            ToolStripMenuItem feedback = new DesktopBridge.Helpers().IsRunningAsUwp()
+                ? Link(text: "Leave Feedback / Rate", url: "ms-windows-store:REVIEW?PFN=LostTechLLC.Zones_kdyhxf5sz30e2")
+                : Link(text: "Feedback...", url: "http://bit.ly/2o7Rxvr");
+            contextMenu.Items.Add(feedback);
 
-            var keyboardMovement = new ToolStripMenuItem("Override Win key + arrows") {
-                Checked = stackSettings.Behaviors.KeyboardMove.Enabled,
-            };
-            keyboardMovement.Click += delegate {
-                keyboardMovement.Checked = stackSettings.Behaviors.KeyboardMove.Enabled = !keyboardMovement.Checked;
-                App.Restart();
-            };
-
-            var middleMouseMovement = new ToolStripMenuItem("Middle mouse drag") {
-                Checked = stackSettings.Behaviors.MouseMove.Enabled,
-            };
-            middleMouseMovement.Click += delegate {
-                middleMouseMovement.Checked = stackSettings.Behaviors.MouseMove.Enabled = !middleMouseMovement.Checked;
-                App.Restart();
-            };
-            contextMenu.Items.Add(keyboardMovement);
-            contextMenu.Items.Add(middleMouseMovement);
             contextMenu.Items.Add(new ToolStripSeparator());
 
             trayIcon.CreateScreensMenu(layoutsDirectory, screenProvider, contextMenu);
             trayIcon.CreateLayoutsMenu(layoutsDirectory, contextMenu);
 
-            contextMenu.Items.Add(new ToolStripMenuItem("Restart", image: null,
-                onClick: (_, __) => App.Restart()) {
-                DisplayStyle = ToolStripItemDisplayStyle.Text
-            });
             if (!new DesktopBridge.Helpers().IsRunningAsUwp())
             {
                 contextMenu.Items.Add(new ToolStripMenuItem("Restart as Admin", image: null,
@@ -104,6 +89,19 @@
 
             return trayIcon;
         }
+
+        ToolStripMenuItem CreateHelpMenu() {
+            var help = new ToolStripMenuItem("Help", image: null) {DisplayStyle = ToolStripItemDisplayStyle.Text};
+            help.DropDownItems.Add(Link("Blog", "http://stack.blogs.losttech.software/"));
+            help.DropDownItems.Add(Link("Telegram Community","https://t.me/joinchat/HCVquw4yDSmwxky5pxxKZw"));
+            help.DropDownItems.Add(Link("Ask a Question", "https://www.allanswered.com/community/s/stack-wm/"));
+            help.DropDownItems.Add(Link("What's New", "https://losttech.software/stack-whatsnew-free.html"));
+            help.DropDownItems.Add("About", image: null, onClick: (_, __) => this.aboutWindow.Show());
+            return help;
+        }
+
+        static ToolStripMenuItem Link(string text, string url) => 
+            new ToolStripMenuItem(text, image: null, onClick: (_,__) => Process.Start(url));
 
         void CreateLayoutsMenu(ObservableDirectory layoutsDirectory, ToolStrip contextMenu)
         {
@@ -220,6 +218,7 @@
 
         void CreateScreensMenu(ObservableDirectory layoutsDirectory, IScreenProvider screenProvider, ToolStrip contextMenu)
         {
+            var switchMenu = new ToolStripMenuItem("Switch Layout"){DisplayStyle =  ToolStripItemDisplayStyle.Text};
             var font = contextMenu.Font;
             var boldFont = new Font(font, FontStyle.Bold);
             foreach (var screen in screenProvider.Screens)
@@ -269,9 +268,9 @@
                             menu.DropDownItems.Remove(layoutMenu);
                     });
 
-                contextMenu.Items.Add(menu);
+                switchMenu.DropDownItems.Add(menu);
             }
-            contextMenu.Items.Add(new ToolStripSeparator());
+            contextMenu.Items.Add(switchMenu);
         }
 
         ToolStripMenuItem SwitchToLayoutMenuItem(ObservableFile file, Win32Screen screen, Font font)

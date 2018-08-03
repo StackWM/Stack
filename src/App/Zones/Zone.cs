@@ -10,6 +10,7 @@
     using System.Windows;
     using System.Windows.Controls;
     using LostTech.Stack.Models;
+    using LostTech.Stack.WindowManagement;
 
     public class Zone : ContentControl
     {
@@ -47,14 +48,15 @@
 
         public ObservableCollection<IAppWindow> Windows { get; } = new ObservableCollection<IAppWindow>();
 
-        protected virtual void OnWindowCollectionChanged(object sender, NotifyCollectionChangedEventArgs change) {
-            var uiThread = TaskScheduler.FromCurrentSynchronizationContext();
+        protected virtual async void OnWindowCollectionChanged(object sender, NotifyCollectionChangedEventArgs change) {
             foreach (IAppWindow window in change.NewItems ?? new IAppWindow[0]) {
-                Rect bounds = this.GetPhysicalBounds();
-                window.Move(bounds).ContinueWith(error => {
-                    if (error.Result != null)
-                        this.NonFatalErrorOccurred?.Invoke(this, new ErrorEventArgs(error.Result));
-                }, uiThread);
+                var bounds = this.GetPhysicalBounds();
+                try {
+                    await window.Move(bounds);
+                } catch (WindowNotFoundException) {
+                } catch (Exception error) {
+                    this.NonFatalErrorOccurred?.Invoke(this, new ErrorEventArgs(error));
+                }
             }
         }
 

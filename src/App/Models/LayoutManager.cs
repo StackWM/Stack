@@ -8,6 +8,7 @@
     using System.Threading.Tasks;
     using EventHook;
     using JetBrains.Annotations;
+    using LostTech.Stack.WindowManagement;
     using LostTech.Stack.Zones;
 
     class LayoutManager : IDisposable
@@ -48,7 +49,7 @@
         void OnApplicationWindowChange(object sender, ApplicationEventArgs applicationEventArgs)
         {
             var app = applicationEventArgs.ApplicationData;
-            var window = new Win32Window(app.HWnd);
+            var window = new Win32Window(app.HWnd, suppressSystemMargin: false);
             if (applicationEventArgs.Event != ApplicationEvents.Launched) {
                 bool wasTracked = this.locations.TryGetValue(window, out var existedAt);
                 if (wasTracked) {

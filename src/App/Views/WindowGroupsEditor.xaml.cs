@@ -26,8 +26,9 @@
             DependencyProperty.Register(nameof(ItemsSource), typeof(ICollection<WindowGroup>),
                 typeof(WindowGroupsEditor), new PropertyMetadata(null));
 
-        void AddGroupClick(object sender, RoutedEventArgs e)
-        {
+        void AddGroupClick(object sender, RoutedEventArgs e) => this.CreateGroup();
+
+        public void CreateGroup() {
             this.ItemsSource.Add(new WindowGroup {Name = "New Group"});
             this.GroupsView.SelectedIndex = this.ItemsSource.Count - 1;
             this.GroupEditor.StartEdititng();
