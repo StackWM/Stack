@@ -587,9 +587,10 @@
                 this.layoutsDirectory.Files,
                 file => Path.GetFileNameWithoutExtension(file.FullName));
 
+            var layoutLaunches = new List<Task>();
             foreach (Win32Screen screen in screens) {
                 if (IsValidScreen(screen)) {
-                    await AddLayoutForScreen(screen);
+                    layoutLaunches.Add(AddLayoutForScreen(screen));
 
                     if (settings.LayoutMap.NeedsUpdate(screen))
                     {
@@ -616,6 +617,8 @@
                 }
                 screen.PropertyChanged += ScreenPropertyChanged;
             }
+
+            await Task.WhenAll(layoutLaunches);
 
             screens.OnChange<Win32Screen>(onAdd: async s => {
                 if (IsValidScreen(s))
