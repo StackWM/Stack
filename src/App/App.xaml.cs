@@ -165,8 +165,6 @@
 
             this.SettingsWindow = new SettingsWindow{ DataContext = settings };
 
-            this.SetupScreenHooks();
-
             this.winApiHandler.Closed += (sender, args) => this.BeginShutdown();
 
             await this.StartLayout(settings);
@@ -751,20 +749,6 @@
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         static string GetUwpRoamingAppData() => global::Windows.Storage.ApplicationData.Current.RoamingFolder.Path;
-
-        private void SetupScreenHooks()
-        {
-            this.winApiHandler.Show();
-            var hwnd = (HwndSource) PresentationSource.FromVisual(this.winApiHandler);
-            hwnd.AddHook(this.OnWindowMessage);
-            this.winApiHandler.Hide();
-        }
-
-        private IntPtr OnWindowMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            //switch ((WindowMessage)msg) {}
-            return IntPtr.Zero;
-        }
 
         public static Version Version => IsUwp
             ? GetUwpVersion()
