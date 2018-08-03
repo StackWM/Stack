@@ -1,0 +1,47 @@
+﻿<metro:MetroWindow x:Class="LostTech.Stack.UpgradeOffer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LostTech.Stack"
+        xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
+        mc:Ignorable="d"
+        Title="Advanced version of Stack available"
+        Icon="StackTaskbarIcon.ico" ShowIconOnTitleBar="False"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="ToolWindow" ResizeMode="NoResize"
+        FontSize="16"
+        SizeToContent="Height"
+        Width="500">
+    <StackPanel Margin="12">
+        <TextBlock>
+            An advanced version of Stack is available for your OS
+            <LineBreak/>
+            <LineBreak/>
+            <Bold>Some of the new features are:</Bold>
+            <LineBreak/>
+            * group windows with tabs<LineBreak/>
+            * position new windows automatically<LineBreak/>
+            * dynamically stack windows inside a zone<LineBreak/>
+            * customizable desktop widgets<LineBreak/>
+            <LineBreak/>
+            
+            
+            <Hyperlink NavigateUri="https://losttech.software/stack-whatsnew.html"
+                       Foreground="White"
+                       RequestNavigate="Hyperlink_RequestNavigate">View the full list</Hyperlink>
+            <LineBreak/>
+            <Italic FontSize="13">an option to upgrade will also be available from the tray icon menu</Italic>
+            <LineBreak/>
+        </TextBlock>
+        
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Background="Black" Padding="10,4" Margin="0,0,10,0" MinWidth="100">UPGRADE</Button>
+            <Button Background="{StaticResource WindowBackgroundBrush}" Padding="10,4" MinWidth="100">LATER</Button>
+        </StackPanel>
+        
+    </StackPanel>
+</metro:MetroWindow>
+
+
+

@@ -293,9 +293,13 @@
       <DependentUpon>StackIcon.xaml</DependentUpon>
     </Compile>
     <Compile Include="TrayIcon.cs" />
+    <Compile Include="UpgradeOffer.xaml.cs">
+      <DependentUpon>UpgradeOffer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utils\DragHookEventArgs.cs" />
     <Compile Include="Utils\EnumUtils.cs" />
     <Compile Include="Utils\MathUtils.cs" />
+    <Compile Include="Utils\OSInfo.cs" />
     <Compile Include="Utils\RectExtensions.cs" />
     <Compile Include="Utils\VersionUtils.cs" />
     <Compile Include="ViewModels\LayoutSelectorViewModel.cs" />
@@ -405,6 +409,10 @@
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UpgradeOffer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\LayoutPreview.xaml">
       <SubType>Designer</SubType>

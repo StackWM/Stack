@@ -184,6 +184,8 @@
                 this.trayIcon.ShowBalloonTip(30);
             }
 
+            this.SuggestUpgrade();
+
             // this must be the last, so that mouse won't lag while we are loading
             this.BindHandlers(settings);
         }
@@ -763,6 +765,37 @@
         {
             var startInfo = new ProcessStartInfo(Process.GetCurrentProcess().MainModule.FileName) { Verb = "runas" };
             Process.Start(startInfo);
+        }
+
+        readonly DispatcherTimer upgradeOfferTimer = new DispatcherTimer {
+            Interval =
+#if DEBUG
+                TimeSpan.FromSeconds(15),
+#else
+                TimeSpan.FromHours(1),
+#endif
+
+        };
+        void SuggestUpgrade() {
+            string osVersion = Environment.OSVersion.Version.ToString();
+            var notifications = this.stackSettings.Notifications;
+            if (notifications.LastUpgradeOffer?.AddMonths(3) > DateTimeOffset.Now
+                && notifications.OsVersionUpgradeSuggested == osVersion)
+                return;
+
+            if (!OSInfo.SupportsDesktopBridge())
+                return;
+
+            this.upgradeOfferTimer.Tick += delegate {
+                this.SuggestUpgradeNow();
+                this.upgradeOfferTimer.Stop();
+            };
+            this.upgradeOfferTimer.Start();
+        }
+
+        void SuggestUpgradeNow() {
+            var upgradeOffer = new UpgradeOffer();
+            upgradeOffer.Show();
         }
     }
 }
