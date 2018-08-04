@@ -19,6 +19,7 @@
     using LostTech.Stack.Zones;
     using Microsoft.HockeyApp;
     using RectangleF = System.Drawing.RectangleF;
+    using static System.FormattableString;
 
     class LayoutManager : IDisposable, IWindowTracker, IWindowManager
     {
@@ -42,11 +43,25 @@
             this.windowFactory = windowFactory ?? throw new ArgumentNullException(nameof(windowFactory));
             this.applicationWatcher = this.eventHookFactory.GetApplicationWatcher();
             this.applicationWatcher.OnApplicationWindowChange += this.OnApplicationWindowChange;
+            this.applicationWatcher.OnWindowOverride += this.ApplicationWatcher_OnWindowOverride;
             this.applicationWatcher.Start();
             this.taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
             if (VirtualDesktop.HasMinimalSupport)
                 this.InitVirtualDesktopSupport();
+        }
+
+        void ApplicationWatcher_OnWindowOverride(object sender, WindowOverrideEventArgs e) {
+            new InvalidOperationException(
+                Invariant($"Received window override for {e.OldWindow.HWnd}->{e.NewWindow.HWnd}.\n") +
+                Invariant($" creation time: {e.OldWindow.CreationTime}->{e.NewWindow.CreationTime}\n") +
+                $" app: {e.OldWindow.AppName}->{e.NewWindow.AppName}").ReportAsWarning();
+
+            if (e.OldWindow.AppName != e.NewWindow.AppName)
+                this.OnApplicationWindowChange(sender, new ApplicationEventArgs {
+                    ApplicationData = e.OldWindow,
+                    Event = ApplicationEvents.Closed,
+                });
         }
 
         public Zone GetLocation([NotNull] IAppWindow window) {
