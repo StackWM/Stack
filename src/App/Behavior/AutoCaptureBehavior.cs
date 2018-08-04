@@ -77,12 +77,16 @@
                 return;
             }
 
-            Rect bounds = args.Subject.Layout.GetPhysicalBounds();
+            Rect? bounds = layout.TryGetPhysicalBounds();
+            if (bounds == null)
+                // don't autocapture, if layout is immediately dropped
+                return;
+
             await Task.Factory.StartNew(() =>
                 this.win32WindowFactory
                     .ForEachTopLevel(async window => {
                         try {
-                            Rect intersection = window.Bounds.Intersection(bounds);
+                            Rect intersection = window.Bounds.Intersection(bounds.Value);
                             if (intersection.IsEmpty || intersection.Width < 10 || intersection.Height < 10)
                                 return;
 
