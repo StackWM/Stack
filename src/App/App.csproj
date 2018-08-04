@@ -91,6 +91,12 @@
     <Reference Include="MahApps.Metro, Version=1.6.5.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MahApps.Metro.1.6.5\lib\net47\MahApps.Metro.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.HockeyApp.Core45, Version=4.1.7.48245, Culture=neutral, PublicKeyToken=5179ea9e4cdf308e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HockeySDK.Community.Core.4.1.7-pre0\lib\portable-net45+win8+wp8+wpa81+win81+uap10.0\Microsoft.HockeyApp.Core45.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.HockeyApp.Kit, Version=4.1.7.48362, Culture=neutral, PublicKeyToken=5179ea9e4cdf308e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HockeySDK.Community.WPF.4.1.7-pre2\lib\net45\Microsoft.HockeyApp.Kit.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Toolkit.Uwp.Notifications, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Toolkit.Uwp.Notifications.3.0.0\lib\netstandard1.4\Microsoft.Toolkit.Uwp.Notifications.dll</HintPath>
     </Reference>
@@ -555,14 +561,6 @@
     <ProjectReference Include="..\..\External\EventHook\EventHook\EventHook.csproj">
       <Project>{3847a7f4-3f6b-4626-af4c-8fdfba6165f2}</Project>
       <Name>EventHook</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\HockeySDK\Src\Kit.Core45\Kit.Core45.csproj">
-      <Project>{14123a8e-6d6b-4362-b001-35b8c2505eed}</Project>
-      <Name>Kit.Core45</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\HockeySDK\Src\Kit.WPF45\Kit.WPF45.csproj">
-      <Project>{c9612531-2077-4662-b8a4-092e06d5069b}</Project>
-      <Name>Kit.WPF45</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\External\MouseKeyHook\MouseKeyHook\MouseKeyHook.csproj">
       <Project>{f52aa97e-180a-40ed-8f2b-09080171d6c7}</Project>
