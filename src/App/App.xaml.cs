@@ -274,6 +274,7 @@
 #else
         const int HeartbeatIntervalMinutes = 60*3;
 #endif
+        static DispatcherTimer heartbeatTimer;
         static async Task EnableHockeyApp()
         {
 #if DEBUG
@@ -294,6 +295,7 @@
             var timer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(HeartbeatIntervalMinutes) };
             timer.Tick += TelemetryHeartbeat;
             timer.Start();
+            heartbeatTimer = timer;
             TelemetryHeartbeat(timer, EventArgs.Empty);
         }
 
