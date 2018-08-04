@@ -287,6 +287,7 @@
 #else
         const int HeartbeatIntervalMinutes = 60*3;
 #endif
+        static readonly DispatcherTimer HeartbeatTimer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(HeartbeatIntervalMinutes) };
         static async Task EnableHockeyApp()
         {
 #if DEBUG
@@ -304,10 +305,9 @@
             }
             catch (IOException e) when ((e.HResult ^ unchecked((int)0x8007_0000)) == (int) Win32ErrorCode.ERROR_NO_MORE_FILES) {}
 
-            var timer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(HeartbeatIntervalMinutes) };
-            timer.Tick += TelemetryHeartbeat;
-            timer.Start();
-            TelemetryHeartbeat(timer, EventArgs.Empty);
+            HeartbeatTimer.Tick += TelemetryHeartbeat;
+            HeartbeatTimer.Start();
+            TelemetryHeartbeat(HeartbeatTimer, EventArgs.Empty);
 
             TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
         }
