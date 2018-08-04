@@ -141,7 +141,7 @@
       <HintPath>..\..\packages\Prism.Core.7.0.0.396\lib\net45\Prism.dll</HintPath>
     </Reference>
     <Reference Include="RecursiveChangeNotifier, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\RecursiveChangeNotifier.0.4.0-b3\lib\netstandard1.0\RecursiveChangeNotifier.dll</HintPath>
+      <HintPath>..\..\packages\RecursiveChangeNotifier.0.4.0-b4\lib\netstandard1.0\RecursiveChangeNotifier.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.AppContext, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
