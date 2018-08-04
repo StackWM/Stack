@@ -38,6 +38,7 @@
     using MahApps.Metro.Controls;
     using Microsoft.HockeyApp;
     using Microsoft.Toolkit.Uwp.Notifications;
+    using Nito.AsyncEx;
     using PCLStorage;
     using PInvoke;
     using Application = System.Windows.Application;
@@ -811,8 +812,10 @@
             this.layoutLoader.ProblemOccurred += this.NonCriticalErrorHandler;
             try {
                 FrameworkElement element = await this.GetLayoutForScreen(screenLayout.Screen);
+                var readiness = new TaskCompletionSource<bool>();
+                Layout.SetReady(element, readiness.Task);
                 element.Loaded += delegate { this.LayoutLoaded?.Invoke(this, Args.Create(screenLayout)); };
-                screenLayout.SetLayout(element);
+                screenLayout.SetLayout(element).ContinueWith(readiness.TryCompleteFromCompletedTask).ReportAsWarning();
 
                 foreach (var troublemaker in screenLayout.FindChildren<Control>().OfType<IObjectWithProblems>())
                     troublemaker.ProblemOccurred += this.NonCriticalErrorHandler;
