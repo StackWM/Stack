@@ -47,6 +47,11 @@
 
         async void SuggestUpgradeNow() {
             var upgradeOffer = new UpgradeOffer();
+            bool? upgrade = upgradeOffer.ShowDialog();
+            if (upgrade == false) {
+                this.notificationSettings.LastUpgradeOffer = DateTimeOffset.Now;
+                this.notificationSettings.OsVersionUpgradeSuggested = Environment.OSVersion.Version.ToString();
+            }
             if (upgradeOffer.ShowDialog() != true)
                 return;
 
