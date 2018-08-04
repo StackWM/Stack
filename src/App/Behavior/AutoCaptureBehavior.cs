@@ -88,7 +88,8 @@
 
                             if (this.win32WindowFactory.DisplayInSwitchToList(window))
                                 await this.Capture(window);
-                        } catch (Exception e) {
+                        } catch (WindowNotFoundException) { }
+                        catch (Exception e) {
                             e.ReportAsWarning();
                         }
                     })
@@ -120,7 +121,8 @@
                     try {
                         if (this.win32WindowFactory.DisplayInSwitchToList(window))
                             await this.Capture(window);
-                    } catch (Exception e) {
+                    } catch (WindowNotFoundException) { }
+                    catch (Exception e) {
                         e.ReportAsWarning();
                     }
                 })
