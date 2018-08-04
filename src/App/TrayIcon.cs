@@ -16,6 +16,7 @@
     using LostTech.Stack.Utils;
     using LostTech.Stack.WindowManagement;
     using LostTech.Windows;
+    using Microsoft.HockeyApp;
     using Microsoft.VisualBasic;
     using PCLStorage;
     using Application = System.Windows.Application;
@@ -58,7 +59,10 @@
                 && OSInfo.SupportsDesktopBridge()
                 && MigrateToStoreVersion.IsStoreVersionInstalled()) {
                 contextMenu.Items.Add("Migrate settings", image: null,
-                        onClick: (_, __) => MigrateToStoreVersion.Migrate())
+                        onClick: (_, __) => {
+                            HockeyClient.Current.TrackEvent("ManualMigrationRequested");
+                            MigrateToStoreVersion.Migrate();
+                        })
                     .ToolTipText = "Migrate all settings to the advanced version, installed from the Store.";
             }
 
