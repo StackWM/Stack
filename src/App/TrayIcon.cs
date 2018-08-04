@@ -54,13 +54,21 @@
 
             var trayIcon = new TrayIcon(notificationIcon, stackSettings, layoutsFolder);
 
+            if (!new DesktopBridge.Helpers().IsRunningAsUwp()
+                && OSInfo.SupportsDesktopBridge()
+                && MigrateToStoreVersion.IsStoreVersionInstalled()) {
+                contextMenu.Items.Add("Migrate settings", image: null,
+                        onClick: (_, __) => MigrateToStoreVersion.Migrate())
+                    .ToolTipText = "Migrate all settings to the advanced version, installed from the Store.";
+            }
+
             contextMenu.Items.Add("Settings", image: null, onClick: (_, __) => settingsWindow.Show())
                 .Font = new Font(contextMenu.Font, FontStyle.Bold);
             trayIcon.Icon.DoubleClick += delegate { settingsWindow.Show(); };
 
             contextMenu.Items.Add(trayIcon.CreateHelpMenu());
             ToolStripMenuItem feedback = new DesktopBridge.Helpers().IsRunningAsUwp()
-                ? Link(text: "Leave Feedback / Rate", url: "ms-windows-store:REVIEW?PFN=LostTechLLC.Zones_kdyhxf5sz30e2")
+                ? Link(text: "Leave Feedback / Rate", url: $"ms-windows-store:REVIEW?PFN={App.StoreFamilyName}")
                 : Link(text: "Feedback...", url: "http://bit.ly/2o7Rxvr");
             contextMenu.Items.Add(feedback);
 
