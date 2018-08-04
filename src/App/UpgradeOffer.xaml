@@ -9,7 +9,7 @@
         Title="Advanced version of Stack available"
         Icon="StackTaskbarIcon.ico" ShowIconOnTitleBar="False"
         WindowStartupLocation="CenterScreen"
-        WindowStyle="ToolWindow" ResizeMode="NoResize"
+        ResizeMode="NoResize"
         FontSize="16"
         SizeToContent="Height"
         Width="500">
@@ -20,7 +20,7 @@
             <LineBreak/>
             <Bold>Some of the new features are:</Bold>
             <LineBreak/>
-            * group windows with tabs<LineBreak/>
+            * optional mini-taskbars for zones containing multiple windows<LineBreak/>
             * position new windows automatically<LineBreak/>
             * dynamically stack windows inside a zone<LineBreak/>
             * customizable desktop widgets<LineBreak/>
@@ -36,12 +36,9 @@
         </TextBlock>
         
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Background="Black" Padding="10,4" Margin="0,0,10,0" MinWidth="100">UPGRADE</Button>
-            <Button Background="{StaticResource WindowBackgroundBrush}" Padding="10,4" MinWidth="100">LATER</Button>
+            <Button Background="Black" Padding="10,4" Margin="0,0,10,0" MinWidth="100" Click="Upgrade_OnClick">UPGRADE</Button>
+            <Button Background="{StaticResource WindowBackgroundBrush}" Padding="10,4" MinWidth="100" Click="Later_OnClick">LATER</Button>
         </StackPanel>
         
     </StackPanel>
 </metro:MetroWindow>
-
-
-

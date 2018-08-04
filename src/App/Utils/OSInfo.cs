@@ -2,6 +2,7 @@
     using System;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using global::Windows.ApplicationModel;
     using global::Windows.Management.Deployment;
 
     public static class OSInfo {
@@ -11,12 +12,12 @@
                 || osVer.Major == 10 && osVer.Build < 14393)
                 return false;
 
-            return HasAppxPackageManager();
+            return HasStore();
         }
 
-        static bool HasAppxPackageManager() {
+        static bool HasStore() {
             try {
-                return CreateAppxPackageManager();
+                return HasStoreInternal();
             } catch (Exception e) {
                 e.ReportAsWarning("Warning: Can't create PackageManager: ");
                 return false;
@@ -24,6 +25,12 @@
         }
 
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-        static bool CreateAppxPackageManager() => new PackageManager() != null;
+        static bool HasStoreInternal() {
+            var packageManager = new PackageManager();
+            Package storePackage = packageManager.FindPackagesForUser(
+                userSecurityId: string.Empty,
+                packageFamilyName: "Microsoft.StorePurchaseApp_8wekyb3d8bbwe").FirstOrDefault();
+            return storePackage != null;
+        }
     }
 }

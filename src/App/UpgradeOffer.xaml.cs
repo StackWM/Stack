@@ -27,5 +27,13 @@ namespace LostTech.Stack {
             Process.Start(e.Uri.ToString());
             e.Handled = true;
         }
+
+        void Upgrade_OnClick(object sender, RoutedEventArgs e) {
+            this.DialogResult = true;
+        }
+
+        void Later_OnClick(object sender, RoutedEventArgs e) {
+            this.DialogResult = false;
+        }
     }
 }
