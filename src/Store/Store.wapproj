@@ -24,7 +24,7 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <PackageCertificateKeyFile>Store_StoreKey.pfx</PackageCertificateKeyFile>
     <EntryPointProjectUniqueName>..\App\App.csproj</EntryPointProjectUniqueName>
-    <PackageCertificateThumbprint>7A9C98BDFEDEC4A68F85E0B6D417C02E2D243EF4</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>F3E2A6D8C767A4E7E28AADCDBA0952645958E463</PackageCertificateThumbprint>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>neutral</AppxBundlePlatforms>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
