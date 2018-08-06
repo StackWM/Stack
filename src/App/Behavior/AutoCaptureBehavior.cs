@@ -185,21 +185,33 @@
                 if (retryAttempts == 0)
                     return;
 
-                await Task.Factory.StartNew(async () => {
-                    await Task.WhenAll(this.layouts.ScreenLayouts.Active().Select(l => Layout.GetReady(l.Layout)));
+                await Task.Factory.StartNew(() =>
+                    Retry.TimesAsync(attempts: 5, async final => {
+                        await Task.WhenAll(this.layouts.ScreenLayouts.Active()
+                            .Select(l => Layout.GetReady(l.Layout)));
 
-                    Zone targetZone = this.layouts.ScreenLayouts.Active()
-                        .SelectMany(layout => layout.Zones.Final())
-                        .OrderBy(zone => LocationError(bounds, zone))
-                        .FirstOrDefault();
+                        Zone targetZone;
+                        try {
+                             targetZone = this.layouts.ScreenLayouts.Active()
+                                .SelectMany(layout => layout.Zones.Final())
+                                .MinByOrDefault(zone => LocationError(bounds, zone));
+                        } catch (InvalidOperationException e) {
+                            if (final) {
+                                Debug.WriteLine($"gave up capturing {window.Title} - zones are not ready");
+                                return;
+                            }
 
-                    var targetBounds = targetZone?.TryGetPhysicalBounds();
-                    if (targetBounds != null) {
-                        this.layoutManager.Move(window, targetZone);
-                        Debug.WriteLine($"move {window.Title} to {targetZone.GetPhysicalBounds()}");
-                        this.alreadyCatpured[window] = true;
-                    }
-                }, CancellationToken.None, TaskCreationOptions.None, this.taskScheduler).Unwrap();
+                            throw new RetriableException(e);
+                        }
+
+                        var targetBounds = targetZone?.TryGetPhysicalBounds();
+                        if (targetBounds != null) {
+                            this.layoutManager.Move(window, targetZone);
+                            Debug.WriteLine($"move {window.Title} to {targetZone.GetPhysicalBounds()}");
+                            this.alreadyCatpured[window] = true;
+                        }
+                    })
+                , CancellationToken.None, TaskCreationOptions.None, this.taskScheduler);
             } catch (WindowNotFoundException) { } catch (OperationCanceledException) { }
         }
 

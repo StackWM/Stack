@@ -29,6 +29,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>true</Prefer32Bit>
     <CodeAnalysisRuleSet>..\..\..\..\Lost.ruleset</CodeAnalysisRuleSet>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -40,6 +41,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>true</Prefer32Bit>
     <CodeAnalysisRuleSet>..\..\..\..\Lost.ruleset</CodeAnalysisRuleSet>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -56,6 +58,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>..\..\..\..\Lost.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CalcBinding, Version=2.3.0.1, Culture=neutral, processorArchitecture=MSIL">
@@ -333,11 +336,14 @@
     <Compile Include="Utils\CollectionUtils.cs" />
     <Compile Include="Utils\DictUtils.cs" />
     <Compile Include="Utils\DragHookEventArgs.cs" />
+    <Compile Include="Utils\EnumerationUtils.cs" />
     <Compile Include="Utils\EnumUtils.cs" />
     <Compile Include="Utils\EventArgs.cs" />
     <Compile Include="Utils\ExceptionExtensions.cs" />
     <Compile Include="Utils\GlassEffect.cs" />
     <Compile Include="Utils\MathUtils.cs" />
+    <Compile Include="Utils\RetriableException.cs" />
+    <Compile Include="Utils\Retry.cs" />
     <Compile Include="Utils\ScreenExtensions.cs" />
     <Compile Include="Utils\Throttle.cs" />
     <Compile Include="Utils\VersionUtils.cs" />
