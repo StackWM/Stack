@@ -62,14 +62,14 @@
 
             this.newRect = rect.Value;
 
-            if (!await this.adjustThrottle.TryAcquire() || this.newRect != rect.Value)
+            if (!await this.adjustThrottle.TryAcquire().ConfigureAwait(false) || this.newRect != rect.Value)
                 return;
 
             this.lastRect = rect.Value;
 
             IAppWindow windowToMove = this.Window.Window;
             try {
-                await windowToMove.Move(this.newRect);
+                await windowToMove.Move(this.newRect).ConfigureAwait(false);
             } catch (WindowNotFoundException) {
             } catch (Exception error) {
                 this.NonFatalErrorOccurred?.Invoke(this, new ErrorEventArgs(error));
