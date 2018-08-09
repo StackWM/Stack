@@ -63,7 +63,7 @@
             this.newRect = rect.Value;
             Thread.MemoryBarrier();
 
-            if (!await this.adjustThrottle.TryAcquire().ConfigureAwait(false))
+            if (!await this.adjustThrottle.TryAcquire())
                 return;
 
             Thread.MemoryBarrier();
