@@ -56,7 +56,7 @@
       
         <Button Grid.Row="2" Margin="10" Padding="36,8" HorizontalAlignment="Center"
                 IsDefault="True"
-                Background="White"
+                Background="White" Foreground="Black"
                 Click="Done_OnClick"
                 FontSize="32" FontWeight="Bold">
           DONE
