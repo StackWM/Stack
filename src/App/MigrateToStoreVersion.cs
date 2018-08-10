@@ -15,7 +15,7 @@
     using static System.FormattableString;
     using static LostTech.Stack.Utils.FileUtils;
 
-    class MigrateToStoreVersion
+    class MigrateToStoreVersion: IDisposable
     {
         readonly NotificationSettings notificationSettings;
 
@@ -137,5 +137,7 @@
                 packageFamilyName: App.StoreFamilyName).FirstOrDefault();
             return storePackage != null;
         }
+
+        public void Dispose() => this.upgradeOfferTimer.Stop();
     }
 }

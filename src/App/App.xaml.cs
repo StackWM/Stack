@@ -472,6 +472,7 @@
 
         async Task DisposeAsync()
         {
+            this.storeVersionMigration?.Dispose();
             this.layoutManager?.Dispose();
             this.layoutManager = null;
             this.hook?.Dispose();
