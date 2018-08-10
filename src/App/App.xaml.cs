@@ -59,6 +59,7 @@
             Opacity = 0,
             AllowsTransparency = true,
             ShowInTaskbar = false,
+            Visibility = Visibility.Hidden,
             WindowStyle = WindowStyle.None,
             Width=0,Height=0,
             Title = nameof(winApiHandler),
@@ -99,6 +100,7 @@
 
             this.MainWindow = this.winApiHandler;
             this.winApiHandler.Show();
+            this.winApiHandler.Loaded += delegate { this.winApiHandler.SetIsListedInTaskSwitcher(false); };
 
             if (!IsUwp) {
                 this.BeginCheckForUpdates();
