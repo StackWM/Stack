@@ -49,13 +49,13 @@
                 LayoutLoader = this.layoutLoader,
                 DataContext = selectorViewModel,
             };
+            selector.Loaded += delegate { Position(screen, selector); };
             selector.Show();
-            Position(screen, selector);
 
             return selector;
         }
 
-        async static void Position(Win32Screen screen, ScreenLayoutSelector selector) {
+        static async void Position(Win32Screen screen, ScreenLayoutSelector selector) {
             selector.TryGetNativeWindow()?.BringToFront().ReportAsWarning();
             await selector.FitToMargin(screen);
             selector.UpdateLayout();
