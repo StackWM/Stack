@@ -602,11 +602,6 @@
                 }
             }
 
-            var layoutsCollection = new TransformObservableCollection<string, ObservableFile,
-                ReadOnlyObservableCollection<ObservableFile>>(
-                this.layoutsDirectory.Files,
-                file => Path.GetFileNameWithoutExtension(file.FullName));
-
             var layoutLaunches = new List<Task>();
             foreach (Win32Screen screen in screens) {
                 if (ScreenExtensions.IsValidScreen(screen)) {
