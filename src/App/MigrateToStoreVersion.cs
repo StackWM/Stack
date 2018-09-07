@@ -1,6 +1,7 @@
 ﻿namespace LostTech.Stack {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Windows;
@@ -96,7 +97,20 @@
                 return;
             }
 
-            Migrate();
+            try {
+                Migrate();
+            } catch (Exception e) {
+                HockeyClient.Current.TrackException(e);
+
+                var openHelp = MessageBox.Show(
+                    messageBoxText: $"Migration failed due to the following error:\n\n{e}\n\nOpen Q&A article on manual migration?",
+                    caption: "Automatic migration failed",
+                    button: MessageBoxButton.YesNo,
+                    icon: MessageBoxImage.Error);
+
+                if (openHelp == MessageBoxResult.Yes)
+                    Process.Start("https://www.allanswered.com/post/qwzpz/manually-migrating-stack-free-settings/");
+            }
         }
 
         public static void Migrate() {
