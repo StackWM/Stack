@@ -115,6 +115,15 @@
                 } else {
                     HockeyClient.Current.TrackEvent("StoreMigrationConflictOverwriteDeclined");
                 }
+            } catch (DirectoryNotFoundException) {
+                MessageBox.Show(
+                    messageBoxText: "Store version does not seem to be installed.\n"
+                                    + "An option to migrate will appear in tray menu next time you start Stack, if store version is installed.",
+                    caption: "Store version not found",
+                    button: MessageBoxButton.OK,
+                    icon: MessageBoxImage.Error);
+
+                HockeyClient.Current.TrackEvent("StoreVersionNotFoundDuringMigration");
             }
         }
 
@@ -122,11 +131,19 @@
             string storeStateRoot = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "Packages", App.StoreFamilyName);
+
+            if (!Directory.Exists(storeStateRoot))
+                throw new DirectoryNotFoundException();
+
+            string storeLocalState = Path.Combine(storeStateRoot, "LocalState");
+            Directory.CreateDirectory(storeLocalState);
             CopyFiles(from: App.AppData.FullName,
-                      to: Path.Combine(storeStateRoot, "LocalState"),
+                      to: storeLocalState,
                       overwrite: overwrite);
+            string storeRoamingState = Path.Combine(storeStateRoot, "RoamingState");
+            Directory.CreateDirectory(storeRoamingState);
             CopyFiles(from: App.RoamingAppData.FullName,
-                      to: Path.Combine(storeStateRoot, "RoamingState"),
+                      to: storeRoamingState,
                       overwrite: overwrite);
         }
 
