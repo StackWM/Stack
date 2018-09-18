@@ -603,6 +603,20 @@
             if (win32Window.Equals(this.win32WindowFactory.Desktop)
                 || win32Window.Equals(this.win32WindowFactory.Shell))
                 return null;
+            if (this.stackSettings.Behaviors.MouseMove.TitleOnly) {
+                var clientArea = win32Window.GetClientBounds().Result;
+                var bounds = win32Window.Bounds;
+                if (Math.Abs(bounds.Height - clientArea.Height) < 3) {
+                    double? screenScale = this.screenProvider.Screens
+                        .FirstOrDefault(s => s.IsActive && s.WorkingArea.Contains(point.x, point.y))
+                        ?.TransformToDevice.M11;
+                    clientArea.Y += 32 * (float)(screenScale ?? 1.25);
+                }
+
+                if (clientArea.Contains(point.x, point.y))
+                    return null;
+            }
+
             try {
                 if (this.stackSettings.Behaviors.MouseMove.WindowGroupIgnoreList.Contains(
                         this.stackSettings.WindowGroups, child))

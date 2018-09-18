@@ -106,6 +106,9 @@
                             ItemsSource="{StaticResource MouseButtonOptions}"
                   />
                 </HeaderedContentControl>
+                <metro:ToggleSwitch Header="Only drag by window title"
+                                    DockPanel.Dock="Top"
+                                    IsChecked="{Binding Behaviors.MouseMove.TitleOnly}"/>
                 <HeaderedContentControl VerticalContentAlignment="Stretch" Margin="0"
                                         Header="Disable for these windows:"
                                         HeaderTemplate="{StaticResource GroupListHeader}"
