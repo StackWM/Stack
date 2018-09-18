@@ -1,9 +1,11 @@
 ﻿namespace LostTech.Stack.Zones
 {
+    using System;
     using System.Diagnostics;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Data;
+    using JetBrains.Annotations;
     using LostTech.Stack.ViewModels;
     using ValueConverters;
 
@@ -12,8 +14,14 @@
         #region IsHint
         static readonly BoolToVisibilityConverter boolToVisibility = new BoolToVisibilityConverter();
 
-        public static bool GetIsHint(DependencyObject obj) => (bool)obj.GetValue(IsHintProperty);
-        public static void SetIsHint(DependencyObject obj, bool value) => obj.SetValue(IsHintProperty, value);
+        public static bool GetIsHint([NotNull] DependencyObject obj) {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+            return (bool)obj.GetValue(IsHintProperty);
+        }
+        public static void SetIsHint([NotNull] DependencyObject obj, bool value) {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+            obj.SetValue(IsHintProperty, value);
+        }
 
         public static readonly DependencyProperty IsHintProperty =
             DependencyProperty.RegisterAttached("IsHint", typeof(bool), typeof(Layout),
@@ -39,8 +47,14 @@
         #region IsHint
         static readonly BoolToVisibilityConverter boolToVisibilityInv = new BoolToVisibilityConverter{IsInverted = true};
 
-        public static bool GetIsUnderlay(DependencyObject obj) => (bool)obj.GetValue(IsUnderlayProperty);
-        public static void SetIsUnderlay(DependencyObject obj, bool value) => obj.SetValue(IsUnderlayProperty, value);
+        public static bool GetIsUnderlay([NotNull] DependencyObject obj) {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+            return (bool)obj.GetValue(IsUnderlayProperty);
+        }
+        public static void SetIsUnderlay([NotNull] DependencyObject obj, bool value) {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+            obj.SetValue(IsUnderlayProperty, value);
+        }
 
         public static readonly DependencyProperty IsUnderlayProperty =
             DependencyProperty.RegisterAttached("IsUnderlay", typeof(bool), typeof(Layout),
@@ -67,17 +81,27 @@
         internal static readonly DependencyPropertyKey ReadyPropertyKey =
             DependencyProperty.RegisterAttachedReadOnly("Ready", typeof(Task), typeof(FrameworkElement), new PropertyMetadata(null));
         public static readonly DependencyProperty ReadyProperty = ReadyPropertyKey.DependencyProperty;
-        public static Task GetReady(DependencyObject obj) => (Task)obj.GetValue(ReadyProperty);
-        internal static void SetReady(DependencyObject obj, Task value) => obj.SetValue(ReadyPropertyKey, value);
+        public static Task GetReady([NotNull] DependencyObject obj) {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+            return (Task)obj.GetValue(ReadyProperty);
+        }
+        internal static void SetReady([NotNull] DependencyObject obj, Task value) {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+            obj.SetValue(ReadyPropertyKey, value);
+        }
+
         #endregion
 
         #region Version
-        public static int GetVersion(DependencyObject obj) {
+        public static int GetVersion([NotNull] DependencyObject obj) {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
             Debug.Assert(!(obj is ScreenLayout));
             return (int)obj.GetValue(VersionProperty);
         }
-
-        public static void SetVersion(DependencyObject obj, int value) => obj.SetValue(VersionProperty, value);
+        public static void SetVersion([NotNull] DependencyObject obj, int value) {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+            obj.SetValue(VersionProperty, value);
+        }
         public static readonly DependencyProperty VersionProperty =
             DependencyProperty.RegisterAttached("Version", typeof(int), typeof(Layout),
                 new PropertyMetadata(defaultValue: 1));
@@ -92,8 +116,14 @@
         #endregion
 
         #region Source
-        internal static string GetSource(DependencyObject obj) => (string)obj.GetValue(SourceProperty);
-        internal static void SetSource(DependencyObject obj, string value) => obj.SetValue(SourceProperty, value);
+        internal static string GetSource([NotNull] DependencyObject obj) {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+            return (string)obj.GetValue(SourceProperty);
+        }
+        internal static void SetSource([NotNull] DependencyObject obj, string value) {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+            obj.SetValue(SourceProperty, value);
+        }
         static readonly DependencyProperty SourceProperty =
             DependencyProperty.RegisterAttached("Source", typeof(string), typeof(Layout));
         #endregion

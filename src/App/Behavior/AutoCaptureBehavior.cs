@@ -187,8 +187,17 @@
 
                 await Task.Factory.StartNew(() =>
                     Retry.TimesAsync(attempts: 5, async final => {
-                        await Task.WhenAll(this.layouts.ScreenLayouts.Active()
-                            .Select(l => Layout.GetReady(l.Layout)));
+                        try {
+                            await Task.WhenAll(this.layouts.ScreenLayouts.Active()
+                                .Select(l => Layout.GetReady(l.Layout)));
+                        } catch (ArgumentNullException e) {
+                            if (final) {
+                                Debug.WriteLine($"gave up capturing {window.Title} - layouts are not ready");
+                                return;
+                            }
+
+                            throw new RetriableException(e);
+                        }
 
                         Zone targetZone;
                         try {
