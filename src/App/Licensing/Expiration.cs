@@ -144,13 +144,16 @@
             try {
                 Domain.GetCurrentDomain();
                 return true;
-            } catch (ActiveDirectoryOperationException e) when (e.HResult == unchecked((int)0x80131500)) {
+            } catch (ActiveDirectoryOperationException e) when (
+                e.HResult == unchecked((int)0x80131500)) {
                 return false;
             } catch (ActiveDirectoryObjectNotFoundException) {
                 return true;
             } catch (ActiveDirectoryOperationException) {
                 return true;
             } catch (DirectoryServicesCOMException) {
+                return true;
+            } catch (ActiveDirectoryServerDownException) {
                 return true;
             } catch (AuthenticationException) {
                 return true;
