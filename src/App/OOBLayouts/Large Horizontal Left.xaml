@@ -76,6 +76,11 @@
           <CollectionContainer Collection="{Binding Windows, Source={x:Reference RightMain}}"/>
           <CollectionContainer Collection="{Binding Windows, Source={x:Reference TopMain}}"/>
           <CollectionContainer Collection="{Binding Windows, Source={x:Reference BottomMain}}"/>
+
+          <CollectionContainer Collection="{Binding Windows, Source={x:Reference TopLeft}}"/>
+          <CollectionContainer Collection="{Binding Windows, Source={x:Reference TopRight}}"/>
+          <CollectionContainer Collection="{Binding Windows, Source={x:Reference BottomLeft}}"/>
+          <CollectionContainer Collection="{Binding Windows, Source={x:Reference BottomRight}}"/>
         </CompositeCollection>
       </zones:WindowTabs.ItemsSource>
     </zones:WindowTabs>
@@ -97,10 +102,10 @@
       <zones:Zone x:Name="TopMain" Grid.Row="0" Grid.ColumnSpan="2"/>
       <zones:Zone x:Name="BottomMain" Grid.Row="1" Grid.ColumnSpan="2"/>
 
-      <zones:Zone Grid.Column="0" Grid.Row="0"/>
-      <zones:Zone Grid.Column="1" Grid.Row="0"/>
-      <zones:Zone Grid.Column="0" Grid.Row="1"/>
-      <zones:Zone Grid.Column="1" Grid.Row="1"/>
+      <zones:Zone x:Name="TopLeft" Grid.Column="0" Grid.Row="0"/>
+      <zones:Zone x:Name="TopRight" Grid.Column="1" Grid.Row="0"/>
+      <zones:Zone x:Name="BottomLeft" Grid.Column="0" Grid.Row="1"/>
+      <zones:Zone x:Name="BottomRight" Grid.Column="1" Grid.Row="1"/>
 
       <zones:Zone Grid.Column="0" Grid.RowSpan="2"
                     Margin="{Binding Source={StaticResource GripSize}, Converter={StaticResource ThicknessConverter}}"
