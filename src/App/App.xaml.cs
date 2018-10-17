@@ -319,9 +319,11 @@
 
         static void TelemetryHeartbeat(object sender, EventArgs e) {
 #if !PROFILE
+            string domainName = Expiration.GetDomainName();
             HockeyClient.Current.TrackEvent("Heartbeat", new Dictionary<string, string> {
                 [nameof(HeartbeatIntervalMinutes)] = Invariant($"{HeartbeatIntervalMinutes}"),
-                [nameof(Expiration.IsDomainUser)] = Invariant($"{Expiration.IsDomainUser()}"),
+                [nameof(Expiration.IsDomainUser)] = Invariant($"{Expiration.IsDomainUser(domainName)}"),
+                ["Domain"] = domainName ?? "",
                 [nameof(Version)] = Invariant($"{Version}"),
                 [nameof(Uptime)] = Invariant($"{Uptime}"),
                 [nameof(IsUwp)] = Invariant($"{IsUwp}"),

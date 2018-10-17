@@ -141,22 +141,28 @@
         }
 
         internal static bool IsDomainUser() {
+            string domainName = GetDomainName();
+            return IsDomainUser(domainName);
+        }
+
+        internal static bool IsDomainUser(string domainName) => domainName != null && !domainName.Equals("tntech.edu", StringComparison.InvariantCultureIgnoreCase);
+
+        internal static string GetDomainName() {
             try {
-                Domain.GetCurrentDomain();
-                return true;
+                return Domain.GetCurrentDomain().Name;
             } catch (ActiveDirectoryOperationException e) when (
                 e.HResult == unchecked((int)0x80131500)) {
-                return false;
+                return null;
             } catch (ActiveDirectoryObjectNotFoundException) {
-                return true;
+                return "<err:onf>";
             } catch (ActiveDirectoryOperationException) {
-                return true;
+                return "<err:op>";
             } catch (DirectoryServicesCOMException) {
-                return true;
+                return "<err:com>";
             } catch (ActiveDirectoryServerDownException) {
-                return true;
+                return "<err:down>";
             } catch (AuthenticationException) {
-                return true;
+                return "<err:auth>";
             }
         }
     }
