@@ -155,7 +155,7 @@
             next = next
                    // if there are no zones with the same directional coordinate, continue along it
                    ?? allZones.Where(zone =>
-                           zone.GetPhysicalBounds().IntersectsWith(strip)
+                           zone.TryGetPhysicalBounds()?.IntersectsWith(strip) == true
                            && !sameCenter.Contains(zone)
                            && DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction) > Epsilon)
                        .OrderBy(GetRank)
