@@ -34,10 +34,17 @@
              Stretch="Fill"
              />
 
-      <TextBlock x:Name="TitleText" Grid.Column="1"
+      <Border Grid.Column="1"
+              Margin="6,1"
+              Padding="0,0,0,3"
+              BorderThickness="0,3,0,0"
+              BorderBrush="{Binding IsForeground, ElementName=Root, Converter={StaticResource IsHightlightedConverter}}"
+              VerticalAlignment="Center">
+      <TextBlock x:Name="TitleText" 
                  Text="{Binding Title, Mode=OneWay}" TextTrimming="CharacterEllipsis"
-                 Margin="6,4"
-                 VerticalAlignment="Center"/>
+                 />
+      </Border>
+      
       <Button Command="{Binding CloseCommand, Mode=OneWay}" Grid.Column="2"
               Foreground="{Binding Foreground, ElementName=ActivateButton}"
               MinWidth="24"
