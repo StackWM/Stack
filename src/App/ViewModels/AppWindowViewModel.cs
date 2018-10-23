@@ -10,10 +10,16 @@
     using LostTech.Stack.WindowManagement;
     using LostTech.Stack.Windows;
     using Prism.Commands;
+    using System.Windows.Media;
+    using System.Windows.Interop;
+    using System.Windows;
+    using System.Windows.Media.Imaging;
+    using System.Threading.Tasks;
 
     public class AppWindowViewModel : SimpleViewModel, IDisposable, IEquatable<AppWindowViewModel>
     {
         static readonly Win32WindowFactory Win32WindowFactory = new Win32WindowFactory();
+        ImageSource icon;
         [NotNull]
         public IAppWindow Window { get; }
         readonly WindowHookEx hook = WindowHookExFactory.Instance.GetHook();
@@ -39,6 +45,35 @@
         public string Title => this.Window.Title;
         public bool IsMinimized => this.Window.IsMinimized;
         public Guid? DesktopID => this.desktopHook?.DesktopID;
+
+        public ImageSource Icon {
+            get {
+                if (!(this.Window is Win32Window win32Window))
+                    return null;
+
+                if (this.icon != null)
+                    return this.icon;
+
+                this.UpdateIcon(win32Window);
+
+                return null;
+            }
+            private set {
+                this.icon = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        async void UpdateIcon(Win32Window win32Window) {
+            try {
+                await Task.Yield();
+                IntPtr hIcon = await win32Window.GetIcon();
+                if (hIcon == IntPtr.Zero)
+                    return;
+
+                this.Icon = Imaging.CreateBitmapSourceFromHIcon(hIcon, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            } catch (WindowNotFoundException) {}
+        }
 
         void HookOnMinimizeChanged(object sender, WindowEventArgs windowEventArgs) {
             if (Win32WindowFactory.Create(windowEventArgs.Handle).Equals(this.Window))

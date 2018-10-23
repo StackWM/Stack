@@ -22,14 +22,23 @@
           >
     <Grid>
       <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="*"/>
         <ColumnDefinition Width="Auto"/>
       </Grid.ColumnDefinitions>
 
-      <TextBlock x:Name="TitleText" Text="{Binding Title, Mode=OneWay}" TextTrimming="CharacterEllipsis"
+      <Image Source="{Binding Icon, Mode=OneWay}"
+             Visibility="{Binding Icon, Converter={StaticResource NullIsFalseConverter}, Mode=OneWay}"
+             MaxHeight="16" MaxWidth="16"
+             Margin="4"
+             Stretch="Fill"
+             />
+
+      <TextBlock x:Name="TitleText" Grid.Column="1"
+                 Text="{Binding Title, Mode=OneWay}" TextTrimming="CharacterEllipsis"
                  Margin="6,4"
                  VerticalAlignment="Center"/>
-      <Button Command="{Binding CloseCommand, Mode=OneWay}" Grid.Column="1"
+      <Button Command="{Binding CloseCommand, Mode=OneWay}" Grid.Column="2"
               Foreground="{Binding Foreground, ElementName=ActivateButton}"
               MinWidth="24"
               Margin="0"
