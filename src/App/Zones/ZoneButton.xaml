@@ -15,8 +15,8 @@
           BorderBrush="{Binding BorderBrush, ElementName=Root}"
           >
     <Grid>
-      <Border Margin="6,1"
-              Padding="0,0,0,3"
+      <Border Margin="6,0"
+              Padding="0,1,0,4"
               BorderThickness="0,3,0,0"
               BorderBrush="{Binding IsForeground, ElementName=Root, Converter={StaticResource IsHightlightedConverter}}"
               VerticalAlignment="Center">

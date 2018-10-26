@@ -35,8 +35,8 @@
              />
 
       <Border Grid.Column="1"
-              Margin="6,1"
-              Padding="0,0,0,3"
+              Margin="4,0,4,0"
+              Padding="0,1,0,4"
               BorderThickness="0,3,0,0"
               BorderBrush="{Binding IsForeground, ElementName=Root, Converter={StaticResource IsHightlightedConverter}}"
               VerticalAlignment="Center">
