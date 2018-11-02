@@ -605,6 +605,10 @@
             if (win32Window.Equals(this.win32WindowFactory.Desktop)
                 || win32Window.Equals(this.win32WindowFactory.Shell))
                 return null;
+            if (this.stackSettings.Behaviors.MouseMove.DisableWhenExclusiveFullScreenActive
+                && SHQueryUserNotificationState(out var notificationState).Succeeded
+                && notificationState == UserNotificationState.D3DFullScreen)
+                return null;
             if (this.stackSettings.Behaviors.MouseMove.TitleOnly) {
                 var clientArea = win32Window.GetClientBounds().Result;
                 var bounds = win32Window.Bounds;
@@ -973,6 +977,20 @@
             : Assembly.GetExecutingAssembly().GetName().Version;
         [MethodImpl(MethodImplOptions.NoInlining)]
         static Version GetUwpVersion() => global::Windows.ApplicationModel.Package.Current.Id.Version.ToVersion();
+
+        [DllImport("shell32.dll")]
+        static extern HResult SHQueryUserNotificationState(out UserNotificationState state);
+
+        enum UserNotificationState
+        {
+            NotPresent = 1,
+            Busy,
+            D3DFullScreen,
+            PresentationMode,
+            AcceptsNotifications,
+            QuietTime,
+            App,
+        }
 
         public int DragThreshold { get; private set; } = 40;
         public static void Restart() { Process.Start(Process.GetCurrentProcess().MainModule.FileName); }

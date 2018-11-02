@@ -7,6 +7,7 @@
     {
         bool enabled = true;
         bool titleOnly;
+        bool disableWhenExclusiveFullScreenActive = true;
         MouseButtons dragButton = MouseButtons.Middle;
 
         public bool Enabled {
@@ -33,6 +34,14 @@
             }
         }
 
+        public bool DisableWhenExclusiveFullScreenActive {
+            get => this.disableWhenExclusiveFullScreenActive;
+            set {
+                this.disableWhenExclusiveFullScreenActive = value;
+                this.OnPropertyChanged();
+            }
+        }
+
         public ObservableCollection<string> WindowGroupIgnoreList { get; } =
             new ObservableCollection<string>();
 
@@ -42,6 +51,7 @@
                 Enabled = this.Enabled,
                 DragButton = this.DragButton,
                 TitleOnly = this.TitleOnly,
+                DisableWhenExclusiveFullScreenActive = this.DisableWhenExclusiveFullScreenActive,
             };
             foreach (string groupName in this.WindowGroupIgnoreList)
                 copy.WindowGroupIgnoreList.Add(groupName);

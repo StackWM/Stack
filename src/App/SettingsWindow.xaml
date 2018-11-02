@@ -109,6 +109,9 @@
                 <metro:ToggleSwitch Header="Only drag by window title"
                                     DockPanel.Dock="Top"
                                     IsChecked="{Binding Behaviors.MouseMove.TitleOnly}"/>
+                <metro:ToggleSwitch Header="Disengage while exclusive fullscreen app is active"
+                                    DockPanel.Dock="Top"
+                                    IsChecked="{Binding Behaviors.MouseMove.DisableWhenExclusiveFullScreenActive}"/>
                 <HeaderedContentControl VerticalContentAlignment="Stretch" Margin="0"
                                         Header="Disable for these windows:"
                                         HeaderTemplate="{StaticResource GroupListHeader}"
