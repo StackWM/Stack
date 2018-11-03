@@ -2,6 +2,7 @@
 {
     using System;
     using System.ComponentModel;
+    using System.Runtime.InteropServices;
     using System.Windows.Input;
     using WindowsDesktop;
     using EventHook.Hooks;
@@ -15,6 +16,7 @@
     using System.Windows;
     using System.Windows.Media.Imaging;
     using System.Threading.Tasks;
+    using LostTech.Stack.WindowManagement.WinApi;
 
     public class AppWindowViewModel : SimpleViewModel, IDisposable, IEquatable<AppWindowViewModel>
     {
@@ -71,7 +73,9 @@
                 if (hIcon == IntPtr.Zero)
                     return;
 
-                this.Icon = Imaging.CreateBitmapSourceFromHIcon(hIcon, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                try {
+                    this.Icon = Imaging.CreateBitmapSourceFromHIcon(hIcon, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                } catch (COMException e) when (HResult.ERROR_INVALID_CURSOR_HANDLE.EqualsCode(e.HResult)) {}
             } catch (WindowNotFoundException) {}
         }
 
