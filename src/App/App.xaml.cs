@@ -784,6 +784,17 @@
             }, onRemove: s => {
                 s.PropertyChanged -= ScreenPropertyChanged;
                 RemoveLayoutForScreen(s);
+            },
+            onReplace: async (old, @new) => {
+                old.PropertyChanged -= ScreenPropertyChanged;
+                @new.PropertyChanged += ScreenPropertyChanged;
+                ScreenLayout layout = this.screenLayouts.FirstOrDefault(l => l.Screen?.ID == old.ID);
+                if (layout != null)
+                    layout.ViewModel.Screen = @new;
+                else {
+                    RemoveLayoutForScreen(old);
+                    await AddLayoutForScreen(@new);
+                }
             });
 
             settings.LayoutMap.Map.CollectionChanged += this.MapOnCollectionChanged;

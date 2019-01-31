@@ -566,7 +566,7 @@
       <Project>{b8ad0753-625f-41e0-a90d-05d587cf0780}</Project>
       <Name>ObservableFileSystem</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\External\EventHook\EventHook\EventHook.csproj">
+    <ProjectReference Include="..\..\External\EventHook\src\EventHook\EventHook.csproj">
       <Project>{3847a7f4-3f6b-4626-af4c-8fdfba6165f2}</Project>
       <Name>EventHook</Name>
     </ProjectReference>
