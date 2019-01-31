@@ -3,7 +3,9 @@
     using System;
     using System.Collections.Specialized;
     using System.ComponentModel;
+    using System.Linq;
     using System.Linq.Expressions;
+    using JetBrains.Annotations;
 
     static class Binder
     {
@@ -39,6 +41,48 @@
                         onAdd(item);
                     foreach (T item in args.OldItems ?? new T[0])
                         onRemove(item);
+                    return;
+                case NotifyCollectionChangedAction.Reset:
+                    throw new NotSupportedException();
+                case NotifyCollectionChangedAction.Move:
+                default:
+                    return;
+                }
+            };
+        }
+
+        public static void OnChange<T>([NotNull] this INotifyCollectionChanged collection,
+            [NotNull] Action<T> onAdd,
+            [NotNull] Action<T> onRemove,
+            [NotNull] Action<T, T> onReplace) {
+            if (collection == null) throw new ArgumentNullException(nameof(collection));
+            if (onAdd == null) throw new ArgumentNullException(nameof(onAdd));
+            if (onRemove == null) throw new ArgumentNullException(nameof(onRemove));
+            if (onReplace == null) throw new ArgumentNullException(nameof(onReplace));
+
+            collection.CollectionChanged += (_, args) => {
+                switch (args.Action) {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (T item in args.NewItems ?? new T[0])
+                        onAdd(item);
+                    return;
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (T item in args.OldItems ?? new T[0])
+                        onRemove(item);
+                    return;
+                case NotifyCollectionChangedAction.Replace:
+                    if (args.NewStartingIndex != args.OldStartingIndex || args.NewItems.Count != args.OldItems.Count) {
+                        foreach (T item in args.NewItems ?? new T[0])
+                            onAdd(item);
+                        foreach (T item in args.OldItems ?? new T[0])
+                            onRemove(item);
+                    } else {
+                        for (int i = 0; i < args.NewItems.Count; i++) {
+                            var old = (T)args.OldItems[i];
+                            var @new = (T)args.NewItems[i];
+                            onReplace(old, @new);
+                        }
+                    }
                     return;
                 case NotifyCollectionChangedAction.Reset:
                     throw new NotSupportedException();
