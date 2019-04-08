@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:LostTech.Stack"
         xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:app="clr-namespace:LostTech.App;assembly=LostTech.App.KeySettings.WPF"
-        xmlns:binding="clr-namespace:LostTech.Stack.DataBinding"
+        xmlns:converters="clr-namespace:ValueConverters;assembly=ValueConverters"
         xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:settings="clr-namespace:LostTech.Stack.Settings"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
@@ -32,10 +32,10 @@
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
         <ResourceDictionary>
-          <binding:RoundtripValueToBoolConverter x:Key="OptionalBoolToBoolConverter">
-            <binding:RoundtripValueToBoolConverter.TrueValue><system:Boolean>True</system:Boolean></binding:RoundtripValueToBoolConverter.TrueValue>
-            <binding:RoundtripValueToBoolConverter.FalseValue><system:Boolean>False</system:Boolean></binding:RoundtripValueToBoolConverter.FalseValue>
-          </binding:RoundtripValueToBoolConverter>
+          <converters:ValueToBoolConverter x:Key="OptionalBoolToBoolConverter">
+            <converters:ValueToBoolConverter.TrueValue><system:Boolean>True</system:Boolean></converters:ValueToBoolConverter.TrueValue>
+            <converters:ValueToBoolConverter.FalseValue><system:Boolean>False</system:Boolean></converters:ValueToBoolConverter.FalseValue>
+          </converters:ValueToBoolConverter>
           <x:Array x:Key="MouseButtonOptions" Type="forms:MouseButtons">
             <forms:MouseButtons>Left</forms:MouseButtons>
             <forms:MouseButtons>Right</forms:MouseButtons>

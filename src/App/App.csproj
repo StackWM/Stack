@@ -253,8 +253,11 @@
     <Reference Include="Validation, Version=2.4.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Validation.2.4.18\lib\net45\Validation.dll</HintPath>
     </Reference>
-    <Reference Include="ValueConverters, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ValueConverters.1.0.7\lib\net45\ValueConverters.dll</HintPath>
+    <Reference Include="ValueConverters, Version=2.0.19091.2, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ValueConverters.2.0.19091.2\lib\net45\ValueConverters.dll</HintPath>
+    </Reference>
+    <Reference Include="ValueConverters.Annotations, Version=2.0.19091.2, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ValueConverters.Annotations.2.0.19091.2\lib\net45\ValueConverters.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="Windows">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Windows Kits\10\UnionMetadata\Windows.winmd</HintPath>
@@ -286,7 +289,6 @@
     <Compile Include="DataBinding\MinimumNumberToVisibilityConverter.cs" />
     <Compile Include="DataBinding\PercentageConverter.cs" />
     <Compile Include="DataBinding\PropertyHelper.cs" />
-    <Compile Include="DataBinding\RoundtripValueToBoolConverter.cs" />
     <Compile Include="DataBinding\TransformObservableCollection.cs" />
     <Compile Include="DataBinding\UniformThicknessConverter.cs" />
     <Compile Include="DebugHelper.cs" />
