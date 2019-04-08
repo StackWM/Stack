@@ -242,7 +242,7 @@
       <HintPath>..\..\packages\System.Xml.ReaderWriter.4.3.1\lib\net46\System.Xml.ReaderWriter.dll</HintPath>
     </Reference>
     <Reference Include="Validation, Version=2.4.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Validation.2.4.18\lib\net45\Validation.dll</HintPath>
+      <HintPath>..\..\packages\Validation.2.4.22\lib\net45\Validation.dll</HintPath>
     </Reference>
     <Reference Include="ValueConverters, Version=2.0.19091.2, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\ValueConverters.2.0.19091.2\lib\net45\ValueConverters.dll</HintPath>
