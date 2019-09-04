@@ -22,8 +22,8 @@
         protected override void OnKeyDown(KeyStroke stroke, HandledEventArgs @event) {
             if (!Hotkey.moveHotkeys.TryGetValue(stroke, out var targetZone) || targetZone == null)
                 return;
-                
-            if (targetZone.TryGetTarget(out var target) && target?.IsLoaded != true)
+
+            if (!targetZone.TryGetTarget(out var target) || !target.IsLoaded)
                 return;
 
             var window = this.windowFactory.Foreground;
