@@ -229,7 +229,7 @@
         {
             var app = applicationEventArgs.ApplicationData;
             var window = this.windowFactory.Create(app.HWnd);
-            if (applicationEventArgs.Event != ApplicationEvents.Launched) {
+            if (applicationEventArgs.Event == ApplicationEvents.Closed) {
                 bool wasTracked = this.StopTrackingInternal(window);
                 this.origins.Remove(window);
                 Debug.WriteLine($"Disappeared: {app.AppTitle} traked: {wasTracked}");
