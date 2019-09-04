@@ -31,7 +31,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WPF", "External\KeySettings
 EndProject
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "Store", "src\Store\Store.wapproj", "{D853CFB3-C797-4950-B8F7-806D2770C4C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventHook", "External\EventHook\EventHook\EventHook.csproj", "{3847A7F4-3F6B-4626-AF4C-8FDFBA6165F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventHook", "External\EventHook\src\EventHook\EventHook.csproj", "{3847A7F4-3F6B-4626-AF4C-8FDFBA6165F2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualDesktop", "External\VirtualDesktop\source\VirtualDesktop\VirtualDesktop.csproj", "{AB848ECD-76AA-41C0-B63D-86A8591B25AA}"
 EndProject
