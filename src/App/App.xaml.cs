@@ -610,7 +610,15 @@
                 && notificationState == UserNotificationState.D3DFullScreen)
                 return null;
             if (this.stackSettings.Behaviors.MouseMove.TitleOnly) {
-                var clientArea = win32Window.GetClientBounds().Result;
+                Rect clientArea;
+                try {
+                    clientArea = win32Window.GetClientBounds().Result;
+                } catch (AggregateException e) {
+                    foreach(var inner in e.InnerExceptions)
+                        this.NonCriticalErrorHandler(this, new ErrorEventArgs(inner));
+                    return null;
+                }
+
                 var bounds = win32Window.Bounds;
                 if (Math.Abs(bounds.Height - clientArea.Height) < 3) {
                     double? screenScale = this.screenProvider.Screens
