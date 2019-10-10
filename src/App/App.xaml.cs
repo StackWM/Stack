@@ -109,8 +109,6 @@
             if (e.Args.Contains("--jit-debugging"))
                 EnableJitDebugging();
 
-            await EnableHockeyApp();
-
             StopRunningInstances();
 
             this.MainWindow = this.stackInstanceWindow;
@@ -120,7 +118,6 @@
             if (IsUwp) {
                 DesktopNotificationManagerCompat.RegisterActivator<UrlNotificationActivator>();
             }
-
 
             if (await Expiration.HasExpired()) {
                 this.Shutdown(2);
@@ -164,17 +161,23 @@
             bool termsVersionMismatch = settings.Notifications.AcceptedTerms != LicenseTermsAcceptance.GetTermsAndConditionsVersion();
             if (termsVersionMismatch) {
                 var termsWindow = new LicenseTermsAcceptance();
-                if (!true.Equals(termsWindow.ShowDialog())) {
+                bool? enableTelemetry = termsWindow.ShowDialog();
+                if (!termsWindow.DialogResultSet || enableTelemetry is null) {
                     this.Shutdown();
                     return;
                 }
+
+                settings.Notifications.EnableTelemetry = enableTelemetry.Value;
                 termsWindow.Close();
                 settings.Notifications.AcceptedTerms = LicenseTermsAcceptance.GetTermsAndConditionsVersion();
             }
 
+            if (settings.Notifications.EnableTelemetry)
+                await EnableHockeyApp();
+
             string version = Invariant($"{Version.Major}.{Version.Minor}");
             if (settings.Notifications.WhatsNewVersionSeen != version) {
-                this.ShowNotification(title: "What's New in Stack Widgets Update (v2.1)", 
+                this.ShowNotification(title: "What's New in Stack Widgets Update (v2.1)",
                     message: "You have received a Stack update. See what's new",
                     navigateTo: new Uri("https://losttech.software/stack-whatsnew.html"));
             }
