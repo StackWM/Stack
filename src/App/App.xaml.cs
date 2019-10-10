@@ -36,7 +36,9 @@
     using LostTech.Stack.Zones;
     using LostTech.Windows;
     using MahApps.Metro.Controls;
-    using Microsoft.HockeyApp;
+    using Microsoft.AppCenter;
+    using Microsoft.AppCenter.Analytics;
+    using Microsoft.AppCenter.Crashes;
     using Microsoft.Toolkit.Uwp.Notifications;
     using Nito.AsyncEx;
     using PCLStorage;
@@ -86,7 +88,6 @@
         MoveToZoneHotkeyBehavior moveToZoneBehavior;
         AutoCaptureBehavior autoCaptureBehavior;
         LayoutManager layoutManager;
-        DispatcherTimer updateTimer;
         readonly IScreenProvider screenProvider = new Win32ScreenProvider();
         ObservableDirectory layoutsDirectory;
         IFolder layoutsFolder;
@@ -116,16 +117,7 @@
             this.stackInstanceWindow.Show();
             this.stackInstanceWindow.Hide();
 
-            if (!IsUwp) {
-#if !PROFILE
-                this.BeginCheckForUpdates();
-                this.updateTimer = new DispatcherTimer(DispatcherPriority.Background) {
-                    Interval = TimeSpan.FromDays(1),
-                    IsEnabled = true,
-                };
-                this.updateTimer.Tick += (_, __) => this.BeginCheckForUpdates();
-#endif
-            } else {
+            if (IsUwp) {
                 DesktopNotificationManagerCompat.RegisterActivator<UrlNotificationActivator>();
             }
 
@@ -245,14 +237,6 @@
             return settingsSet.Value;
         }
 
-        void BeginCheckForUpdates()
-        {
-            HockeyClient.Current.CheckForUpdatesAsync(autoShowUi: true, shutdownActions: () => {
-                this.BeginShutdown();
-                return true;
-            }).GetAwaiter();
-        }
-
         static void StopRunningInstances()
         {
             var currentWindow = IntPtr.Zero;
@@ -291,19 +275,10 @@
         static async Task EnableHockeyApp()
         {
 #if DEBUG
-            HockeyClient.Current.Configure("be80a4a0381c4c37bc187d593ac460f9");
-            ((HockeyClient)HockeyClient.Current).OnHockeySDKInternalException += (sender, args) =>
-            {
-                if (Debugger.IsAttached) { Debugger.Break(); }
-            };
+            AppCenter.Start("be80a4a0-381c-4c37-bc18-7d593ac460f9", typeof(Analytics), typeof(Crashes));
 #else
-            HockeyClient.Current.Configure("6037e69fa4944acc9d83ef7682e60732");
+            AppCenter.Start("6037e69f-a494-4acc-9d83-ef7682e60732", typeof(Analytics), typeof(Crashes));
 #endif
-            try
-            {
-                await HockeyClient.Current.SendCrashesAsync().ConfigureAwait(false);
-            }
-            catch (IOException e) when ((e.HResult ^ unchecked((int)0x8007_0000)) == (int) Win32ErrorCode.ERROR_NO_MORE_FILES) {}
 
             HeartbeatTimer.Tick += TelemetryHeartbeat;
             HeartbeatTimer.Start();
@@ -314,13 +289,13 @@
 
         static void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e) {
             foreach (Exception exception in e.Exception.Flatten().InnerExceptions)
-                HockeyClient.Current.TrackException(exception, properties: new Dictionary<string, string>{["unobserved"] = "true"});
+                Crashes.TrackError(exception, properties: new Dictionary<string, string>{["unobserved"] = "true"});
         }
 
         static void TelemetryHeartbeat(object sender, EventArgs e) {
 #if !PROFILE
             string domainName = Expiration.GetDomainName();
-            HockeyClient.Current.TrackEvent("Heartbeat", new Dictionary<string, string> {
+            Analytics.TrackEvent("Heartbeat", new Dictionary<string, string> {
                 [nameof(HeartbeatIntervalMinutes)] = Invariant($"{HeartbeatIntervalMinutes}"),
                 [nameof(Expiration.IsDomainUser)] = Invariant($"{Expiration.IsDomainUser(domainName)}"),
                 ["Domain"] = domainName ?? "",
@@ -528,12 +503,12 @@
         }
 
         void NonCriticalErrorHandler(object sender, ErrorEventArgs error) {
-            #if !DEBUG
+#if !DEBUG
             if (error.GetException() is WindowNotFoundException)
                 return;
-            #endif
+#endif
 
-            HockeyClient.Current.TrackException(error.GetException(), properties: new Dictionary<string, string> {
+            Crashes.TrackError(error.GetException(), properties: new Dictionary<string, string> {
                 ["warning"] = "true",
                 ["user-visible"] = "true",
             });
@@ -682,13 +657,6 @@
             await this.DisposeAsync();
 
             this.Shutdown();
-        }
-
-        protected override void OnExit(ExitEventArgs exitArgs)
-        {
-            base.OnExit(exitArgs);
-            HockeyClient.Current.Flush();
-            Thread.Sleep(1000);
         }
 
         async Task StartLayout(StackSettings settings)

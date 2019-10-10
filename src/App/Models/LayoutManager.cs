@@ -17,7 +17,7 @@
     using LostTech.Stack.ViewModels;
     using LostTech.Stack.WindowManagement;
     using LostTech.Stack.Zones;
-    using Microsoft.HockeyApp;
+    using Microsoft.AppCenter.Crashes;
     using RectangleF = System.Drawing.RectangleF;
     using static System.FormattableString;
 
@@ -195,7 +195,7 @@
         void ReportTaskException(Task task) {
             if (task.IsFaulted)
                 foreach (var exception in task.Exception.InnerExceptions)
-                    HockeyClient.Current.TrackException(exception);
+                    Crashes.TrackError(exception);
         }
 
         bool StopTrackingInternal(IAppWindow window) {

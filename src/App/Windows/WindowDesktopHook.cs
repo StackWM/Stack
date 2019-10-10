@@ -7,11 +7,11 @@
     using System.Windows.Threading;
 
     using JetBrains.Annotations;
-    using Microsoft.HockeyApp;
     using WindowsDesktop;
     using LostTech.Stack.Models;
     using LostTech.Stack.Utils;
     using LostTech.Stack.WindowManagement;
+    using Microsoft.AppCenter.Crashes;
 
     sealed class WindowDesktopHook: IDisposable, INotifyPropertyChanged
     {
@@ -39,10 +39,10 @@
                 this.DesktopID = VirtualDesktop.IdFromHwnd(this.windowHandle);
                 this.strikes = 0;
             } catch (Win32Exception e) {
-                HockeyClient.Current.TrackException(e);
+                Crashes.TrackError(e);
                 this.strikes++;
             } catch (ArgumentException e) {
-                HockeyClient.Current.TrackException(e);
+                Crashes.TrackError(e);
                 this.strikes++;
             } catch (COMException e) {
                 e.ReportAsWarning();

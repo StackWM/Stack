@@ -17,7 +17,7 @@
     using LostTech.Stack.Utils;
     using LostTech.Stack.WindowManagement;
     using LostTech.Windows;
-    using Microsoft.HockeyApp;
+    using Microsoft.AppCenter.Crashes;
     using Microsoft.VisualBasic;
     using PCLStorage;
     using Application = System.Windows.Application;
@@ -92,7 +92,7 @@
                 DisplayStyle = ToolStripItemDisplayStyle.Text,
             });
             contextMenu.Items.Add(new ToolStripMenuItem("D: Report", image: null,
-                onClick: (_, __) => HockeyClient.Current.TrackException(new Exception("Requested report from context menu"))) {
+                onClick: (_, __) => Crashes.GenerateTestCrash()) {
                 DisplayStyle = ToolStripItemDisplayStyle.Text,
             });
 #endif
