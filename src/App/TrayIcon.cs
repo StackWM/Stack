@@ -107,6 +107,7 @@
 
         ToolStripMenuItem CreateHelpMenu() {
             var help = new ToolStripMenuItem("Help", image: null) {DisplayStyle = ToolStripItemDisplayStyle.Text};
+            help.DropDownItems.Add(Link("Basic Layout Tutorial", "https://www.wpftutorial.net/LayoutProperties.html"));
             help.DropDownItems.Add(Link("Blog", "http://stack.blogs.losttech.software/"));
             help.DropDownItems.Add(Link("Telegram Community","https://t.me/joinchat/HCVquw4yDSmwxky5pxxKZw"));
             help.DropDownItems.Add(Link("Ask a Question", "https://stackoverflow.com/questions/ask?tags=stack%20window-management"));
