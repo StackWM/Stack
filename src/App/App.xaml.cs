@@ -10,21 +10,16 @@
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
-    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Forms;
     using System.Windows.Interop;
     using System.Windows.Media;
     using System.Windows.Threading;
-    using DesktopNotifications;
-    using global::Windows.Storage;
-    using global::Windows.UI.Notifications;
     using Gma.System.MouseKeyHook;
     using JetBrains.Annotations;
     using LostTech.App;
     using LostTech.Stack.Behavior;
-    using LostTech.Stack.Compat;
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.Models;
     using LostTech.Stack.Extensibility.Filters;
@@ -37,12 +32,8 @@
     using LostTech.Stack.Zones;
     using LostTech.Windows;
     using MahApps.Metro.Controls;
-    using Microsoft.AppCenter;
-    using Microsoft.AppCenter.Analytics;
     using Microsoft.AppCenter.Crashes;
-    using Microsoft.Toolkit.Uwp.Notifications;
     using PInvoke;
-    using Application = System.Windows.Application;
     using Control = System.Windows.Controls.Control;
     using DragAction = System.Windows.DragAction;
     using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
@@ -51,14 +42,13 @@
     using Brushes = System.Windows.Media.Brushes;
     using Color = System.Windows.Media.Color;
     using MessageBox = System.Windows.MessageBox;
-    using XmlDocument = global::Windows.Data.Xml.Dom.XmlDocument;
     using Rect = System.Drawing.RectangleF;
     using Point = System.Drawing.PointF;
 
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : BoilerplateApp, ILayoutsViewModel, IAsyncDisposable
+    public partial class App : BoilerplateApp, ILayoutsViewModel
     {
         IKeyboardMouseEvents hook;
         WindowDragOperation dragOperation;
@@ -122,6 +112,8 @@
             var baseStartup = await this.StartupCompletion;
             if (baseStartup.LaunchCancelled)
                 return;
+
+            WarningExtensions.WarningsService = WarningsService.Default;
 
             this.MainWindow = this.stackInstanceWindow;
             this.stackInstanceWindow.Show();
@@ -541,7 +533,11 @@
         public override string AppName => "Stack";
         public override string CompanyName => "Lost Tech LLC";
         public override TimeSpan HeartbeatInterval => TimeSpan.FromHours(3);
-        protected override WhatsNew WhatsNew => throw new NotImplementedException();
+        protected override WhatsNew WhatsNew => new WhatsNew {
+            Title = "What's New in Stack 3",
+            Message = "You have received a Stack update. See what's new",
+            DetailsUri = new Uri("https://losttech.software/stack-whatsnew-3.0.html"),
+        };
 
         async Task StartLayout(StackSettings settings)
         {
