@@ -97,7 +97,7 @@
                             e.ReportAsWarning();
                         }
                     })
-                    .ReportAsWarning()).ConfigureAwait(false);
+                    ?.ReportAsWarning()).ConfigureAwait(false);
         }
 
         void OnDesktopSwitched(object sender, EventArgs e) {
@@ -130,7 +130,7 @@
                         e.ReportAsWarning();
                     }
                 })
-                .ReportAsWarning();
+                ?.ReportAsWarning();
         }
 
         protected override bool CanExecute(string commandName) {
