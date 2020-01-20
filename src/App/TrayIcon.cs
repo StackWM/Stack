@@ -18,7 +18,6 @@
     using LostTech.Stack.WindowManagement;
     using LostTech.Windows;
     using Microsoft.AppCenter.Crashes;
-    using Microsoft.VisualBasic;
     using Application = System.Windows.Application;
     using FontStyle = System.Drawing.FontStyle;
     using MessageBox = System.Windows.MessageBox;
@@ -178,9 +177,13 @@
 
         static void EditLayoutClick(object sender, EventArgs e) => EditLayout((FileInfo)((ToolStripItem) sender).Tag);
 
-        async void CreateNewLayout(object sender, EventArgs e)
-        {
-            string layoutName = Interaction.InputBox("Enter new layout name", "New Layout");
+        async void CreateNewLayout(object sender, EventArgs e) {
+            var inputBox = new InputBox {
+                Title = "Enter new layout name",
+                Input = { Text = "New Layout" },
+            };
+            if (inputBox.ShowDialog() != true) return;
+            string layoutName = inputBox.Input.Text;
             if (string.IsNullOrEmpty(layoutName))
                 return;
 
@@ -192,10 +195,9 @@
             }
 
             layoutName += ".xaml";
-            FileInfo layoutFile;
+            var layoutFile = new FileInfo(Path.Combine(this.layoutsFolder.FullName, layoutName));
             try {
-                layoutFile =
-                    await this.layoutsFolder.CreateFileAsync(layoutName, CreationCollisionOption.FailIfExists);
+                layoutFile.Create().Close();
             }
             catch (IOException) {
                 MessageBox.Show($"Can not create file {layoutName}. Perhaps it already exists?",

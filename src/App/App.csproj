@@ -57,7 +57,7 @@
 
   <ItemGroup>
     <PackageReference Include="CalcBinding" Version="2.5.2" />
-    <PackageReference Include="LostTech.App.Boilerplate.WPF" Version="0.0.1-CI-2020-01-19--003" />
+    <PackageReference Include="LostTech.App.Boilerplate.WPF" Version="0.0.2-CI-2020-01-19--005" />
     <PackageReference Include="LostTech.Stack.Extensibility" Version="0.1.2" />
     <PackageReference Include="MahApps.Metro" Version="1.6.5" />
     <PackageReference Include="PInvoke.User32" Version="0.6.6" />

@@ -39,7 +39,7 @@
         <TextBlock Margin="0,12">
             <Span>Stack</Span>
             <InlineUIContainer BaselineAlignment="Bottom">
-                <TextBox Text="{Binding Source={x:Static local:App.Version}, Mode=OneTime}"
+                <TextBox Text="{Binding Version, Source={x:Static local:App.Boilerplate}, Mode=OneTime}"
                          Margin="-2,0" Padding="0" BorderThickness="0"
                          IsReadOnly="True"
                          />

@@ -71,23 +71,6 @@ namespace DesktopNotifications
         }
 
         /// <summary>
-        /// Registers the activator type as a COM server client so that Windows can launch your activator.
-        /// </summary>
-        /// <typeparam name="T">Your implementation of NotificationActivator. Must have GUID and ComVisible attributes on class.</typeparam>
-        public static void RegisterActivator<T>()
-            where T : NotificationActivator {
-            // Register type
-            var regService = new RegistrationServices();
-
-            regService.RegisterTypeForComClients(
-                typeof(T),
-                RegistrationClassContext.LocalServer,
-                RegistrationConnectionType.MultipleUse);
-
-            _registeredActivator = true;
-        }
-
-        /// <summary>
         /// Creates a toast notifier. You must have called <see cref="RegisterActivator{T}"/> first (and also <see cref="RegisterAumidAndComServer(string)"/> if you're a classic Win32 app), or this will throw an exception.
         /// </summary>
         /// <returns></returns>

@@ -58,14 +58,13 @@
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : BoilerplateApp, ILayoutsViewModel
+    public partial class App : BoilerplateApp, ILayoutsViewModel, IAsyncDisposable
     {
         IKeyboardMouseEvents hook;
         WindowDragOperation dragOperation;
         ICollection<ScreenLayout> screenLayouts;
         IEnumerable<ScreenLayout> ILayoutsViewModel.ScreenLayouts => this.screenLayouts;
         TrayIcon trayIcon;
-        DirectoryInfo localSettingsFolder, roamingSettingsFolder;
 
         readonly Window stackInstanceWindow = new Window {
             Opacity = 0,
@@ -100,8 +99,6 @@
 
         protected override async void OnStartup(StartupEventArgs e)
         {
-            base.OnStartup(e);
-
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             if (e.Args.Contains("--jit-debugging"))
@@ -109,12 +106,8 @@
 
             StopRunningInstances();
 
-            this.MainWindow = this.stackInstanceWindow;
-            this.stackInstanceWindow.Show();
-            this.stackInstanceWindow.Hide();
-
             if (IsUwp) {
-                DesktopNotificationManagerCompat.RegisterActivator<UrlNotificationActivator>();
+#warning URL notifications links are not supported
             }
 
             if (await Expiration.HasExpired()) {
@@ -122,12 +115,18 @@
                 return;
             }
 
-            this.localSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(AppData.FullName);
-            this.roamingSettingsFolder = await FileSystem.Current.GetFolderFromPathAsync(RoamingAppData.FullName);
+            bool migrating = await SettingsMigration.Migrate(AppData);
 
-            bool migrating = await SettingsMigration.Migrate(this.localSettingsFolder);
+            base.OnStartup(e);
 
-            this.localSettings = XmlSettings.Create(this.localSettingsFolder);
+            var baseStartup = await this.StartupCompletion;
+            if (baseStartup.LaunchCancelled)
+                return;
+
+            this.MainWindow = this.stackInstanceWindow;
+            this.stackInstanceWindow.Show();
+            this.stackInstanceWindow.Hide();
+
             var settings = new StackSettings {
                 LayoutMap = await this.InitializeSettingsSet<ScreenLayouts>("LayoutMap.xml"),
                 Behaviors = await this.InitializeSettingsSet<Behaviors>("Behaviors.xml"),
@@ -156,33 +155,13 @@
             settings.Behaviors.General.OnChange(s => s.SuppressSystemMargin,
                 suppress => this.win32WindowFactory.SuppressSystemMargin = suppress);
 
-            bool termsVersionMismatch = settings.Notifications.AcceptedTerms != LicenseTermsAcceptance.GetTermsAndConditionsVersion();
-            if (termsVersionMismatch) {
-                var termsWindow = new LicenseTermsAcceptance();
-                bool? enableTelemetry = termsWindow.ShowDialog();
-                if (!termsWindow.DialogResultSet || enableTelemetry is null) {
-                    this.Shutdown();
-                    return;
-                }
+#warning  this needs to be implemented in Boilerplate
+            //if (settings.Notifications.EnableTelemetry) {
 
-                settings.Notifications.EnableTelemetry = enableTelemetry.Value;
-                termsWindow.Close();
-                settings.Notifications.AcceptedTerms = LicenseTermsAcceptance.GetTermsAndConditionsVersion();
-            }
-
-            if (settings.Notifications.EnableTelemetry)
-                await EnableHockeyApp();
-
-            string version = Invariant($"{Version.Major}.{Version.Minor}");
-            if (settings.Notifications.WhatsNewVersionSeen != version) {
-                this.ShowNotification(title: "What's New in Stack Widgets Update (v2.1)",
-                    message: "You have received a Stack update. See what's new",
-                    navigateTo: new Uri("https://losttech.software/stack-whatsnew.html"));
-            }
-            settings.Notifications.WhatsNewVersionSeen = version;
+            //}
 
             if (!this.stackInstanceWindow.IsLoaded) {
-                if (termsVersionMismatch)
+                if (baseStartup.TermsUpdated)
                     Restart();
                 return;
             }
@@ -213,29 +192,6 @@
 
             // this must be the last, so that mouse won't lag while we are loading
             this.BindHandlers(settings);
-        }
-
-        async Task<T> InitializeSettingsSet<T>(string fileName)
-            where T: class, new()
-        {
-            SettingsSet<T, T> settingsSet;
-            try {
-                settingsSet = await this.localSettings.LoadOrCreate<T>(fileName);
-            }
-            catch (Exception settingsError) {
-                var errorFile = await this.localSettingsFolder.CreateFileAsync(
-                    $"{fileName}.err", CreationCollisionOption.ReplaceExisting);
-                Debug.WriteLine(settingsError.ToString());
-                await errorFile.WriteAllTextAsync(settingsError.ToString());
-                var brokenFile = await this.localSettingsFolder.GetFileAsync(fileName);
-                await brokenFile.MoveAsync(
-                    Path.Combine(this.localSettingsFolder.FullName, $"Err.{fileName}"),
-                    NameCollisionOption.ReplaceExisting);
-                settingsSet = await this.localSettings.LoadOrCreate<T>(fileName);
-                settingsSet.ScheduleSave();
-            }
-            settingsSet.Autosave = true;
-            return settingsSet.Value;
         }
 
         static void StopRunningInstances()
@@ -272,40 +228,13 @@
 #else
         const int HeartbeatIntervalMinutes = 60*3;
 #endif
-        static readonly DispatcherTimer HeartbeatTimer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(HeartbeatIntervalMinutes) };
-        static async Task EnableHockeyApp()
-        {
+
+        protected override string AppCenterSecret =>
 #if DEBUG
-            AppCenter.Start("be80a4a0-381c-4c37-bc18-7d593ac460f9", typeof(Analytics), typeof(Crashes));
+            "be80a4a0-381c-4c37-bc18-7d593ac460f9";
 #else
-            AppCenter.Start("6037e69f-a494-4acc-9d83-ef7682e60732", typeof(Analytics), typeof(Crashes));
+            "6037e69f-a494-4acc-9d83-ef7682e60732";
 #endif
-
-            HeartbeatTimer.Tick += TelemetryHeartbeat;
-            HeartbeatTimer.Start();
-            TelemetryHeartbeat(HeartbeatTimer, EventArgs.Empty);
-
-            TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
-        }
-
-        static void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e) {
-            foreach (Exception exception in e.Exception.Flatten().InnerExceptions)
-                Crashes.TrackError(exception, properties: new Dictionary<string, string>{["unobserved"] = "true"});
-        }
-
-        static void TelemetryHeartbeat(object sender, EventArgs e) {
-#if !PROFILE
-            string domainName = Expiration.GetDomainName();
-            Analytics.TrackEvent("Heartbeat", new Dictionary<string, string> {
-                [nameof(HeartbeatIntervalMinutes)] = Invariant($"{HeartbeatIntervalMinutes}"),
-                [nameof(Expiration.IsDomainUser)] = Invariant($"{Expiration.IsDomainUser(domainName)}"),
-                ["Domain"] = domainName ?? "",
-                [nameof(Version)] = Invariant($"{Version}"),
-                [nameof(Uptime)] = Invariant($"{Uptime}"),
-                [nameof(IsUwp)] = Invariant($"{IsUwp}"),
-            });
-#endif
-        }
 
         static void EnableJitDebugging()
         {
@@ -468,41 +397,6 @@
             this.layoutManager.Move(window, zone);
         }
 
-        void ShowNotification(string title, string message, Uri navigateTo, TimeSpan? duration = null) {
-            var content = new ToastContent {
-                Launch = navigateTo.ToString(),
-
-                Header = title == null ? null : new ToastHeader(title, title, navigateTo.ToString()),
-
-                Visual = new ToastVisual {
-                    BindingGeneric = new ToastBindingGeneric {
-                        Children = { new AdaptiveText{Text = message} },
-                    }
-                }
-            };
-
-            var contentXml = new XmlDocument();
-            contentXml.LoadXml(content.GetContent());
-            var toast = new ToastNotification(contentXml) {
-                // DTO + null == null
-                ExpirationTime = DateTimeOffset.Now + duration,
-            };
-            try {
-                DesktopNotificationManagerCompat.CreateToastNotifier().Show(toast);
-            } catch (Exception e) {
-                string retrying = this.trayIcon != null ? "retrying" : "no retry";
-                e.ReportAsWarning(prefix: $"Notification failed, {retrying}: ");
-
-                if (this.trayIcon == null)
-                    return;
-
-                this.trayIcon.Icon.BalloonTipIcon = ToolTipIcon.None;
-                this.trayIcon.Icon.BalloonTipTitle = title;
-                this.trayIcon.Icon.BalloonTipText = message;
-                this.trayIcon.Icon.ShowBalloonTip(1000);
-            }
-        }
-
         void NonCriticalErrorHandler(object sender, ErrorEventArgs error) {
 #if !DEBUG
             if (error.GetException() is WindowNotFoundException)
@@ -626,7 +520,7 @@
             };
         }
 
-        async Task DisposeAsync()
+        public override async ValueTask DisposeAsync()
         {
             this.layoutManager?.Dispose();
             this.layoutManager = null;
@@ -641,23 +535,7 @@
 
             WindowHookExFactory.Instance.Shutdown();
 
-            LostTech.App.Settings settings = this.localSettings;
-            if (settings != null)
-            {
-                settings.ScheduleSave();
-                await settings.DisposeAsync();
-                this.localSettings = null;
-                Debug.WriteLine("settings written");
-            }
-        }
-
-        public async void BeginShutdown()
-        {
-            Debug.WriteLine("shutdown requested");
-
-            await this.DisposeAsync();
-
-            this.Shutdown();
+            await base.DisposeAsync();
         }
 
         public override string AppName => "Stack";
@@ -667,7 +545,7 @@
 
         async Task StartLayout(StackSettings settings)
         {
-            this.layoutsFolder = this.roamingSettingsFolder.CreateSubdirectory("Layouts");
+            this.layoutsFolder = this.RoamingAppDataDirectory.CreateSubdirectory("Layouts");
             await this.InstallDefaultLayouts(this.layoutsFolder);
             this.layoutLoader = new LayoutLoader(this.layoutsFolder);
 
@@ -863,7 +741,6 @@
         void OnLayoutClosed(object sender, EventArgs args) { this.BeginShutdown(); }
 
         internal static readonly string OutOfBoxLayoutsResourcePrefix = typeof(App).Namespace + ".OOBLayouts.";
-        LostTech.App.Settings localSettings;
 
         async Task InstallDefaultLayouts(DirectoryInfo destination) {
             IList<FileInfo> layoutFiles = this.layoutsFolder.GetFiles();
@@ -879,7 +756,8 @@
                     continue;
 
                 await using var stream = resourceContainer.GetManifestResourceStream(resource);
-                FileInfo file = await destination.CreateFileAsync(name, CreationCollisionOption.ReplaceExisting).ConfigureAwait(false);
+                Trace.Assert(stream != null);
+                var file = new FileInfo(Path.Combine(destination.FullName, name));
                 await using var targetStream = file.OpenWrite();
                 await stream.CopyToAsync(targetStream).ConfigureAwait(false);
                 targetStream.Close();
@@ -968,14 +846,6 @@
         [MethodImpl(MethodImplOptions.NoInlining)]
         static string GetUwpRoamingAppData() => global::Windows.Storage.ApplicationData.Current.RoamingFolder.Path;
 
-        protected override string AppCenterSecret { get; }
-
-        public static Version Version => IsUwp
-            ? GetUwpVersion()
-            : Assembly.GetExecutingAssembly().GetName().Version;
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        static Version GetUwpVersion() => global::Windows.ApplicationModel.Package.Current.Id.Version.ToVersion();
-
         [DllImport("shell32.dll")]
         static extern HResult SHQueryUserNotificationState(out UserNotificationState state);
 
@@ -990,7 +860,6 @@
             App,
         }
 
-        public int DragThreshold { get; private set; } = 40;
         public static void Restart() { Process.Start(Process.GetCurrentProcess().MainModule.FileName); }
 
         public static void RestartAsAdmin()
