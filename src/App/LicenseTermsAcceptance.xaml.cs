@@ -7,6 +7,7 @@
     using System.Security.Cryptography;
     using System.Windows;
     using global::Windows.System;
+    using LostTech.App;
 
     /// <summary>
     /// Interaction logic for LicenseTermsAcceptance.xaml
@@ -28,7 +29,7 @@
                     if (new DesktopBridge.Helpers().IsRunningAsUwp())
                         Launcher.LaunchUriAsync(args.Uri).GetAwaiter();
                     else
-                        Process.Start(args.Uri.AbsoluteUri);
+                        BoilerplateApp.Boilerplate.Launch(args.Uri);
                 };
             };
         }

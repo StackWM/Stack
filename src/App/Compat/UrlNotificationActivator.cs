@@ -1,9 +1,9 @@
 ﻿namespace LostTech.Stack.Compat
 {
     using System;
-    using System.Diagnostics;
     using System.Runtime.InteropServices;
     using DesktopNotifications;
+    using LostTech.App;
 
     [ClassInterface(ClassInterfaceType.None)]
     [ComSourceInterfaces(typeof(INotificationActivationCallback))]
@@ -12,7 +12,7 @@
     {
         public override void OnActivated(string arguments, NotificationUserInput userInput, string appUserModelId) {
             var uri = new Uri(arguments, UriKind.Absolute);
-            Process.Start(uri.ToString());
+            BoilerplateApp.Boilerplate.Launch(uri);
         }
     }
 }

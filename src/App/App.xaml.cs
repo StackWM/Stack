@@ -856,13 +856,9 @@
             App,
         }
 
-        public static void Restart() { Process.Start(Process.GetCurrentProcess().MainModule.FileName); }
+        public static void Restart() => StartNewInstance();
 
-        public static void RestartAsAdmin()
-        {
-            var startInfo = new ProcessStartInfo(Process.GetCurrentProcess().MainModule.FileName) { Verb = "runas" };
-            Process.Start(startInfo);
-        }
+        public static void RestartAsAdmin() => StartNewInstanceAsAdmin();
 
         static void EnableCustomWidgetLoading() {
             AppDomain.CurrentDomain.AssemblyResolve += CustomWidgetsLoader;

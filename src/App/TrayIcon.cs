@@ -12,9 +12,7 @@
     using System.Windows.Forms;
     using LostTech.App;
     using LostTech.Stack.DataBinding;
-    using LostTech.Stack.Models;
     using LostTech.Stack.Settings;
-    using LostTech.Stack.Utils;
     using LostTech.Stack.WindowManagement;
     using LostTech.Windows;
     using Microsoft.AppCenter.Crashes;
@@ -115,8 +113,10 @@
             return help;
         }
 
-        static ToolStripMenuItem Link(string text, string url) => 
-            new ToolStripMenuItem(text, image: null, onClick: (_,__) => Process.Start(url));
+        static ToolStripMenuItem Link(string text, string url)
+            => Link(text, new Uri(url, UriKind.Absolute));
+        static ToolStripMenuItem Link(string text, Uri url) =>
+            new ToolStripMenuItem(text, image: null, onClick: (_,__) => BoilerplateApp.Boilerplate.Launch(url));
 
         void CreateLayoutsMenu(ObservableDirectory layoutsDirectory, ToolStrip contextMenu)
         {
@@ -167,7 +167,12 @@
             layoutsMenu.DropDownItems.Add(new ToolStripMenuItem("New...", null, this.CreateNewLayout));
             layoutsMenu.DropDownItems.Add(new ToolStripMenuItem(
                 "Open Layouts Folder", null,
-                (_, __) => Process.Start(this.layoutsFolder.FullName)));
+                (_, __) => {
+                    var startInfo = new ProcessStartInfo(this.layoutsFolder.FullName) {
+                        UseShellExecute = true,
+                    };
+                    Process.Start(startInfo);
+                }));
 
             contextMenu.Items.Add(layoutsMenu);
             contextMenu.Items.Add(new ToolStripSeparator());

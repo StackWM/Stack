@@ -1,11 +1,9 @@
-﻿
-
-namespace LostTech.Stack
+﻿namespace LostTech.Stack
 {
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
-    using System.Diagnostics;
+    using LostTech.App;
 
     /// <summary>
     /// Interaction logic for About.xaml
@@ -26,7 +24,7 @@ namespace LostTech.Stack
 
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
-            Process.Start(e.Uri.ToString());
+            BoilerplateApp.Boilerplate.Launch(e.Uri);
             e.Handled = true;
         }
     }
