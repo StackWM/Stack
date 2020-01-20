@@ -18,6 +18,7 @@
     using System.Windows.Media;
     using System.Windows.Threading;
     using DesktopNotifications;
+    using global::Windows.Storage;
     using global::Windows.UI.Notifications;
     using Gma.System.MouseKeyHook;
     using JetBrains.Annotations;
@@ -36,14 +37,14 @@
     using LostTech.Stack.Zones;
     using LostTech.Windows;
     using MahApps.Metro.Controls;
-    using Microsoft.HockeyApp;
+    using Microsoft.AppCenter;
+    using Microsoft.AppCenter.Analytics;
+    using Microsoft.AppCenter.Crashes;
     using Microsoft.Toolkit.Uwp.Notifications;
-    using PCLStorage;
     using PInvoke;
     using Application = System.Windows.Application;
     using Control = System.Windows.Controls.Control;
     using DragAction = System.Windows.DragAction;
-    using FileAccess = PCLStorage.FileAccess;
     using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
     using static System.FormattableString;
     using static PInvoke.User32;
@@ -57,14 +58,14 @@
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application, ILayoutsViewModel
+    public partial class App : BoilerplateApp, ILayoutsViewModel
     {
         IKeyboardMouseEvents hook;
         WindowDragOperation dragOperation;
         ICollection<ScreenLayout> screenLayouts;
         IEnumerable<ScreenLayout> ILayoutsViewModel.ScreenLayouts => this.screenLayouts;
         TrayIcon trayIcon;
-        IFolder localSettingsFolder, roamingSettingsFolder;
+        DirectoryInfo localSettingsFolder, roamingSettingsFolder;
 
         readonly Window stackInstanceWindow = new Window {
             Opacity = 0,
@@ -85,10 +86,9 @@
         MoveToZoneHotkeyBehavior moveToZoneBehavior;
         AutoCaptureBehavior autoCaptureBehavior;
         LayoutManager layoutManager;
-        DispatcherTimer updateTimer;
         readonly IScreenProvider screenProvider = new Win32ScreenProvider();
         ObservableDirectory layoutsDirectory;
-        IFolder layoutsFolder;
+        DirectoryInfo layoutsFolder;
         LayoutLoader layoutLoader;
         LayoutMappingViewModel layoutMapping;
         int zoneIndex;
@@ -107,27 +107,15 @@
             if (e.Args.Contains("--jit-debugging"))
                 EnableJitDebugging();
 
-            await EnableHockeyApp();
-
             StopRunningInstances();
 
             this.MainWindow = this.stackInstanceWindow;
             this.stackInstanceWindow.Show();
             this.stackInstanceWindow.Hide();
 
-            if (!IsUwp) {
-#if !PROFILE
-                this.BeginCheckForUpdates();
-                this.updateTimer = new DispatcherTimer(DispatcherPriority.Background) {
-                    Interval = TimeSpan.FromDays(1),
-                    IsEnabled = true,
-                };
-                this.updateTimer.Tick += (_, __) => this.BeginCheckForUpdates();
-#endif
-            } else {
+            if (IsUwp) {
                 DesktopNotificationManagerCompat.RegisterActivator<UrlNotificationActivator>();
             }
-
 
             if (await Expiration.HasExpired()) {
                 this.Shutdown(2);
@@ -171,17 +159,23 @@
             bool termsVersionMismatch = settings.Notifications.AcceptedTerms != LicenseTermsAcceptance.GetTermsAndConditionsVersion();
             if (termsVersionMismatch) {
                 var termsWindow = new LicenseTermsAcceptance();
-                if (!true.Equals(termsWindow.ShowDialog())) {
+                bool? enableTelemetry = termsWindow.ShowDialog();
+                if (!termsWindow.DialogResultSet || enableTelemetry is null) {
                     this.Shutdown();
                     return;
                 }
+
+                settings.Notifications.EnableTelemetry = enableTelemetry.Value;
                 termsWindow.Close();
                 settings.Notifications.AcceptedTerms = LicenseTermsAcceptance.GetTermsAndConditionsVersion();
             }
 
+            if (settings.Notifications.EnableTelemetry)
+                await EnableHockeyApp();
+
             string version = Invariant($"{Version.Major}.{Version.Minor}");
             if (settings.Notifications.WhatsNewVersionSeen != version) {
-                this.ShowNotification(title: "What's New in Stack Widgets Update (v2.1)", 
+                this.ShowNotification(title: "What's New in Stack Widgets Update (v2.1)",
                     message: "You have received a Stack update. See what's new",
                     navigateTo: new Uri("https://losttech.software/stack-whatsnew.html"));
             }
@@ -235,21 +229,13 @@
                 await errorFile.WriteAllTextAsync(settingsError.ToString());
                 var brokenFile = await this.localSettingsFolder.GetFileAsync(fileName);
                 await brokenFile.MoveAsync(
-                    Path.Combine(this.localSettingsFolder.Path, $"Err.{fileName}"),
+                    Path.Combine(this.localSettingsFolder.FullName, $"Err.{fileName}"),
                     NameCollisionOption.ReplaceExisting);
                 settingsSet = await this.localSettings.LoadOrCreate<T>(fileName);
                 settingsSet.ScheduleSave();
             }
             settingsSet.Autosave = true;
             return settingsSet.Value;
-        }
-
-        void BeginCheckForUpdates()
-        {
-            HockeyClient.Current.CheckForUpdatesAsync(autoShowUi: true, shutdownActions: () => {
-                this.BeginShutdown();
-                return true;
-            }).GetAwaiter();
         }
 
         static void StopRunningInstances()
@@ -290,19 +276,10 @@
         static async Task EnableHockeyApp()
         {
 #if DEBUG
-            HockeyClient.Current.Configure("be80a4a0381c4c37bc187d593ac460f9");
-            ((HockeyClient)HockeyClient.Current).OnHockeySDKInternalException += (sender, args) =>
-            {
-                if (Debugger.IsAttached) { Debugger.Break(); }
-            };
+            AppCenter.Start("be80a4a0-381c-4c37-bc18-7d593ac460f9", typeof(Analytics), typeof(Crashes));
 #else
-            HockeyClient.Current.Configure("6037e69fa4944acc9d83ef7682e60732");
+            AppCenter.Start("6037e69f-a494-4acc-9d83-ef7682e60732", typeof(Analytics), typeof(Crashes));
 #endif
-            try
-            {
-                await HockeyClient.Current.SendCrashesAsync().ConfigureAwait(false);
-            }
-            catch (IOException e) when ((e.HResult ^ unchecked((int)0x8007_0000)) == (int) Win32ErrorCode.ERROR_NO_MORE_FILES) {}
 
             HeartbeatTimer.Tick += TelemetryHeartbeat;
             HeartbeatTimer.Start();
@@ -313,13 +290,13 @@
 
         static void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e) {
             foreach (Exception exception in e.Exception.Flatten().InnerExceptions)
-                HockeyClient.Current.TrackException(exception, properties: new Dictionary<string, string>{["unobserved"] = "true"});
+                Crashes.TrackError(exception, properties: new Dictionary<string, string>{["unobserved"] = "true"});
         }
 
         static void TelemetryHeartbeat(object sender, EventArgs e) {
 #if !PROFILE
             string domainName = Expiration.GetDomainName();
-            HockeyClient.Current.TrackEvent("Heartbeat", new Dictionary<string, string> {
+            Analytics.TrackEvent("Heartbeat", new Dictionary<string, string> {
                 [nameof(HeartbeatIntervalMinutes)] = Invariant($"{HeartbeatIntervalMinutes}"),
                 [nameof(Expiration.IsDomainUser)] = Invariant($"{Expiration.IsDomainUser(domainName)}"),
                 ["Domain"] = domainName ?? "",
@@ -527,12 +504,12 @@
         }
 
         void NonCriticalErrorHandler(object sender, ErrorEventArgs error) {
-            #if !DEBUG
+#if !DEBUG
             if (error.GetException() is WindowNotFoundException)
                 return;
-            #endif
+#endif
 
-            HockeyClient.Current.TrackException(error.GetException(), properties: new Dictionary<string, string> {
+            Crashes.TrackError(error.GetException(), properties: new Dictionary<string, string> {
                 ["warning"] = "true",
                 ["user-visible"] = "true",
             });
@@ -609,7 +586,15 @@
                 && notificationState == UserNotificationState.D3DFullScreen)
                 return null;
             if (this.stackSettings.Behaviors.MouseMove.TitleOnly) {
-                var clientArea = win32Window.GetClientBounds().Result;
+                Rect clientArea;
+                try {
+                    clientArea = win32Window.GetClientBounds().Result;
+                } catch (AggregateException e) {
+                    foreach(var inner in e.InnerExceptions)
+                        this.NonCriticalErrorHandler(this, new ErrorEventArgs(inner));
+                    return null;
+                }
+
                 var bounds = win32Window.Bounds;
                 if (Math.Abs(bounds.Height - clientArea.Height) < 3) {
                     double? screenScale = this.screenProvider.Screens
@@ -675,20 +660,18 @@
             this.Shutdown();
         }
 
-        protected override void OnExit(ExitEventArgs exitArgs)
-        {
-            base.OnExit(exitArgs);
-            HockeyClient.Current.Flush();
-            Thread.Sleep(1000);
-        }
+        public override string AppName => "Stack";
+        public override string CompanyName => "Lost Tech LLC";
+        public override TimeSpan HeartbeatInterval => TimeSpan.FromHours(3);
+        protected override WhatsNew WhatsNew => throw new NotImplementedException();
 
         async Task StartLayout(StackSettings settings)
         {
-            this.layoutsFolder = await this.roamingSettingsFolder.CreateFolderAsync("Layouts", CreationCollisionOption.OpenIfExists);
+            this.layoutsFolder = this.roamingSettingsFolder.CreateSubdirectory("Layouts");
             await this.InstallDefaultLayouts(this.layoutsFolder);
             this.layoutLoader = new LayoutLoader(this.layoutsFolder);
 
-            this.layoutsDirectory = new ObservableDirectory(this.layoutsFolder.Path);
+            this.layoutsDirectory = new ObservableDirectory(this.layoutsFolder.FullName);
 
             var screens = this.screenProvider.Screens;
             var layoutNameCollection = new TransformObservableCollection<string, ObservableFile,
@@ -882,8 +865,8 @@
         internal static readonly string OutOfBoxLayoutsResourcePrefix = typeof(App).Namespace + ".OOBLayouts.";
         LostTech.App.Settings localSettings;
 
-        async Task InstallDefaultLayouts(IFolder destination) {
-            IList<IFile> layoutFiles = await this.layoutsFolder.GetFilesAsync().ConfigureAwait(false);
+        async Task InstallDefaultLayouts(DirectoryInfo destination) {
+            IList<FileInfo> layoutFiles = this.layoutsFolder.GetFiles();
 
             DateTime appTimestamp = File.GetLastWriteTimeUtc(Assembly.GetExecutingAssembly().Location);
 
@@ -891,17 +874,15 @@
             foreach (var resource in resourceContainer.GetManifestResourceNames()
                                                       .Where(name => name.StartsWith(OutOfBoxLayoutsResourcePrefix))) {
                 var name = resource.Substring(OutOfBoxLayoutsResourcePrefix.Length);
-                IFile existing = layoutFiles.FirstOrDefault(file => Path.GetFullPath(file.Name) == Path.GetFullPath(name));
-                if (existing != null && File.GetLastWriteTimeUtc(existing.Path) > appTimestamp)
+                FileInfo existing = layoutFiles.FirstOrDefault(file => Path.GetFullPath(file.Name) == Path.GetFullPath(name));
+                if (existing != null && existing.LastWriteTimeUtc > appTimestamp)
                     continue;
 
-                using (var stream = resourceContainer.GetManifestResourceStream(resource)) {
-                    IFile file = await destination.CreateFileAsync(name, CreationCollisionOption.ReplaceExisting).ConfigureAwait(false);
-                    using (var targetStream = await file.OpenAsync(FileAccess.ReadAndWrite).ConfigureAwait(false)) {
-                        await stream.CopyToAsync(targetStream).ConfigureAwait(false);
-                        targetStream.Close();
-                    }
-                }
+                await using var stream = resourceContainer.GetManifestResourceStream(resource);
+                FileInfo file = await destination.CreateFileAsync(name, CreationCollisionOption.ReplaceExisting).ConfigureAwait(false);
+                await using var targetStream = file.OpenWrite();
+                await stream.CopyToAsync(targetStream).ConfigureAwait(false);
+                targetStream.Close();
             }
         }
 
@@ -986,6 +967,8 @@
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         static string GetUwpRoamingAppData() => global::Windows.Storage.ApplicationData.Current.RoamingFolder.Path;
+
+        protected override string AppCenterSecret { get; }
 
         public static Version Version => IsUwp
             ? GetUwpVersion()

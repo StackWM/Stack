@@ -1,6 +1,7 @@
 ﻿namespace LostTech.Stack.Settings
 {
     using System;
+    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using JetBrains.Annotations;
@@ -8,12 +9,11 @@
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.Extensibility.Filters;
     using LostTech.Stack.Models;
-    using PCLStorage;
     using LegacyWindowGroup = Models.Legacy.WindowGroup;
 
     class SettingsMigration
     {
-        public static async Task<bool> Migrate([NotNull] IFolder localSettingsFolder) {
+        public static async Task<bool> Migrate([NotNull] DirectoryInfo localSettingsFolder) {
             if (localSettingsFolder == null)
                 throw new ArgumentNullException(nameof(localSettingsFolder));
 

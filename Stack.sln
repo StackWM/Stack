@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2003
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App", "src\App\App.csproj", "{C9C161DE-31A7-4426-B523-7302DFF6B66A}"
 EndProject
@@ -56,8 +56,8 @@ Global
 		{C9C161DE-31A7-4426-B523-7302DFF6B66A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9C161DE-31A7-4426-B523-7302DFF6B66A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9C161DE-31A7-4426-B523-7302DFF6B66A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C9C161DE-31A7-4426-B523-7302DFF6B66A}.ReleaseProfile|Any CPU.ActiveCfg = ReleaseProfile|Any CPU
-		{C9C161DE-31A7-4426-B523-7302DFF6B66A}.ReleaseProfile|Any CPU.Build.0 = ReleaseProfile|Any CPU
+		{C9C161DE-31A7-4426-B523-7302DFF6B66A}.ReleaseProfile|Any CPU.ActiveCfg = Release|Any CPU
+		{C9C161DE-31A7-4426-B523-7302DFF6B66A}.ReleaseProfile|Any CPU.Build.0 = Release|Any CPU
 		{ADEA0E3B-E6AF-403B-B293-F3BC88F426BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ADEA0E3B-E6AF-403B-B293-F3BC88F426BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADEA0E3B-E6AF-403B-B293-F3BC88F426BA}.Release|Any CPU.ActiveCfg = Release|Any CPU

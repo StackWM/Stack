@@ -29,8 +29,8 @@
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     >
-            <Button IsDefault="True" FontWeight="Bold" Click="AcceptClick">Accept</Button>
-            <Button IsCancel="True" Click="DeclineClick">Decline</Button>
+            <Button IsDefault="True" FontWeight="Bold" Click="AcceptClick">Opt-In</Button>
+            <Button IsCancel="True" Click="DeclineClick">Opt-Out</Button>
         </StackPanel>
     </Grid>
 </Window>

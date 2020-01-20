@@ -7,12 +7,21 @@
         string acceptedTerms = null;
         bool iamInTrayDone = false;
         string whatsNewVersionSeen = null;
+        bool enableTelemetry = false;
 
         public string AcceptedTerms
         {
             get => this.acceptedTerms;
             set {
                 this.acceptedTerms = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        public bool EnableTelemetry {
+            get => this.enableTelemetry;
+            set {
+                this.enableTelemetry = value;
                 this.OnPropertyChanged();
             }
         }
@@ -36,6 +45,7 @@
 
         public NotificationSettings Copy() => new NotificationSettings {
             AcceptedTerms = this.AcceptedTerms,
+            EnableTelemetry = this.EnableTelemetry,
             IamInTrayDone = this.IamInTrayDone,
             WhatsNewVersionSeen = this.WhatsNewVersionSeen,
         };

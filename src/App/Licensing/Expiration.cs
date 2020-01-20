@@ -12,7 +12,7 @@
     using System.Windows;
     using System.Windows.Interop;
     using global::Windows.Services.Store;
-    using Microsoft.HockeyApp;
+    using Microsoft.AppCenter.Crashes;
     using Prism.Commands;
 
     static class Expiration
@@ -47,7 +47,7 @@
 
                 return false;
             } catch (Exception ex) {
-                HockeyClient.Current.TrackException(ex);
+                Crashes.TrackError(ex);
                 return !evaluationAllowed;
             }
         }
@@ -55,7 +55,7 @@
         static async Task<bool> PromptUserToPurchase(string title, string text) {
             var durables = await LicensingContext.Value.GetAssociatedStoreProductsAsync(new[] {"Durable"});
             if (durables.ExtendedError != null) {
-                HockeyClient.Current.TrackException(durables.ExtendedError, new Dictionary<string, string> {
+                Crashes.TrackError(durables.ExtendedError, new Dictionary<string, string> {
                     ["warning"] = "true",
                 });
                 return false;
@@ -66,7 +66,7 @@
                 .ToArray();
 
             if (products.Length == 0) {
-                HockeyClient.Current.TrackException(new InvalidProgramException("Can't find any enterprise subscription products"));
+                Crashes.TrackError(new InvalidProgramException("Can't find any enterprise subscription products"));
                 MessageBox.Show("We could not find any subscriptions. Incident will be reported.",
                     "Windows Store issue", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;

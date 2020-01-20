@@ -1,28 +1,25 @@
 ﻿namespace LostTech.Stack.InternalExtensions
 {
 	using System;
-	using System.Threading.Tasks;
-	using PCLStorage;
+    using System.IO;
+    using System.Threading.Tasks;
 
 	static class IoExtensions
 	{
-		public static async Task<string[]> ReadLinesAsync(this IFile file)
+		public static async Task<string[]> ReadLinesAsync(this FileInfo file)
 		{
-			var text = await file.ReadAllTextAsync().ConfigureAwait(false);
+			string text = await File.ReadAllTextAsync(file.Name).ConfigureAwait(false);
 			return text.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
 		}
 
-		public static async Task<IFile> GetFileOrNull(this IFolder folder, string name)
+		public static async Task<FileInfo> GetFileOrNull(this DirectoryInfo folder, string name)
 		{
 			try
 			{
-				return await folder.GetFileAsync(name).ConfigureAwait(false);
+				var result = new FileInfo(Path.Combine(folder.FullName, name));
+				return result.Exists ? result : null;
 			}
-			catch (PCLStorage.Exceptions.FileNotFoundException)
-			{
-				return null;
-			}
-			catch (System.IO.FileNotFoundException)
+			catch (FileNotFoundException)
 			{
 				return null;
 			}

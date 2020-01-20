@@ -15,15 +15,13 @@
     using LostTech.Stack.InternalExtensions;
     using LostTech.Stack.Zones;
     using MahApps.Metro.Controls;
-    using PCLStorage;
-    using FileAccess = PCLStorage.FileAccess;
 
     public class LayoutLoader: IObjectWithProblems
     {
-        readonly IFolder layoutDirectory;
+        readonly DirectoryInfo layoutDirectory;
         readonly Stopwatch loadTimer = new Stopwatch();
 
-        public LayoutLoader(IFolder layoutDirectory) {
+        public LayoutLoader(DirectoryInfo layoutDirectory) {
             this.layoutDirectory = layoutDirectory ?? throw new ArgumentNullException(nameof(layoutDirectory));
         }
 
@@ -48,7 +46,7 @@
             }
 
             FrameworkElement layout;
-            using (var stream = await file.OpenAsync(FileAccess.Read))
+            using (var stream = file.OpenRead())
             using (var xmlReader = XmlReader.Create(stream)) {
                 try {
                     layout = (FrameworkElement)XamlReader.Load(xmlReader);

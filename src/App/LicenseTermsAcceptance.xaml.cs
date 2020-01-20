@@ -17,7 +17,7 @@
         {
             this.InitializeComponent();
 
-            Stream resource = GetTermsAndCondtions();
+            Stream resource = GetTermsAndConditions();
             this.LicenseContent.NavigateToStream(resource);
             this.LicenseContent.Navigated += delegate {
                 this.LicenseContent.Navigating += (_, args) => {
@@ -33,7 +33,9 @@
             };
         }
 
-        static Stream GetTermsAndCondtions()
+        public bool DialogResultSet { get; private set; }
+
+        static Stream GetTermsAndConditions()
         {
             string @namespace = typeof(LicenseTermsAcceptance).Namespace;
             string resourceName = new DesktopBridge.Helpers().IsRunningAsUwp() ? "StoreTerms" : "Terms";
@@ -44,17 +46,17 @@
         public static string GetTermsAndConditionsVersion()
         {
             var algorithm = new SHA256CryptoServiceProvider();
-            byte[] hash = algorithm.ComputeHash(GetTermsAndCondtions());
+            byte[] hash = algorithm.ComputeHash(GetTermsAndConditions());
             return Convert.ToBase64String(hash);
         }
 
         void AcceptClick(object sender, RoutedEventArgs e) {
-            e.Handled = true;
+            this.DialogResultSet = e.Handled = true;
             this.DialogResult = true;
         }
 
         void DeclineClick(object sender, RoutedEventArgs e) {
-            e.Handled = true;
+            this.DialogResultSet = e.Handled = true;
             this.DialogResult = false;
         }
     }

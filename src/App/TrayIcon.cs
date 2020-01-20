@@ -17,12 +17,9 @@
     using LostTech.Stack.Utils;
     using LostTech.Stack.WindowManagement;
     using LostTech.Windows;
-    using Microsoft.HockeyApp;
+    using Microsoft.AppCenter.Crashes;
     using Microsoft.VisualBasic;
-    using PCLStorage;
     using Application = System.Windows.Application;
-    using FileAccess = PCLStorage.FileAccess;
-    using FileSystem = PCLStorage.FileSystem;
     using FontStyle = System.Drawing.FontStyle;
     using MessageBox = System.Windows.MessageBox;
 
@@ -30,11 +27,11 @@
     {
         public NotifyIcon Icon { get; }
         readonly StackSettings stackSettings;
-        readonly IFolder layoutsFolder;
+        readonly DirectoryInfo layoutsFolder;
         readonly Lazy<About> aboutWindow = new Lazy<About>(() => new About(), isThreadSafe: false);
         readonly Lazy<SettingsWindow> settingsWindow;
 
-        TrayIcon(NotifyIcon trayIcon, StackSettings stackSettings, IFolder layoutsFolder, Lazy<SettingsWindow> settingsWindow)
+        TrayIcon(NotifyIcon trayIcon, StackSettings stackSettings, DirectoryInfo layoutsFolder, Lazy<SettingsWindow> settingsWindow)
         {
             this.Icon = trayIcon;
             this.stackSettings = stackSettings;
@@ -43,7 +40,7 @@
         }
 
         public static async Task<TrayIcon> StartTrayIcon(
-            IFolder layoutsFolder, ObservableDirectory layoutsDirectory,
+            DirectoryInfo layoutsFolder, ObservableDirectory layoutsDirectory,
             StackSettings stackSettings,
             IScreenProvider screenProvider, 
             Lazy<SettingsWindow> settingsWindow)
@@ -92,7 +89,7 @@
                 DisplayStyle = ToolStripItemDisplayStyle.Text,
             });
             contextMenu.Items.Add(new ToolStripMenuItem("D: Report", image: null,
-                onClick: (_, __) => HockeyClient.Current.TrackException(new Exception("Requested report from context menu"))) {
+                onClick: (_, __) => Crashes.GenerateTestCrash()) {
                 DisplayStyle = ToolStripItemDisplayStyle.Text,
             });
 #endif
@@ -107,6 +104,7 @@
 
         ToolStripMenuItem CreateHelpMenu() {
             var help = new ToolStripMenuItem("Help", image: null) {DisplayStyle = ToolStripItemDisplayStyle.Text};
+            help.DropDownItems.Add(Link("Basic Layout Tutorial", "https://www.wpftutorial.net/LayoutProperties.html"));
             help.DropDownItems.Add(Link("Blog", "http://stack.blogs.losttech.software/"));
             help.DropDownItems.Add(Link("Telegram Community","https://t.me/joinchat/HCVquw4yDSmwxky5pxxKZw"));
             help.DropDownItems.Add(Link("Ask a Question", "https://stackoverflow.com/questions/ask?tags=stack%20window-management"));
@@ -133,7 +131,7 @@
                     return null;
 
                 var name = Path.GetFileNameWithoutExtension(file.FullName);
-                var layoutFile = FileSystem.Current.GetFileFromPathAsync(file.FullName).Result;
+                var layoutFile = new FileInfo(file.FullName);
                 var layoutMenu = new ToolStripMenuItem(name, null, EditLayoutClick) { Tag = layoutFile };
                 file.OnChange(f => f.FullName,
                     newName => {
@@ -143,7 +141,7 @@
                         }
 
                         layoutMenu.Text = Path.GetFileNameWithoutExtension(newName);
-                        layoutMenu.Tag = FileSystem.Current.GetFileFromPathAsync(newName).Result;
+                        layoutMenu.Tag = new FileInfo(newName);
                     });
                 return layoutMenu;
             }
@@ -161,7 +159,7 @@
                         layoutsMenu.DropDownItems.Insert(1, menuItem);
                 }, onRemove: file => {
                     var layoutMenu = layoutsMenu.DropDownItems.OfType<ToolStripMenuItem>()
-                        .FirstOrDefault(item => ((IFile) item.Tag)?.Path == file.FullName);
+                        .FirstOrDefault(item => ((FileInfo) item.Tag)?.FullName == file.FullName);
                     if (layoutMenu != null)
                         layoutsMenu.DropDownItems.Remove(layoutMenu);
                 });
@@ -170,7 +168,7 @@
             layoutsMenu.DropDownItems.Add(new ToolStripMenuItem("New...", null, this.CreateNewLayout));
             layoutsMenu.DropDownItems.Add(new ToolStripMenuItem(
                 "Open Layouts Folder", null,
-                (_, __) => Process.Start(this.layoutsFolder.Path)));
+                (_, __) => Process.Start(this.layoutsFolder.FullName)));
 
             contextMenu.Items.Add(layoutsMenu);
             contextMenu.Items.Add(new ToolStripSeparator());
@@ -178,7 +176,7 @@
 
         static bool IsLayoutFileName(string fileName) => Path.GetExtension(fileName) == ".xaml";
 
-        static void EditLayoutClick(object sender, EventArgs e) => EditLayout((IFile)((ToolStripItem) sender).Tag);
+        static void EditLayoutClick(object sender, EventArgs e) => EditLayout((FileInfo)((ToolStripItem) sender).Tag);
 
         async void CreateNewLayout(object sender, EventArgs e)
         {
@@ -194,7 +192,7 @@
             }
 
             layoutName += ".xaml";
-            IFile layoutFile;
+            FileInfo layoutFile;
             try {
                 layoutFile =
                     await this.layoutsFolder.CreateFileAsync(layoutName, CreationCollisionOption.FailIfExists);
@@ -210,9 +208,9 @@
             EditLayout(layoutFile);
         }
 
-        static void EditLayout(IFile layoutFile)
+        static void EditLayout(FileInfo layoutFile)
         {
-            ShowOpenWithDialog(layoutFile.Path);
+            ShowOpenWithDialog(layoutFile.FullName);
         }
 
         static void ShowOpenWithDialog(string path)
@@ -223,12 +221,12 @@
             });
         }
 
-        static async Task WriteSampleLayoutTo(IFile layoutFile)
+        static async Task WriteSampleLayoutTo(FileInfo layoutFile)
         {
             string sampleResourceName = App.OutOfBoxLayoutsResourcePrefix + "OOB Horizontal.xaml";
             var resourceContainer = App.GetResourceContainer();
             using (var sampleStream = resourceContainer.GetManifestResourceStream(sampleResourceName))
-            using (var layoutStream = await layoutFile.OpenAsync(FileAccess.ReadAndWrite).ConfigureAwait(false)) {
+            using (var layoutStream = layoutFile.OpenWrite()) {
                 await sampleStream.CopyToAsync(layoutStream).ConfigureAwait(false);
                 layoutStream.Close();
             }
