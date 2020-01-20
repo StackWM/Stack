@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:LostTech.Stack"
         mc:Ignorable="d"
         SizeToContent="WidthAndHeight"
+        ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         Height="450" Width="800">
     <Window.Resources>
@@ -20,10 +21,10 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBox Name="Input" Margin="8"/>
+        <TextBox Name="Input" MinWidth="400" Margin="8"/>
 
         <StackPanel Grid.Row="1" HorizontalAlignment="Center" Orientation="Horizontal">
-            <Button IsDefault="True">OK</Button>
+            <Button IsDefault="True" Click="OK_Click">OK</Button>
             <Button IsCancel="True">Cancel</Button>
         </StackPanel>
     </Grid>

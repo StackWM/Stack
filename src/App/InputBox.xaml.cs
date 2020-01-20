@@ -1,22 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿namespace LostTech.Stack {
+    using System;
+    using System.Collections.Generic;
+    using System.Windows;
+    using System.Windows.Input;
 
-namespace LostTech.Stack {
     /// <summary>
     /// Interaction logic for InputBox.xaml
     /// </summary>
     public partial class InputBox : Window {
         public InputBox() {
-            InitializeComponent();
+            this.InitializeComponent();
+        }
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e) {
+            if (e.Key == Key.Escape) {
+                e.Handled = true;
+                this.Close();
+                return;
+            }
+
+            base.OnPreviewKeyDown(e);
+        }
+
+        private void OK_Click(object sender, RoutedEventArgs e) {
+            this.DialogResult = true;
+            this.Close();
         }
     }
 }
