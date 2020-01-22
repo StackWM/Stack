@@ -1,6 +1,3 @@
-[submodule "External/VirtualDesktop"]
-	path = External/VirtualDesktop
-	url = https://github.com/losttech/VirtualDesktop.git
 [submodule "External/EventHook"]
 	path = External/EventHook
 	url = https://github.com/losttech/Windows-User-Action-Hook.git
@@ -31,3 +28,6 @@
 [submodule "src/ScreenTracking"]
 	path = src/ScreenTracking
 	url = https://losttech.visualstudio.com/DefaultCollection/Stack/_git/ScreenTracking
+[submodule "src/WindowManagement.Win32"]
+	path = src/WindowManagement.Win32
+	url = https://losttech.visualstudio.com/DefaultCollection/Stack/_git/WindowManagement.Win32

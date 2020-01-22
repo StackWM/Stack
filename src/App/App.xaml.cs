@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
+    using System.Drawing;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -112,8 +113,6 @@
             var baseStartup = await this.StartupCompletion;
             if (baseStartup.LaunchCancelled)
                 return;
-
-            WarningExtensions.WarningsService = WarningsService.Default;
 
             this.MainWindow = this.stackInstanceWindow;
             this.stackInstanceWindow.Show();

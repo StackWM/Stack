@@ -98,7 +98,7 @@
                 Array.Reverse(allZones);
 
             var sameCenter = allZones.Where(zone => zone.GetPhysicalBounds().Center()
-                .Equals(windowCenter, epsilon: Epsilon)).ToArray();
+                .Equals(windowCenter, maxDistance: Epsilon)).ToArray();
 
             var reducedWindowBounds = window.Bounds.Inflated(-1,-1);
             if (reducedWindowBounds.IsEmpty)
@@ -147,7 +147,7 @@
                         zone.GetPhysicalBounds().Intersection(strip).Area().AtLeast(1)
                         / zone.GetPhysicalBounds().Area().AtLeast(1),
 
-                    CenterTravelDistance = windowCenter.Diff(zone.GetPhysicalBounds().Center()).Length(),
+                    CenterTravelDistance = windowCenter.Subtract(zone.GetPhysicalBounds().Center()).Length(),
 
                     DistanceAlongDirection = DistanceAlongDirection(windowCenter, zone.GetPhysicalBounds().Center(), direction),
                 };
@@ -194,6 +194,6 @@
             public int CompareTo(Rank other) => this.Total.CompareTo(other.Total);
         }
 
-        static double DistanceAlongDirection(PointF @from, PointF to, PointF direction) => to.Diff(@from).DotProduct(direction);
+        static double DistanceAlongDirection(PointF @from, PointF to, PointF direction) => to.Subtract(@from).DotProduct(direction);
     }
 }

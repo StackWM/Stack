@@ -58,6 +58,7 @@
   <ItemGroup>
     <PackageReference Include="CalcBinding" Version="2.5.2" />
     <PackageReference Include="LostTech.App.Boilerplate.WPF" Version="0.0.2-CI-2020-01-19--006" />
+    <PackageReference Include="LostTech.Drawing.Primitives.Extensions" Version="0.0.2" />
     <PackageReference Include="LostTech.Stack.Extensibility" Version="0.1.2" />
     <PackageReference Include="MahApps.Metro" Version="1.6.5" />
     <PackageReference Include="PInvoke.User32" Version="0.6.6" />
@@ -70,7 +71,6 @@
     <ProjectReference Include="..\..\External\KeySettings\src\WPF\WPF.csproj" />
     <ProjectReference Include="..\..\External\MouseKeyHook\MouseKeyHook\MouseKeyHook.csproj" />
     <ProjectReference Include="..\..\External\ObservableFileSystem\src\ObservableFileSystem.csproj" />
-    <ProjectReference Include="..\..\External\VirtualDesktop\source\VirtualDesktop\VirtualDesktop.csproj" />
     <ProjectReference Include="..\..\External\Widgets\src\Widgets.csproj" />
     <ProjectReference Include="..\Screen.WPF\Screen.csproj" />
     <ProjectReference Include="..\ScreenTracking\ScreenTracking.csproj" />

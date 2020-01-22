@@ -4,6 +4,7 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Drawing;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -241,7 +242,7 @@
 
             var zoneBounds = zone.GetPhysicalBounds();
             return bounds.Corners().Zip(zoneBounds.Corners(),
-                (from, to) => from.Diff(to).LengthSquared())
+                (from, to) => from.Subtract(to).LengthSquared())
                 .Sum();
         }
 

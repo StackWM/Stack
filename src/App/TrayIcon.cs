@@ -13,6 +13,7 @@
     using LostTech.App;
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.Settings;
+    using LostTech.Stack.Utils;
     using LostTech.Stack.WindowManagement;
     using LostTech.Windows;
     using Microsoft.AppCenter.Crashes;
