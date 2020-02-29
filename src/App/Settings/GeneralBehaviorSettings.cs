@@ -1,5 +1,6 @@
 ﻿namespace LostTech.Stack.Settings
 {
+    using System.Collections.ObjectModel;
     using LostTech.App.DataBinding;
     public sealed class GeneralBehaviorSettings: NotifyPropertyChangedBase, ICopyable<GeneralBehaviorSettings>
     {
@@ -49,12 +50,20 @@
             }
         }
 
-        public GeneralBehaviorSettings Copy() => new GeneralBehaviorSettings {
-            SuppressSystemMargin = this.SuppressSystemMargin,
-            CaptureOnAppStart = this.CaptureOnAppStart,
-            CaptureOnDesktopSwitch = this.CaptureOnDesktopSwitch,
-            CaptureOnStackStart = this.CaptureOnStackStart,
-            CaptureOnLayoutChange = this.CaptureOnLayoutChange,
-        };
+        public ObservableCollection<string> CaptureIgnoreList { get; } =
+            new ObservableCollection<string>();
+
+        public GeneralBehaviorSettings Copy() {
+            var copy = new GeneralBehaviorSettings {
+                SuppressSystemMargin = this.SuppressSystemMargin,
+                CaptureOnAppStart = this.CaptureOnAppStart,
+                CaptureOnDesktopSwitch = this.CaptureOnDesktopSwitch,
+                CaptureOnStackStart = this.CaptureOnStackStart,
+                CaptureOnLayoutChange = this.CaptureOnLayoutChange,
+            };
+            foreach(string groupName in this.CaptureIgnoreList)
+                copy.CaptureIgnoreList.Add(groupName);
+            return copy;
+        }
     }
 }

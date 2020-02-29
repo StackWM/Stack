@@ -28,11 +28,13 @@
         readonly Win32WindowFactory win32WindowFactory;
         readonly WindowHookEx activationHook = WindowHookExFactory.Instance.GetHook();
         readonly TaskScheduler taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+        readonly IEnumerable<WindowGroup> windowGroups;
         readonly ConcurrentDictionary<IAppWindow, bool> alreadyCatpured = new ConcurrentDictionary<IAppWindow, bool>();
 
         public AutoCaptureBehavior(
             [NotNull] IKeyboardEvents keyboardHook,
             [NotNull] IEnumerable<CommandKeyBinding> keyBindings,
+            [NotNull] IEnumerable<WindowGroup> windowGroups,
             [NotNull] GeneralBehaviorSettings settings,
             [NotNull] LayoutManager layoutManager,
             [NotNull] ILayoutsViewModel layouts,
@@ -41,6 +43,7 @@
         {
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
             this.layoutManager = layoutManager ?? throw new ArgumentNullException(nameof(layoutManager));
+            this.windowGroups = windowGroups ?? throw new ArgumentNullException(nameof(windowGroups));
             this.layouts = layouts ?? throw new ArgumentNullException(nameof(layouts));
             this.win32WindowFactory = win32WindowFactory ?? throw new ArgumentNullException(nameof(win32WindowFactory));
             this.BeginInitAsync();
@@ -90,7 +93,9 @@
                             if (intersection.IsEmpty || intersection.Width < 10 || intersection.Height < 10)
                                 return;
 
-                            if (this.win32WindowFactory.DisplayInSwitchToList(window))
+                            if (this.win32WindowFactory.DisplayInSwitchToList(window)
+                                && !this.settings.CaptureIgnoreList.Contains(
+                                        this.windowGroups, window.Handle))
                                 await this.Capture(window);
                         } catch (WindowNotFoundException) { }
                         catch (Exception e) {
@@ -108,6 +113,9 @@
         void OnWindowAppeared(object sender, EventArgs<IAppWindow> args) {
             if (this.settings.CaptureOnAppStart == true)
                 Task.Factory.StartNew(async () => {
+                            if (this.settings.CaptureIgnoreList.Contains(
+                                    this.windowGroups, ((Win32Window)args.Subject).Handle))
+                                return;
                             await this.Capture(args.Subject);
                             await Task.Delay(millisecondsDelay: 300);
                             await this.Capture(args.Subject);
@@ -123,7 +131,9 @@
             this.win32WindowFactory
                 .ForEachTopLevel(async window => {
                     try {
-                        if (this.win32WindowFactory.DisplayInSwitchToList(window))
+                        if (this.win32WindowFactory.DisplayInSwitchToList(window)
+                            && !this.settings.CaptureIgnoreList.Contains(
+                                this.windowGroups, window.Handle))
                             await this.Capture(window);
                     } catch (WindowNotFoundException) { }
                     catch (Exception e) {
@@ -232,7 +242,9 @@
                 return;
 
             IAppWindow foreground = this.win32WindowFactory.Foreground;
-            if (foreground != null && !this.alreadyCatpured.ContainsKey(foreground))
+            if (foreground != null && !this.alreadyCatpured.ContainsKey(foreground)
+                && !this.settings.CaptureIgnoreList.Contains(
+                        this.windowGroups, ((Win32Window)foreground).Handle))
                 await Task.Run(() => this.Capture(foreground)).ConfigureAwait(false);
         }
 
