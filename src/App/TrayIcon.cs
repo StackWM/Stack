@@ -11,6 +11,7 @@
     using System.Windows;
     using System.Windows.Forms;
     using LostTech.App;
+    using LostTech.Stack.Behavior;
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.Models;
     using LostTech.Stack.Settings;
@@ -76,7 +77,7 @@
 
             contextMenu.Items.Add(new ToolStripSeparator());
 
-            trayIcon.CreateScreensMenu(layoutsDirectory, screenProvider, contextMenu);
+            trayIcon.CreateScreensMenu(layoutsDirectory, screenProvider, contextMenu, stackSettings.Behaviors.KeyBindings);
             trayIcon.CreateLayoutsMenu(layoutsDirectory, contextMenu);
 
             if (!new DesktopBridge.Helpers().IsRunningAsUwp())
@@ -235,11 +236,22 @@
             }
         }
 
-        void CreateScreensMenu(ObservableDirectory layoutsDirectory, IScreenProvider screenProvider, ToolStrip contextMenu)
+        void CreateScreensMenu(ObservableDirectory layoutsDirectory, IScreenProvider screenProvider,
+            ToolStrip contextMenu, IEnumerable<CommandKeyBinding> keyBindings)
         {
-            var switchMenu = new ToolStripMenuItem("Switch Layout"){DisplayStyle =  ToolStripItemDisplayStyle.Text};
+            var switchMenu = new ToolStripMenuItem("Switch Layout") {
+                DisplayStyle =  ToolStripItemDisplayStyle.Text,
+                DropDownItems = {
+                    new ToolStripMenuItem($"On current screen: {keyBindings.FirstOrDefault(binding => binding.CommandName == HotkeyBehavior.Commands.ChooseLayout)?.Shortcut}") {
+                        DisplayStyle = ToolStripItemDisplayStyle.Text,
+                        Enabled = false,
+                    },
+                    new ToolStripSeparator(),
+                },
+            };
             var font = contextMenu.Font;
             var boldFont = new Font(font, FontStyle.Bold);
+
             foreach (var screen in screenProvider.Screens)
             {
                 var menu = new ToolStripMenuItem(ScreenLayouts.GetDesignation(screen)){DisplayStyle = ToolStripItemDisplayStyle.Text};
