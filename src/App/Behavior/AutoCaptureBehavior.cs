@@ -216,7 +216,7 @@
 
                         var targetBounds = targetZone?.TryGetPhysicalBounds();
                         if (targetBounds != null) {
-                            this.layoutManager.Move(window, targetZone);
+                            await this.layoutManager.Move(window, targetZone);
                             Debug.WriteLine($"move {window.Title} to {targetZone.GetPhysicalBounds()}");
                             this.alreadyCatpured[window] = true;
                         }

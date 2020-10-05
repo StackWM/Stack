@@ -385,7 +385,7 @@
                 return;
             if (problem != null)
                 this.NonCriticalErrorHandler(this, new ErrorEventArgs(problem));
-            this.layoutManager.Move(window, zone);
+            await this.layoutManager.Move(window, zone);
         }
 
         void NonCriticalErrorHandler(object sender, ErrorEventArgs error) {

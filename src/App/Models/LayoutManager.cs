@@ -81,7 +81,7 @@
             return currentScreenLocation ?? this.SearchSuspended(window, out var _);
         }
 
-        public void Move([NotNull] IAppWindow window, [NotNull] Zone target) {
+        public async Task Move([NotNull] IAppWindow window, [NotNull] Zone target) {
             if (window == null)
                 throw new ArgumentNullException(nameof(window));
             if (target == null)
@@ -255,7 +255,7 @@
                     }
 
                     if (zoneTask.Result != null) {
-                        this.Move(window, zoneTask.Result);
+                        this.Move(window, zoneTask.Result).Wait();
                         Debug.WriteLine("Did it!");
                     }
                 }, this.taskScheduler);

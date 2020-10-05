@@ -19,7 +19,7 @@
             this.windowFactory = windowFactory ?? throw new ArgumentNullException(nameof(windowFactory));
         }
 
-        protected override void OnKeyDown(KeyStroke stroke, HandledEventArgs @event) {
+        protected override async void OnKeyDown(KeyStroke stroke, HandledEventArgs @event) {
             if (!Hotkey.moveHotkeys.TryGetValue(stroke, out var targetZone) || targetZone == null)
                 return;
 
@@ -31,7 +31,7 @@
                 return;
 
             @event.Handled = true;
-            this.layoutManager.Move(window, target);
+            await this.layoutManager.Move(window, target);
         }
     }
 }

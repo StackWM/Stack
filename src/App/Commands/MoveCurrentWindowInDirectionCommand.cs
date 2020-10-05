@@ -174,7 +174,7 @@
             Debug.WriteLine("");
 #endif
             if (next != null)
-                this.layoutManager.Move(window, next);
+                this.layoutManager.Move(window, next).Wait();
             else
                 Debug.WriteLine($"nowhere to move {window.Title}");
 

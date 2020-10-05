@@ -1,10 +1,12 @@
-﻿namespace LostTech.Stack.Models {
+﻿#nullable enable
+namespace LostTech.Stack.Models {
     using System.Threading.Tasks;
-    using JetBrains.Annotations;
     using LostTech.Stack.WindowManagement;
+    using LostTech.Stack.Zones;
 
     interface IWindowManager
     {
-        Task<bool?> Detach([NotNull] IAppWindow window, bool restoreBounds = false);
+        Task<bool?> Detach(IAppWindow window, bool restoreBounds = false);
+        Task Move(IAppWindow window, Zone target);
     }
 }
