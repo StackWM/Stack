@@ -15,6 +15,7 @@
         public bool IsVisible { get; } = true;
         public bool IsOnCurrentDesktop { get; } = true;
         public bool IsVisibleOnAllDesktops { get; } = false;
+        public bool IsVisibleInAppSwitcher => true;
         public Task<Exception> Activate() => throw new NotSupportedException();
         public Task<Exception> BringToFront() => throw new NotSupportedException();
         public Task<bool?> Close() => throw new NotSupportedException();

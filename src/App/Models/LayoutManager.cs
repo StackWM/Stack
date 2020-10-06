@@ -13,6 +13,8 @@
     using WindowsDesktop;
     using EventHook;
     using JetBrains.Annotations;
+    using LostTech.Stack.Extensibility;
+    using LostTech.Stack.Extensibility.Services;
     using LostTech.Stack.Utils;
     using LostTech.Stack.ViewModels;
     using LostTech.Stack.WindowManagement;
@@ -81,6 +83,7 @@
             return currentScreenLocation ?? this.SearchSuspended(window, out var _);
         }
 
+        Task IWindowManager.Move(IAppWindow window, IZone target) => this.Move(window, (Zone)target);
         public async Task Move([NotNull] IAppWindow window, [NotNull] Zone target) {
             if (window == null)
                 throw new ArgumentNullException(nameof(window));

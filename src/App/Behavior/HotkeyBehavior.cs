@@ -9,7 +9,7 @@
     using Gma.System.MouseKeyHook;
     using JetBrains.Annotations;
     using LostTech.App;
-    using LostTech.Stack.Models;
+    using LostTech.Stack.Extensibility.Services;
     using LostTech.Stack.ViewModels;
     using LostTech.Stack.WindowManagement;
     using LostTech.Windows;

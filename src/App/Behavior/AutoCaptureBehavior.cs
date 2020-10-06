@@ -91,7 +91,7 @@
                             if (intersection.IsEmpty || intersection.Width < 10 || intersection.Height < 10)
                                 return;
 
-                            if (this.win32WindowFactory.DisplayInSwitchToList(window))
+                            if (window.IsVisibleInAppSwitcher)
                                 await this.Capture(window);
                         } catch (WindowNotFoundException) { }
                         catch (Exception e) {
@@ -124,7 +124,7 @@
             this.win32WindowFactory
                 .ForEachTopLevel(async window => {
                     try {
-                        if (this.win32WindowFactory.DisplayInSwitchToList(window))
+                        if (window.IsVisibleInAppSwitcher)
                             await this.Capture(window);
                     } catch (WindowNotFoundException) { }
                     catch (Exception e) {

@@ -2,16 +2,17 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Specialized;
     using System.ComponentModel;
     using System.Linq;
     using System.Xml.Serialization;
     using LostTech.App.DataBinding;
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.Extensibility.Filters;
+    using LostTech.Stack.WindowManagement;
     using ThomasJaworski.ComponentModel;
 
-    public sealed class WindowGroup : NotifyPropertyChangedBase, ICopyable<WindowGroup>
+    public sealed class WindowGroup : NotifyPropertyChangedBase, ICopyable<WindowGroup>,
+        IWindowGroup, IFilter<IAppWindow>
     {
         public const int LatestVersion = 1;
         string name;
@@ -57,6 +58,9 @@
 
         [XmlIgnore]
         public string FiltersString => string.Join(Environment.NewLine, this.Filters);
+
+        public bool Matches(IAppWindow value)
+            => this.Filters?.Any(f => f.Matches(((Win32Window)value).Handle)) == true;
 
         public WindowGroup Copy() {
             var copy = new WindowGroup {

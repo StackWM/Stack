@@ -24,7 +24,9 @@
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.Models;
     using LostTech.Stack.Extensibility.Filters;
+    using LostTech.Stack.Extensibility.Services;
     using LostTech.Stack.Licensing;
+    using LostTech.Stack.Services;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
     using LostTech.Stack.ViewModels;
@@ -49,7 +51,7 @@
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : BoilerplateApp, ILayoutsViewModel
+    public partial class App : BoilerplateApp, ILayoutsViewModel, IServiceProvider
     {
         IKeyboardMouseEvents hook;
         WindowDragOperation dragOperation;
@@ -873,6 +875,20 @@
                 return null;
 
             return Assembly.LoadFrom(fileName);
+        }
+
+        public object? GetService(Type serviceType) {
+            if (serviceType == typeof(IWindowManager))
+                return this.layoutManager;
+            if (serviceType == typeof(Win32WindowFactory))
+                return this.win32WindowFactory;
+            if (serviceType == typeof(IStringDictionary<IFilter<IAppWindow>>))
+                return new UserGroupsDictionary(this.stackSettings.WindowGroups);
+            if (serviceType == typeof(IEnumerable<IAppWindow>))
+                return new TopLevelWindowsEnumerable(this.win32WindowFactory);
+            if (serviceType == typeof(IEnumerable<WindowGroup>))
+                return this.stackSettings.WindowGroups;
+            return null;
         }
     }
 }

@@ -59,8 +59,10 @@
     <PackageReference Include="CalcBinding" Version="2.5.2" />
     <PackageReference Include="LostTech.App.Boilerplate.WPF" Version="0.0.2-CI-2020-01-19--006" />
     <PackageReference Include="LostTech.Drawing.Primitives.Extensions" Version="0.0.2" />
-    <PackageReference Include="LostTech.Stack.Extensibility" Version="0.1.2" />
+    <PackageReference Include="LostTech.Stack.Extensibility" Version="0.2.0-a1" />
+    <PackageReference Include="LostTech.Stack.WindowManagement" Version="2.0.1" />
     <PackageReference Include="MahApps.Metro" Version="1.6.5" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
     <PackageReference Include="PInvoke.User32" Version="0.6.6" />
     <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
     <PackageReference Include="ValueConverters" Version="2.0.19091.2" />
@@ -75,7 +77,6 @@
     <ProjectReference Include="..\Screen.WPF\Screen.csproj" />
     <ProjectReference Include="..\ScreenTracking\ScreenTracking.csproj" />
     <ProjectReference Include="..\WindowManagement.WPF\WindowManagement.WPF.csproj" />
-    <ProjectReference Include="..\WindowManagement\WindowManagement.csproj" />
   </ItemGroup>
 
 </Project>

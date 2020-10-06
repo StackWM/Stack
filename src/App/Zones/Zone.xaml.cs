@@ -7,6 +7,7 @@
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
+    using LostTech.Stack.Extensibility;
     using LostTech.Stack.Licensing;
     using LostTech.Stack.Models;
     using LostTech.Stack.ViewModels;
@@ -14,7 +15,7 @@
     /// <summary>
     /// Interaction logic for Zone.xaml
     /// </summary>
-    public partial class Zone : UserControl, IObjectWithProblems
+    public partial class Zone : UserControl, IObjectWithProblems, IZone
     {
         public Zone() {
             this.ViewModel.Windows = this.Windows;
