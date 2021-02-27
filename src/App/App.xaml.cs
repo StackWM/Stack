@@ -534,9 +534,9 @@
         public override string AppName => "Stack";
         public override string CompanyName => "Lost Tech LLC";
         public override TimeSpan HeartbeatInterval => TimeSpan.FromHours(3);
-        protected override WhatsNew WhatsNew => new WhatsNew {
-            Title = "What's New in Stack 3",
-            Message = "You have received a Stack update. See what's new",
+        protected override WhatsNew WhatsNew => new(
+            Title: "What's New in Stack 3",
+            Message:"You have received a Stack update. See what's new") {
             DetailsUri = new Uri("https://losttech.software/stack-whatsnew-3.0.html"),
         };
 

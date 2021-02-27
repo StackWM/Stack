@@ -48,7 +48,7 @@
             <Span>by Lost Tech LLC</Span>
         </TextBlock>
 
-        <TextBlock Margin="0,12">Powered by Microsoft .NET Framework</TextBlock>
+        <TextBlock Margin="0,12">Powered by .NET</TextBlock>
 
         <TextBlock Margin="0,12"><Hyperlink NavigateUri="http://myapppolicy.com/app/stack"
                                             ToolTip="http://myapppolicy.com/app/stack"

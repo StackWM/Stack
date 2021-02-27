@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0-windows10.0.18362.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
@@ -48,16 +48,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Windows">
-      <HintPath>$(MSBuildProgramFiles32)\Windows Kits\10\UnionMetadata\10.0.18362.0\Windows.winmd</HintPath>
-      <Private>False</Private>
-      <IsWinMDFile>true</IsWinMDFile>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="CalcBinding" Version="2.5.2" />
-    <PackageReference Include="LostTech.App.Boilerplate.WPF" Version="0.0.2-CI-2020-01-19--006" />
+    <PackageReference Include="LostTech.App.Boilerplate.WPF" Version="0.0.3-CI-2021-02-27--002" />
     <PackageReference Include="LostTech.Drawing.Primitives.Extensions" Version="0.0.2" />
     <PackageReference Include="LostTech.Stack.Extensibility" Version="0.2.0-a1" />
     <PackageReference Include="LostTech.Stack.WindowManagement" Version="2.0.1" />
