@@ -790,6 +790,7 @@
             this.autoCaptureBehavior = new AutoCaptureBehavior(
                 layoutManager: this.layoutManager,
                 settings: settings.Behaviors.General,
+                windowGroups: settings.WindowGroups,
                 layouts: this,
                 keyBindings: settings.Behaviors.KeyBindings,
                 keyboardHook: this.hook,

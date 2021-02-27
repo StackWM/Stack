@@ -80,7 +80,8 @@
     </metro:MetroWindow.Resources>
     <metro:MetroAnimatedSingleRowTabControl Margin="8">
         <TabItem Header="General">
-          <StackPanel Margin="8" Orientation="Vertical">
+            <DockPanel Margin="8">
+            <StackPanel Orientation="Vertical" DockPanel.Dock="Top">
             <metro:ToggleSwitch Visibility="Collapsed"/>
             <metro:ToggleSwitch Header="Suppress empty area around windows (experimental)"
                                 IsChecked="{Binding Behaviors.General.SuppressSystemMargin}"/>
@@ -92,7 +93,16 @@
                                 IsChecked="{Binding Behaviors.General.CaptureOnDesktopSwitch, Converter={StaticResource OptionalBoolToBoolConverter}}"/>
             <metro:ToggleSwitch Header="Capture windows when they open"
                                 IsChecked="{Binding Behaviors.General.CaptureOnAppStart, Converter={StaticResource OptionalBoolToBoolConverter}}"/>
-          </StackPanel>
+            </StackPanel>
+                <HeaderedContentControl VerticalContentAlignment="Stretch" Margin="0"
+                                        Header="Do not capture these windows automatically:"
+                                        HeaderTemplate="{StaticResource GroupListHeader}"
+                                        >
+                    <views:WindowGroupListEditor AvailableGroups="{Binding WindowGroups}"
+                                                 VerticalAlignment="Stretch"
+                                                 Groups="{Binding Behaviors.General.CaptureIgnoreList}"/>
+                </HeaderedContentControl>
+            </DockPanel>
         </TabItem>
         <TabItem Header="Mouse Drag">
             <DockPanel Margin="8">

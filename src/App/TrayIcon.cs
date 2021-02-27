@@ -11,6 +11,7 @@
     using System.Windows;
     using System.Windows.Forms;
     using LostTech.App;
+    using LostTech.Stack.Behavior;
     using LostTech.Stack.DataBinding;
     using LostTech.Stack.Settings;
     using LostTech.Stack.Utils;
@@ -71,7 +72,7 @@
 
             contextMenu.Items.Add(new ToolStripSeparator());
 
-            trayIcon.CreateScreensMenu(layoutsDirectory, screenProvider, contextMenu);
+            trayIcon.CreateScreensMenu(layoutsDirectory, screenProvider, contextMenu, stackSettings.Behaviors.KeyBindings);
             trayIcon.CreateLayoutsMenu(layoutsDirectory, contextMenu);
 
             if (!new DesktopBridge.Helpers().IsRunningAsUwp())
@@ -102,10 +103,10 @@
 
         ToolStripMenuItem CreateHelpMenu() {
             var help = new ToolStripMenuItem("Help", image: null) {DisplayStyle = ToolStripItemDisplayStyle.Text};
-            help.DropDownItems.Add(Link("Basic Layout Tutorial", "https://www.wpftutorial.net/LayoutProperties.html"));
+            help.DropDownItems.Add(Link("Making new layouts", "https://github.com/losttech/Stack/blob/master/docs/layouts/README.md"));
             help.DropDownItems.Add(Link("Blog", "http://stack.blogs.losttech.software/"));
             help.DropDownItems.Add(Link("Telegram Community","https://t.me/joinchat/HCVquw4yDSmwxky5pxxKZw"));
-            help.DropDownItems.Add(Link("Ask a Question", "https://stackoverflow.com/questions/ask?tags=stack%20window-management"));
+            help.DropDownItems.Add(Link("Ask a Question", "https://superuser.com/questions/ask?tags=stack%20window-management"));
             help.DropDownItems.Add(Link("What's New", "https://losttech.software/stack-whatsnew.html"));
             help.DropDownItems.Add("About", image: null, onClick: (_, __) => {
                 this.aboutWindow.Value.Show();
@@ -240,11 +241,22 @@
             }
         }
 
-        void CreateScreensMenu(ObservableDirectory layoutsDirectory, IScreenProvider screenProvider, ToolStrip contextMenu)
+        void CreateScreensMenu(ObservableDirectory layoutsDirectory, IScreenProvider screenProvider,
+            ToolStrip contextMenu, IEnumerable<CommandKeyBinding> keyBindings)
         {
-            var switchMenu = new ToolStripMenuItem("Switch Layout"){DisplayStyle =  ToolStripItemDisplayStyle.Text};
+            var switchMenu = new ToolStripMenuItem("Switch Layout") {
+                DisplayStyle =  ToolStripItemDisplayStyle.Text,
+                DropDownItems = {
+                    new ToolStripMenuItem($"On current screen: {keyBindings.FirstOrDefault(binding => binding.CommandName == HotkeyBehavior.Commands.ChooseLayout)?.Shortcut}") {
+                        DisplayStyle = ToolStripItemDisplayStyle.Text,
+                        Enabled = false,
+                    },
+                    new ToolStripSeparator(),
+                },
+            };
             var font = contextMenu.Font;
             var boldFont = new Font(font, FontStyle.Bold);
+
             foreach (var screen in screenProvider.Screens)
             {
                 var menu = new ToolStripMenuItem(ScreenLayouts.GetDesignation(screen)){DisplayStyle = ToolStripItemDisplayStyle.Text};
