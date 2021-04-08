@@ -30,7 +30,8 @@
         readonly WindowHookEx activationHook = WindowHookExFactory.Instance.GetHook();
         readonly TaskScheduler taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
         readonly IEnumerable<WindowGroup> windowGroups;
-        readonly ConcurrentDictionary<IAppWindow, bool> alreadyCatpured = new ConcurrentDictionary<IAppWindow, bool>();
+        readonly ConcurrentDictionary<IAppWindow, bool> alreadyCaptured = new();
+        readonly IReadOnlySet<IAppWindow> excluded;
 
         public AutoCaptureBehavior(
             [NotNull] IKeyboardEvents keyboardHook,
@@ -39,7 +40,8 @@
             [NotNull] GeneralBehaviorSettings settings,
             [NotNull] LayoutManager layoutManager,
             [NotNull] ILayoutsViewModel layouts,
-            [NotNull] Win32WindowFactory win32WindowFactory)
+            [NotNull] Win32WindowFactory win32WindowFactory,
+            IReadOnlySet<IAppWindow> excluded)
             : base(keyboardHook, keyBindings)
         {
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
@@ -47,6 +49,7 @@
             this.windowGroups = windowGroups ?? throw new ArgumentNullException(nameof(windowGroups));
             this.layouts = layouts ?? throw new ArgumentNullException(nameof(layouts));
             this.win32WindowFactory = win32WindowFactory ?? throw new ArgumentNullException(nameof(win32WindowFactory));
+            this.excluded = excluded ?? throw new ArgumentNullException(nameof(excluded));
             this.BeginInitAsync();
         }
 
@@ -95,8 +98,7 @@
                                 return;
 
                             if (window.IsVisibleInAppSwitcher
-                                && !this.settings.CaptureIgnoreList.Contains(
-                                        this.windowGroups, window.Handle))
+                                && this.EligibleForAutoCapture(window))
                                 await this.Capture(window);
                         } catch (WindowNotFoundException) { }
                         catch (Exception e) {
@@ -114,8 +116,7 @@
         void OnWindowAppeared(object sender, EventArgs<IAppWindow> args) {
             if (this.settings.CaptureOnAppStart == true)
                 Task.Factory.StartNew(async () => {
-                            if (this.settings.CaptureIgnoreList.Contains(
-                                    this.windowGroups, ((Win32Window)args.Subject).Handle))
+                            if (!this.EligibleForAutoCapture((Win32Window)args.Subject))
                                 return;
                             await this.Capture(args.Subject);
                             await Task.Delay(millisecondsDelay: 300);
@@ -125,7 +126,15 @@
         }
 
         void OnWindowDestroyed(object sender, EventArgs<IAppWindow> e) {
-            this.alreadyCatpured.TryRemove(e.Subject, out bool _);
+            this.alreadyCaptured.TryRemove(e.Subject, out bool _);
+        }
+
+        bool EligibleForAutoCapture(Win32Window window) {
+            lock(this.excluded)
+                if (this.excluded.Contains(window))
+                    return false;
+
+            return !this.settings.CaptureIgnoreList.Contains(this.windowGroups, window.Handle);
         }
 
         void Capture() {
@@ -133,8 +142,7 @@
                 .ForEachTopLevel(async window => {
                     try {
                         if (window.IsVisibleInAppSwitcher
-                            && !this.settings.CaptureIgnoreList.Contains(
-                                this.windowGroups, window.Handle))
+                            && this.EligibleForAutoCapture(window))
                             await this.Capture(window);
                     } catch (WindowNotFoundException) { }
                     catch (Exception e) {
@@ -164,7 +172,7 @@
                 throw new ArgumentNullException(nameof(window));
 
             if (this.layoutManager.GetLocation(window, searchSuspended: true) != null) {
-                this.alreadyCatpured[window] = true;
+                this.alreadyCaptured[window] = true;
                 return;
             }
 
@@ -228,7 +236,7 @@
                         if (targetBounds != null) {
                             await this.layoutManager.Move(window, targetZone);
                             Debug.WriteLine($"move {window.Title} to {targetZone.GetPhysicalBounds()}");
-                            this.alreadyCatpured[window] = true;
+                            this.alreadyCaptured[window] = true;
                         }
                     })
                 , CancellationToken.None, TaskCreationOptions.None, this.taskScheduler);
@@ -243,9 +251,8 @@
                 return;
 
             IAppWindow foreground = this.win32WindowFactory.Foreground;
-            if (foreground != null && !this.alreadyCatpured.ContainsKey(foreground)
-                && !this.settings.CaptureIgnoreList.Contains(
-                        this.windowGroups, ((Win32Window)foreground).Handle))
+            if (foreground != null && !this.alreadyCaptured.ContainsKey(foreground)
+                && this.EligibleForAutoCapture((Win32Window)foreground))
                 await Task.Run(() => this.Capture(foreground)).ConfigureAwait(false);
         }
 

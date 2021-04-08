@@ -782,9 +782,11 @@
                 settings.WindowGroups,
                 this.win32WindowFactory);
 
+            var autoCaptureExclusionSet = new HashSet<IAppWindow>();
+
             this.hotkeyBehavior = new HotkeyBehavior(this.hook, settings.Behaviors.KeyBindings,
                 this, this.screenProvider, this.win32WindowFactory,
-                this.layoutManager, this.layoutMapping);
+                this.layoutManager, this.layoutMapping, autoCaptureExclusionSet);
             this.moveToZoneBehavior = new MoveToZoneHotkeyBehavior(this.hook, this.layoutManager, this.win32WindowFactory);
 
             this.autoCaptureBehavior = new AutoCaptureBehavior(
@@ -794,7 +796,8 @@
                 layouts: this,
                 keyBindings: settings.Behaviors.KeyBindings,
                 keyboardHook: this.hook,
-                win32WindowFactory: this.win32WindowFactory);
+                win32WindowFactory: this.win32WindowFactory,
+                excluded: autoCaptureExclusionSet);
 
             this.dragHook = new DragHook(settings.Behaviors.MouseMove.DragButton, this.hook);
             settings.Behaviors.MouseMove.OnChange(s => s.DragButton, newButton => this.dragHook.SetButton(newButton));

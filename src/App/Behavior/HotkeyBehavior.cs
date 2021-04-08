@@ -1,4 +1,5 @@
-﻿namespace LostTech.Stack.Behavior
+﻿#nullable enable
+namespace LostTech.Stack.Behavior
 {
     using System;
     using System.Collections.Generic;
@@ -6,10 +7,12 @@
     using System.Drawing;
     using System.Linq;
     using System.Threading.Tasks;
+    using EventHook.Hooks;
     using Gma.System.MouseKeyHook;
     using JetBrains.Annotations;
     using LostTech.App;
     using LostTech.Stack.Extensibility.Services;
+    using LostTech.Stack.Models;
     using LostTech.Stack.ViewModels;
     using LostTech.Stack.WindowManagement;
     using LostTech.Windows;
@@ -22,21 +25,26 @@
         readonly Win32WindowFactory windowFactory;
         readonly IScreenProvider screenProvider;
         readonly IWindowManager windowManager;
+        readonly ISet<IAppWindow> autoCaptureExclusion;
+        readonly WindowHookEx hook = WindowHookExFactory.Instance.GetHook();
 
         public HotkeyBehavior(
-            [NotNull] IKeyboardEvents keyboardHook,
-            [NotNull] IEnumerable<CommandKeyBinding> keyBindings,
-            [NotNull] ILayoutsViewModel layoutsViewModel,
-            [NotNull] IScreenProvider screenProvider,
-            [NotNull] Win32WindowFactory windowFactory,
-            [NotNull] IWindowManager windowManager,
-            [NotNull] ILayoutMappingViewModel layoutMapping)
+            IKeyboardEvents keyboardHook,
+            IEnumerable<CommandKeyBinding> keyBindings,
+            ILayoutsViewModel layoutsViewModel,
+            IScreenProvider screenProvider,
+            Win32WindowFactory windowFactory,
+            IWindowManager windowManager,
+            ILayoutMappingViewModel layoutMapping,
+            ISet<IAppWindow> autoCaptureExclusion)
             : base(keyboardHook, keyBindings) {
             this.layoutsViewModel = layoutsViewModel ?? throw new ArgumentNullException(nameof(layoutsViewModel));
             this.screenProvider = screenProvider ?? throw new ArgumentNullException(nameof(screenProvider));
             this.windowFactory = windowFactory ?? throw new ArgumentNullException(nameof(windowFactory));
             this.windowManager = windowManager ?? throw new ArgumentNullException(nameof(windowManager));
             this.layoutMapping = layoutMapping ?? throw new ArgumentNullException(nameof(layoutMapping));
+            this.autoCaptureExclusion = autoCaptureExclusion ?? throw new ArgumentNullException(nameof(autoCaptureExclusion));
+            this.hook.Destroyed += this.HookOnDestroyed;
         }
 
         protected override bool CanExecute(string commandName) {
@@ -66,15 +74,28 @@
                 break;
             case Commands.DetachWindow:
                 var foreground = this.windowFactory.Foreground;
-                if (foreground != null)
+                if (foreground != null) {
+                    lock (this.autoCaptureExclusion) {
+                        this.autoCaptureExclusion.Add(foreground);
+                    }
                     await this.windowManager.Detach(foreground, restoreBounds: true);
+                }
                 break;
             }
         }
 
+        void HookOnDestroyed(object? sender, WindowEventArgs windowEventArgs) {
+            Task.Run(() => {
+                var window = this.windowFactory.Create(windowEventArgs.Handle);
+                lock (this.autoCaptureExclusion) {
+                    this.autoCaptureExclusion.Remove(window);
+                }
+            });
+        }
+
         [NotNull]
         Win32Screen GetCurrentScreen() {
-            Win32Window foreground = this.windowFactory.Foreground;
+            Win32Window? foreground = this.windowFactory.Foreground;
             if (foreground?.Equals(this.windowFactory.Desktop) == true
                 || foreground?.Equals(this.windowFactory.Shell) == true)
                 foreground = null;
@@ -95,6 +116,11 @@
         }
 
         protected override bool IsCommandSupported(string commandName) => Commands.All.Contains(commandName);
+
+        public override void Dispose() {
+            this.hook.Destroyed -= this.HookOnDestroyed;
+            base.Dispose();
+        }
 
         public static class Commands
         {
