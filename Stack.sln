@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App", "src\App\App.csproj", "{C9C161DE-31A7-4426-B523-7302DFF6B66A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Screen", "src\Screen.WPF\Screen.csproj", "{ADEA0E3B-E6AF-403B-B293-F3BC88F426BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Screen", "src\Screen.WPF\Screen.csproj", "{ADEA0E3B-E6AF-403B-B293-F3BC88F426BA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{37EB4CB8-4D2F-4852-9EDD-5CC736A8F4E6}"
 	ProjectSection(SolutionItems) = preProject
@@ -54,8 +54,8 @@ Global
 		{C9C161DE-31A7-4426-B523-7302DFF6B66A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9C161DE-31A7-4426-B523-7302DFF6B66A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9C161DE-31A7-4426-B523-7302DFF6B66A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C9C161DE-31A7-4426-B523-7302DFF6B66A}.ReleaseProfile|Any CPU.ActiveCfg = Release|Any CPU
-		{C9C161DE-31A7-4426-B523-7302DFF6B66A}.ReleaseProfile|Any CPU.Build.0 = Release|Any CPU
+		{C9C161DE-31A7-4426-B523-7302DFF6B66A}.ReleaseProfile|Any CPU.ActiveCfg = ReleaseProfile|Any CPU
+		{C9C161DE-31A7-4426-B523-7302DFF6B66A}.ReleaseProfile|Any CPU.Build.0 = ReleaseProfile|Any CPU
 		{ADEA0E3B-E6AF-403B-B293-F3BC88F426BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ADEA0E3B-E6AF-403B-B293-F3BC88F426BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADEA0E3B-E6AF-403B-B293-F3BC88F426BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -91,9 +91,9 @@ Global
 		{D853CFB3-C797-4950-B8F7-806D2770C4C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D853CFB3-C797-4950-B8F7-806D2770C4C8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D853CFB3-C797-4950-B8F7-806D2770C4C8}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{D853CFB3-C797-4950-B8F7-806D2770C4C8}.ReleaseProfile|Any CPU.ActiveCfg = Release|Any CPU
-		{D853CFB3-C797-4950-B8F7-806D2770C4C8}.ReleaseProfile|Any CPU.Build.0 = Release|Any CPU
-		{D853CFB3-C797-4950-B8F7-806D2770C4C8}.ReleaseProfile|Any CPU.Deploy.0 = Release|Any CPU
+		{D853CFB3-C797-4950-B8F7-806D2770C4C8}.ReleaseProfile|Any CPU.ActiveCfg = ReleaseProfile|Any CPU
+		{D853CFB3-C797-4950-B8F7-806D2770C4C8}.ReleaseProfile|Any CPU.Build.0 = ReleaseProfile|Any CPU
+		{D853CFB3-C797-4950-B8F7-806D2770C4C8}.ReleaseProfile|Any CPU.Deploy.0 = ReleaseProfile|Any CPU
 		{3847A7F4-3F6B-4626-AF4C-8FDFBA6165F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3847A7F4-3F6B-4626-AF4C-8FDFBA6165F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3847A7F4-3F6B-4626-AF4C-8FDFBA6165F2}.Release|Any CPU.ActiveCfg = Release|Any CPU

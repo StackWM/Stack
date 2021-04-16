@@ -8,6 +8,10 @@
       <Configuration>Debug</Configuration>
       <Platform>AnyCPU</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseProfile|AnyCPU">
+      <Configuration>ReleaseProfile</Configuration>
+      <Platform>AnyCPU</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|AnyCPU">
       <Configuration>Release</Configuration>
       <Platform>AnyCPU</Platform>
@@ -30,18 +34,13 @@
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppInstallerUpdateFrequency>1</AppInstallerUpdateFrequency>
     <AppInstallerCheckForUpdateFrequency>OnApplicationRun</AppInstallerCheckForUpdateFrequency>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AppxBundle>Always</AppxBundle>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AppxBundle>Always</AppxBundle>
   </PropertyGroup>
   <ItemGroup>
-    <AppxManifest Include="Manifest.Debug.xml" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AppxManifest Include="Manifest.Debug.xml" Condition="'$(Configuration)'=='Debug' OR '$(Configuration)'=='ReleaseProfile'">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <AppxManifest Include="Package.appxmanifest" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AppxManifest Include="Package.appxmanifest" Condition="'$(Configuration)'=='Release'">
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="Store_TemporaryKey.pfx" />

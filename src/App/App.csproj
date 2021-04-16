@@ -1,10 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows10.0.18362.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
+    <Configurations>Debug;Release;ReleaseProfile</Configurations>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -16,8 +17,13 @@
     <Version>3.0.0</Version>
     <Authors>Victor Milovanov</Authors>
     <Company>Lost Tech LLC</Company>
-    <Copyright>© Lost Tech LLC 2020</Copyright>
+    <Copyright>© Lost Tech LLC 2021</Copyright>
     <PackageProjectUrl>https://losttech.software/stack.html</PackageProjectUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'ReleaseProfile'">
+    <OutputPath>bin\ReleaseProfile\</OutputPath>
+    <DefineConstants>PROFILE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
