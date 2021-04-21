@@ -6,6 +6,7 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Configurations>Debug;Release;ReleaseProfile</Configurations>
+    <ReferenceConfiguration>$(Configuration)</ReferenceConfiguration>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -24,6 +25,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'ReleaseProfile'">
     <OutputPath>bin\ReleaseProfile\</OutputPath>
     <DefineConstants>PROFILE</DefineConstants>
+    <ReferenceConfiguration>Release</ReferenceConfiguration>
   </PropertyGroup>
 
   <ItemGroup>
@@ -67,14 +69,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\External\EventHook\src\EventHook\EventHook.csproj" />
-    <ProjectReference Include="..\..\External\KeySettings\src\WPF\WPF.csproj" />
-    <ProjectReference Include="..\..\External\MouseKeyHook\MouseKeyHook\MouseKeyHook.csproj" />
-    <ProjectReference Include="..\..\External\ObservableFileSystem\src\ObservableFileSystem.csproj" />
-    <ProjectReference Include="..\..\External\Widgets\src\Widgets.csproj" />
-    <ProjectReference Include="..\Screen.WPF\Screen.csproj" />
-    <ProjectReference Include="..\ScreenTracking\ScreenTracking.csproj" />
-    <ProjectReference Include="..\WindowManagement.WPF\WindowManagement.WPF.csproj" />
+    <ProjectReference Include="..\..\External\EventHook\src\EventHook\EventHook.csproj" AdditionalProperties="Configuration=$(ReferenceConfiguration)" />
+    <ProjectReference Include="..\..\External\KeySettings\src\WPF\WPF.csproj" AdditionalProperties="Configuration=$(ReferenceConfiguration)" />
+    <ProjectReference Include="..\..\External\MouseKeyHook\MouseKeyHook\MouseKeyHook.csproj" AdditionalProperties="Configuration=$(ReferenceConfiguration)" />
+    <ProjectReference Include="..\..\External\ObservableFileSystem\src\ObservableFileSystem.csproj" AdditionalProperties="Configuration=$(ReferenceConfiguration)" />
+    <ProjectReference Include="..\..\External\Widgets\src\Widgets.csproj" AdditionalProperties="Configuration=$(ReferenceConfiguration)" />
+    <ProjectReference Include="..\Screen.WPF\Screen.csproj" AdditionalProperties="Configuration=$(ReferenceConfiguration)" />
+    <ProjectReference Include="..\ScreenTracking\ScreenTracking.csproj" AdditionalProperties="Configuration=$(ReferenceConfiguration)" />
+    <ProjectReference Include="..\WindowManagement.WPF\WindowManagement.WPF.csproj" AdditionalProperties="Configuration=$(ReferenceConfiguration)" />
   </ItemGroup>
 
 </Project>
