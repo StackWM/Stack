@@ -870,7 +870,12 @@
         }
 
         static Assembly CustomWidgetsLoader(object sender, ResolveEventArgs args) {
-            string fileName = $"{args.Name}.dll";
+            string? name = args.Name.Contains(", PublicKeyToken=", StringComparison.Ordinal)
+                ? TryParseAssemblyName(args.Name)
+                : args.Name;
+            if (name is null) return null;
+
+            string fileName = $"{name}.dll";
             if (Path.GetFileName(fileName) != fileName)
                 return null;
 
@@ -879,6 +884,15 @@
                 return null;
 
             return Assembly.LoadFrom(fileName);
+        }
+
+        static string? TryParseAssemblyName(string fullName) {
+            try {
+                var name = new AssemblyName(fullName);
+                return name.Name;
+            } catch (FileLoadException) {
+                return null;
+            }
         }
 
         public object? GetService(Type serviceType) {
