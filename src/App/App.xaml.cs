@@ -108,8 +108,6 @@
                 return;
             }
 
-            bool migrating = await SettingsMigration.Migrate(AppData);
-
             base.OnStartup(e);
 
             var baseStartup = await this.StartupCompletion;
