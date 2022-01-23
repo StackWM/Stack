@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Configurations>Debug;Release;ReleaseProfile</Configurations>
@@ -62,10 +62,10 @@
     <PackageReference Include="LostTech.Stack.Extensibility" Version="0.2.0-a1" />
     <PackageReference Include="LostTech.Stack.WindowManagement" Version="2.0.1" />
     <PackageReference Include="MahApps.Metro" Version="1.6.5" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
-    <PackageReference Include="PInvoke.User32" Version="0.6.6" />
-    <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
-    <PackageReference Include="ValueConverters" Version="2.0.19091.2" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+    <PackageReference Include="PInvoke.User32" Version="0.7.104" />
+    <PackageReference Include="Prism.Core" Version="8.1.97" />
+    <PackageReference Include="ValueConverters" Version="2.2.10" />
   </ItemGroup>
 
   <ItemGroup>
