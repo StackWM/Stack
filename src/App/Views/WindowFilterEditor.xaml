@@ -24,6 +24,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Column="0" Grid.Row="0">Class:</TextBlock>
@@ -34,6 +35,11 @@
         <TextBlock Grid.Column="0" Grid.Row="1">Title:</TextBlock>
         <views:StringFilterEditor Grid.Column="1" Grid.Row="1"
                                   Filter="{Binding Filter.TitleFilter, ElementName=LayoutRoot}"
+                                  />
+
+        <TextBlock Grid.Column="0" Grid.Row="2">Process:</TextBlock>
+        <views:StringFilterEditor Grid.Column="1" Grid.Row="2"
+                                  Filter="{Binding Filter.ProcessFilter, ElementName=LayoutRoot}"
                                   />
     </Grid>
 </UserControl>
