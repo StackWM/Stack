@@ -1,5 +1,6 @@
 ﻿namespace LostTech.Stack.Utils {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
 
     class Retry {
@@ -42,5 +43,8 @@
 
             await func(true).ConfigureAwait(continueOnCapturedContext: captureContext);
         }
+
+        public static CancellationToken Timeout(TimeSpan delay)
+            => new CancellationTokenSource(delay).Token;
     }
 }
