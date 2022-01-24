@@ -1,4 +1,4 @@
-namespace LostTech.Stack
+﻿namespace LostTech.Stack
 {
     using System;
     using System.Collections.Generic;
@@ -756,8 +756,7 @@ namespace LostTech.Stack
 
                 await using var stream = resourceContainer.GetManifestResourceStream(resource);
                 Trace.Assert(stream != null);
-                var file = new FileInfo(Path.Combine(destination.FullName, name));
-                await using var targetStream = file.OpenWrite();
+                await using var targetStream = new FileStream(Path.Combine(destination.FullName, name), FileMode.Create);
                 await stream.CopyToAsync(targetStream).ConfigureAwait(false);
                 targetStream.Close();
             }
