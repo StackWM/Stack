@@ -4,6 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
     <UseWPF>true</UseWPF>
+	<Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <Configurations>Debug;Release;ReleaseProfile</Configurations>
     <ReferenceConfiguration>$(Configuration)</ReferenceConfiguration>
@@ -18,7 +19,7 @@
     <Version>3.0.0</Version>
     <Authors>Victor Milovanov</Authors>
     <Company>Lost Tech LLC</Company>
-    <Copyright>© Lost Tech LLC 2021</Copyright>
+    <Copyright>© Lost Tech LLC 2022</Copyright>
     <PackageProjectUrl>https://losttech.software/stack.html</PackageProjectUrl>
   </PropertyGroup>
 
@@ -59,7 +60,7 @@
     <PackageReference Include="CalcBinding" Version="2.5.2" />
     <PackageReference Include="LostTech.App.Boilerplate.WPF" Version="0.0.3-CI-2021-02-27--002" />
     <PackageReference Include="LostTech.Drawing.Primitives.Extensions" Version="0.0.2" />
-    <PackageReference Include="LostTech.Stack.Extensibility" Version="0.2.0-a1" />
+    <PackageReference Include="LostTech.Stack.Extensibility" Version="0.2.0-a3" />
     <PackageReference Include="LostTech.Stack.WindowManagement" Version="2.0.1" />
     <PackageReference Include="MahApps.Metro" Version="1.6.5" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
