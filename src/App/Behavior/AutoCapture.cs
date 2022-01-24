@@ -1,23 +1,23 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
 
-using LostTech.Stack.Extensibility;
+using LostTech.Stack.Extensibility.Filters;
 using LostTech.Stack.Zones;
 
 namespace LostTech.Stack.Behavior;
 
 public static class AutoCapture {
     public static readonly DependencyProperty WindowsProperty =
-        DependencyProperty.RegisterAttached("Windows", typeof(ObservableCollection<Filter>), typeof(Zone));
+        DependencyProperty.RegisterAttached("Windows", typeof(ObservableCollection<CaptureFilter>), typeof(Zone));
 
     public static readonly DependencyProperty PriorityProperty =
-        DependencyProperty.RegisterAttached("Priority", typeof(int), typeof(Filter),
+        DependencyProperty.RegisterAttached("Priority", typeof(int), typeof(CaptureFilter),
             new PropertyMetadata(defaultValue: int.MaxValue));
 
-    public static ObservableCollection<Filter> GetWindows(DependencyObject target) {
-        if (target.GetValue(WindowsProperty) is ObservableCollection<Filter> v)
+    public static ObservableCollection<CaptureFilter> GetWindows(DependencyObject target) {
+        if (target.GetValue(WindowsProperty) is ObservableCollection<CaptureFilter> v)
             return v;
-        v = new ObservableCollection<Filter>();
+        v = new ObservableCollection<CaptureFilter>();
         target.SetValue(WindowsProperty, v);
         return v;
     }
