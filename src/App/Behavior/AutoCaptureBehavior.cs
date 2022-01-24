@@ -176,6 +176,53 @@
                 return;
             }
 
+            if (await this.CaptureByZoneFilter((Win32Window)window) != false)
+                return;
+
+            await this.CaptureToNearest(window);
+        }
+
+        async Task<bool?> CaptureByZoneFilter([NotNull] Win32Window window) {
+            try {
+                var t = await Task.Factory.StartNew(() =>
+                    Retry.TimesAsync(attempts: 5, async final => {
+                        bool layoutsReady = await this.layouts.ScreenLayouts.Active()
+                            .AllReady(Retry.Timeout(TimeSpan.FromSeconds(5)));
+                        if (!layoutsReady) {
+                            Debug.WriteLine($"gave up capturing {window.Title} - layouts are not ready");
+                            return (bool?)null;
+                        }
+
+                        Zone? targetZone;
+                        try {
+                            targetZone = this.layouts.ScreenLayouts.Active()
+                               .SelectMany(layout => layout.Zones.Final())
+                               .SelectMany(zone => AutoCapture.GetWindows(zone).OrEmpty().Select(fc => (zone, fc)))
+                               .OrderBy(zone => Math.Min(zone.fc.Priority, AutoCapture.GetPriority(zone.fc)))
+                               .FirstOrDefault(zone => zone.fc.Filters.Any(f => f.Matches(window.Handle)))
+                               .zone;
+                        } catch (InvalidOperationException e) {
+                            if (final) {
+                                Debug.WriteLine($"gave up capturing {window.Title} - zones are not ready");
+                                return (bool?)null;
+                            }
+
+                            throw new RetriableException(e);
+                        }
+
+                        if (targetZone is not null) {
+                            await this.Capture(window, targetZone);
+                            return true;
+                        }
+                        return false;
+                    })
+                    , CancellationToken.None, TaskCreationOptions.None, this.taskScheduler);
+                return await t;
+            } catch (WindowNotFoundException) { } catch (OperationCanceledException) { }
+            return null;
+        }
+
+        async Task CaptureToNearest([NotNull] IAppWindow window) {
             try {
                 Rect bounds = Rect.Empty;
 
@@ -204,25 +251,23 @@
                 if (retryAttempts == 0)
                     return;
 
-                await Task.Factory.StartNew(() =>
+                var t = await Task.Factory.StartNew(() =>
                     Retry.TimesAsync(attempts: 5, async final => {
-                        try {
-                            await Task.WhenAll(this.layouts.ScreenLayouts.Active()
-                                .Select(l => Layout.GetReady(l.Layout)));
-                        } catch (ArgumentNullException e) {
+                        bool layoutsReady = await this.layouts.ScreenLayouts.Active().AllReady(Retry.Timeout(TimeSpan.FromSeconds(5)));
+                        if (!layoutsReady) {
                             if (final) {
                                 Debug.WriteLine($"gave up capturing {window.Title} - layouts are not ready");
                                 return;
                             }
 
-                            throw new RetriableException(e);
+                            throw new RetriableException("layouts are not ready");
                         }
 
-                        Zone targetZone;
+                        Zone? targetZone;
                         try {
-                             targetZone = this.layouts.ScreenLayouts.Active()
-                                .SelectMany(layout => layout.Zones.Final())
-                                .MinByOrDefault(zone => LocationError(bounds, zone));
+                            targetZone = this.layouts.ScreenLayouts.Active()
+                               .SelectMany(layout => layout.Zones.Final())
+                               .MinByOrDefault(zone => LocationError(bounds, zone));
                         } catch (InvalidOperationException e) {
                             if (final) {
                                 Debug.WriteLine($"gave up capturing {window.Title} - zones are not ready");
@@ -232,15 +277,21 @@
                             throw new RetriableException(e);
                         }
 
-                        var targetBounds = targetZone?.TryGetPhysicalBounds();
-                        if (targetBounds != null) {
-                            await this.layoutManager.Move(window, targetZone);
-                            Debug.WriteLine($"move {window.Title} to {targetZone.GetPhysicalBounds()}");
-                            this.alreadyCaptured[window] = true;
-                        }
+                        await this.Capture(window, targetZone);
                     })
                 , CancellationToken.None, TaskCreationOptions.None, this.taskScheduler);
+
+                await t;
             } catch (WindowNotFoundException) { } catch (OperationCanceledException) { }
+        }
+
+        async Task Capture(IAppWindow window, Zone? targetZone) {
+            var targetBounds = targetZone?.TryGetPhysicalBounds();
+            if (targetBounds != null) {
+                await this.layoutManager.Move(window, targetZone!);
+                Debug.WriteLine($"move {window.Title} to {targetBounds.Value}");
+                this.alreadyCaptured[window] = true;
+            }
         }
 
         async void OnWindowActivated(object sender, WindowEventArgs e) {

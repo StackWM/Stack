@@ -41,5 +41,8 @@
             MinBy(enumerable, propertyGetter, out var result);
             return result;
         }
+
+        public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T>? enumerable)
+            => enumerable ?? Array.Empty<T>();
     }
 }
