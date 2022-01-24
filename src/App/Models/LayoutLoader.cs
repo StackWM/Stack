@@ -51,9 +51,9 @@
                 try {
                     layout = (FrameworkElement)XamlReader.Load(xmlReader);
                 } catch (XamlParseException e) {
-                    this.problems.Add($"{file.Name}: {e.Message}");
-                    this.ProblemOccurred?.Invoke(this, new ErrorEventArgs(e));
-                    return MakeDefaultLayout(file.Name, e);
+                    return MakeErrorLayout(file, e);
+                } catch (XmlException e) {
+                    return MakeErrorLayout(file, e);
                 }
             }
 
@@ -66,6 +66,12 @@
 
             Debug.WriteLine($"loaded layout {fileName} in {this.loadTimer.ElapsedMilliseconds}ms");
             return layout;
+
+            FrameworkElement MakeErrorLayout(FileInfo file, Exception e) {
+                this.problems.Add($"{file.Name}: {e.Message}");
+                this.ProblemOccurred?.Invoke(this, new ErrorEventArgs(e));
+                return MakeDefaultLayout(file.Name, e);
+            }
         }
 
         void ReportProblem(string fileName, string message) {
