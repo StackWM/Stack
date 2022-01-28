@@ -211,6 +211,7 @@
                         }
 
                         if (targetZone is not null) {
+                            Debug.WriteLine($"CaptureByZoneFilter: {window.Title} to {targetZone.Name ?? targetZone.Id}");
                             await this.Capture(window, targetZone);
                             return true;
                         }

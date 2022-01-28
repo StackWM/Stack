@@ -870,7 +870,7 @@
             AppDomain.CurrentDomain.AssemblyResolve += CustomWidgetsLoader;
         }
 
-        static Assembly CustomWidgetsLoader(object sender, ResolveEventArgs args) {
+        static Assembly? CustomWidgetsLoader(object sender, ResolveEventArgs args) {
             string? name = args.Name.Contains(", PublicKeyToken=", StringComparison.Ordinal)
                 ? TryParseAssemblyName(args.Name)
                 : args.Name;
