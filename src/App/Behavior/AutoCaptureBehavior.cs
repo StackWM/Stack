@@ -197,7 +197,7 @@
                         try {
                             targetZone = this.layouts.ScreenLayouts.Active()
                                .SelectMany(layout => layout.Zones.Final())
-                               .SelectMany(zone => AutoCapture.GetWindows(zone).OrEmpty().Select(fc => (zone, fc)))
+                               .SelectMany(zone => AutoCapture.GetCaptureFilters(zone).OrEmpty().Select(fc => (zone, fc)))
                                .OrderBy(zone => Math.Min(zone.fc.Priority, AutoCapture.GetPriority(zone.fc)))
                                .FirstOrDefault(zone => zone.fc.Filters.Any(f => f.Matches(window.Handle)))
                                .zone;
