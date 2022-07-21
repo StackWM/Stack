@@ -281,14 +281,14 @@
 
         #region Virtual Desktop Support
         void InitVirtualDesktopSupport() {
-            VirtualDesktop.CurrentChanged += this.VirtualDesktopOnCurrentChanged;
+            VirtualDesktop.CurrentChanged += this.DesktopOnCurrentChanged;
         }
         void DisposeVirtualDesktopSupport() {
-            VirtualDesktop.CurrentChanged -= this.VirtualDesktopOnCurrentChanged;
+            VirtualDesktop.CurrentChanged -= this.DesktopOnCurrentChanged;
         }
         readonly Dictionary<Guid?, Dictionary<Zone, List<AppWindowViewModel>>> suspended =
             new Dictionary<Guid?, Dictionary<Zone, List<AppWindowViewModel>>>();
-        async void VirtualDesktopOnCurrentChanged(object sender, VirtualDesktopChangedEventArgs change) {
+        async void DesktopOnCurrentChanged(object sender, VirtualDesktopChangedEventArgs change) {
             await this.StartOnParentThread(() => {
                 var oldWindows = this.suspended.GetOrCreate(change.OldDesktop?.Id);
                 oldWindows.Clear();
@@ -296,6 +296,8 @@
                 IEnumerable<Zone> activeZones;
                 lock(this.locations)
                     activeZones = this.locations.Values.Distinct().ToList();
+
+                var lostCurrentLocation = new List<AppWindowViewModel>();
 
                 foreach (Zone activeZone in activeZones) {
                     if (activeZone == null)
@@ -310,17 +312,27 @@
                                 zoneSuspendList.Add(appWindow);
                                 Debug.WriteLine($"suspended layout of: {appWindow.Title}");
                                 activeZone.Windows.Remove(appWindow);
+                                lostCurrentLocation.Add(appWindow);
                             } else {
                                 Debug.WriteLine($"ignoring pinned window: {appWindow.Title}");
                             }
                         } catch (WindowNotFoundException) {
                             activeZone.Windows.Remove(appWindow);
+                            lostCurrentLocation.Add(appWindow);
                         }
                 }
 
-                if (this.suspended.TryGetValue(change.NewDesktop?.Id, out var newWindows)) {
-                    foreach (var zoneContent in newWindows)
-                        zoneContent.Key.Windows.AddRange(zoneContent.Value);
+                lock (this.locations) {
+                    foreach (var appWindow in lostCurrentLocation) {
+                        this.locations.Remove(appWindow.Window);
+                    }
+                    if (this.suspended.TryGetValue(change.NewDesktop?.Id, out var newWindows)) {
+                        foreach (var zoneContent in newWindows) {
+                            zoneContent.Key.Windows.AddRange(zoneContent.Value);
+                            foreach (var appWindow in zoneContent.Value)
+                                this.locations.Add(appWindow.Window, zoneContent.Key);
+                        }
+                    }
                 }
 
                 this.DesktopSwitched?.Invoke(this, EventArgs.Empty);
