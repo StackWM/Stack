@@ -97,8 +97,7 @@
                             if (intersection.IsEmpty || intersection.Width < 10 || intersection.Height < 10)
                                 return;
 
-                            if (window.IsVisibleInAppSwitcher
-                                && this.EligibleForAutoCapture(window))
+                            if (this.EligibleForAutoCapture(window))
                                 await this.Capture(window);
                         } catch (WindowNotFoundException) { }
                         catch (Exception e) {
@@ -130,6 +129,12 @@
         }
 
         bool EligibleForAutoCapture(Win32Window window) {
+            try {
+                if (!window.IsVisibleInAppSwitcher)
+                    return false;
+            } catch (WindowNotFoundException) {
+                return false;
+            }
             lock(this.excluded)
                 if (this.excluded.Contains(window))
                     return false;
@@ -141,8 +146,7 @@
             this.win32WindowFactory
                 .ForEachTopLevel(async window => {
                     try {
-                        if (window.IsVisibleInAppSwitcher
-                            && this.EligibleForAutoCapture(window))
+                        if (this.EligibleForAutoCapture(window))
                             await this.Capture(window);
                     } catch (WindowNotFoundException) { }
                     catch (Exception e) {
