@@ -78,7 +78,7 @@
         MoveToZoneHotkeyBehavior moveToZoneBehavior;
         AutoCaptureBehavior autoCaptureBehavior;
         LayoutManager layoutManager;
-        readonly IScreenProvider screenProvider = new Win32ScreenProvider();
+        readonly IScreenProvider screenProvider;
         ObservableDirectory layoutsDirectory;
         DirectoryInfo layoutsFolder;
         LayoutLoader layoutLoader;
@@ -89,6 +89,10 @@
         public event EventHandler<EventArgs<ScreenLayout>> LayoutLoaded;
 
         internal static readonly bool IsUwp = new DesktopBridge.Helpers().IsRunningAsUwp();
+
+        public App() {
+            this.screenProvider = new Win32ScreenProvider(a => this.Dispatcher.BeginInvoke(a));
+        }
 
         protected override async void OnStartup(StartupEventArgs e)
         {
