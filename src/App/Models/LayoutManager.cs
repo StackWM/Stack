@@ -49,7 +49,7 @@
             this.applicationWatcher.Start();
             this.taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
-            if (VirtualDesktop.HasMinimalSupport)
+            if (VirtualDesktop.IsPresent)
                 this.InitVirtualDesktopSupport();
         }
 
@@ -164,7 +164,7 @@
             try {
                 Guid? newDesktop = window.DesktopID;
                 switch (e.PropertyName) {
-                case nameof(AppWindowViewModel.DesktopID) when VirtualDesktop.HasMinimalSupport:
+                case nameof(AppWindowViewModel.DesktopID) when VirtualDesktop.IsPresent:
                     bool nowVisible = underlyingWindow.IsOnCurrentDesktop;
                     Zone currentZone;
                     lock (this.locations)
@@ -327,10 +327,19 @@
                         this.locations.Remove(appWindow.Window);
                     }
                     if (this.suspended.TryGetValue(change.NewDesktop?.Id, out var newWindows)) {
+                        var restoredLocations = new HashSet<AppWindowViewModel>();
                         foreach (var zoneContent in newWindows) {
                             zoneContent.Key.Windows.AddRange(zoneContent.Value);
-                            foreach (var appWindow in zoneContent.Value)
-                                this.locations.Add(appWindow.Window, zoneContent.Key);
+                            foreach (var appWindow in zoneContent.Value) {
+                                if (!restoredLocations.Add(appWindow)) {
+                                    Trace.WriteLine($"Duplicate location: {appWindow.Title}");
+                                }
+                                if (this.locations.ContainsKey(appWindow.Window)) {
+                                    Trace.WriteLine($"Window already listed in locations: {appWindow.Title}");
+                                } else {
+                                    this.locations.Add(appWindow.Window, zoneContent.Key);
+                                }
+                            }
                         }
                     }
                 }
@@ -414,7 +423,7 @@
             this.applicationWatcher.OnApplicationWindowChange -= this.OnApplicationWindowChange;
             this.applicationWatcher.Stop();
             this.eventHookFactory.Dispose();
-            if (VirtualDesktop.HasMinimalSupport)
+            if (VirtualDesktop.IsPresent)
                 this.DisposeVirtualDesktopSupport();
 
             List<AppWindowViewModel> windows;

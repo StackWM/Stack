@@ -178,13 +178,6 @@
                 this.trayIcon.Icon.ShowBalloonTip(30);
             }
 
-            if (WindowsDesktop.VirtualDesktop.IsPresent && !WindowsDesktop.VirtualDesktop.HasMinimalSupport) {
-                WindowsDesktop.VirtualDesktop.InitializationException.ReportAsWarning();
-                this.NonCriticalErrorHandler(this, new ErrorEventArgs(new Exception(
-                    message: "Your OS has Virtual Desktops, but this version of API is not supported. You might notice Stack behaving weird when using Virtual Desktops.",
-                    innerException: WindowsDesktop.VirtualDesktop.InitializationException)));
-            }
-
             var timeout = TimeSpan.FromSeconds(90);
             if (!await this.screenLayouts.Active().AllReady(Retry.Timeout(timeout)))
                 Debug.WriteLine($"WARNING: layouts not ready after {timeout}");
