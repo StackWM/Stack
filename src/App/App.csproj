@@ -17,7 +17,7 @@
     <RootNamespace>LostTech.Stack</RootNamespace>
     <AssemblyName>Stack</AssemblyName>
     <Description>Tiling window manager</Description>
-    <Version>3.0.3</Version>
+    <Version>3.0.4</Version>
     <Authors>Victor Nova</Authors>
     <Company>Lost Tech LLC</Company>
     <Copyright>© Lost Tech LLC 2022</Copyright>
