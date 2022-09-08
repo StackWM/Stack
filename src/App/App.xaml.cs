@@ -96,6 +96,10 @@
 
         protected override async void OnStartup(StartupEventArgs e)
         {
+            if (e.Args.Contains("-ToastActivated")) {
+                throw new NotImplementedException("Toast activation is not implemented");
+            }
+
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             if (e.Args.Contains("--jit-debugging"))
