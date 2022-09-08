@@ -35,6 +35,7 @@
             this.Filters.Add(new WindowFilter {
                 ClassFilter = new CommonStringMatchFilter {Value = ""},
                 TitleFilter = new CommonStringMatchFilter {Value = "Title"},
+                ProcessFilter = new CommonStringMatchFilter { Value = "" },
             });
             int index = this.Filters.Count - 1;
             this.FiltersView.SelectedIndex = index;
