@@ -129,6 +129,12 @@
                 WindowGroups = await this.InitializeSettingsSet<CopyableObservableCollection<WindowGroup>>("WindowGroups.xml"),
             };
             this.stackSettings = settings;
+            // workaround for filters not being created fully and editor binding failing due to that
+            foreach (var filter in settings.WindowGroups.SelectMany(g => g.Filters)) {
+                filter.TitleFilter ??= new() { Value = "" };
+                filter.ClassFilter ??= new() { Value = "" };
+                filter.ProcessFilter ??= new() { Value = "" };
+            }
             if (settings.WindowGroups.Count == 0
                 && settings.Behaviors.MouseMove.WindowGroupIgnoreList.Count == 0
                 && settings.Behaviors.KeyboardMove.WindowGroupIgnoreList.Count == 0) {
