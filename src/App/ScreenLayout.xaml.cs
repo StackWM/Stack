@@ -18,6 +18,7 @@
     using MahApps.Metro.Controls;
     using Microsoft.Win32;
     using PInvoke;
+    using ManagedShell.Common.Helpers;
 
     /// <summary>
     /// Interaction logic for ScreenLayout.xaml
@@ -48,6 +49,13 @@
         internal new ScreenLayoutViewModel ViewModel {
             get => (ScreenLayoutViewModel)base.ViewModel;
             set => base.ViewModel = value;
+        }
+
+        protected override void OnSourceInitialized(EventArgs e) {
+            base.OnSourceInitialized(e);
+
+            var handle = new WindowInteropHelper(this).EnsureHandle();
+            WindowHelper.HideWindowFromTasks(handle);
         }
     }
 

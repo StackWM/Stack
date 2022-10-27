@@ -5,18 +5,20 @@
     using System.IO;
     using System.Windows;
     using System.Windows.Controls;
-    using LostTech.Stack.Licensing;
+    using System.Windows.Input;
+    using System.Windows.Interop;
+
     using LostTech.Stack.Models;
     using LostTech.Stack.ViewModels;
     using LostTech.Stack.WindowManagement;
+
+    using ManagedShell.Common.Helpers;
 
     /// <summary>
     /// Interaction logic for WindowButton.xaml
     /// </summary>
     public partial class WindowButton : UserControl, IObjectWithProblems, IDisposable
     {
-        readonly Win32WindowFactory win32WindowFactory = new Win32WindowFactory();
-
         public WindowButton() {
             this.InitializeComponent();
 
@@ -52,6 +54,33 @@
         readonly List<string> problems = new List<string>();
         public IList<string> Problems => new ReadOnlyCollection<string>(this.problems);
         public event EventHandler<ErrorEventArgs> ProblemOccurred;
+
+        bool peaking = false;
+        protected override void OnMouseEnter(MouseEventArgs e) {
+            base.OnMouseEnter(e);
+
+            var parentWindow = System.Windows.Window.GetWindow(this);
+
+            if (!this.peaking && this.Window is Win32Window win32
+                && parentWindow is not null
+                && ManagedShell.Interop.NativeMethods.DwmIsCompositionEnabled()) {
+                this.peaking = true;
+                WindowHelper.PeekWindow(true, win32.Handle, new WindowInteropHelper(parentWindow).Handle);
+            }
+        }
+
+        protected override void OnMouseLeave(MouseEventArgs e) {
+            var parentWindow = System.Windows.Window.GetWindow(this);
+
+            if (this.peaking && this.Window is Win32Window win32
+                && parentWindow is not null
+                && ManagedShell.Interop.NativeMethods.DwmIsCompositionEnabled()) {
+                WindowHelper.PeekWindow(false, win32.Handle, new WindowInteropHelper(parentWindow).Handle);
+                this.peaking = false;
+            }
+
+            base.OnMouseLeave(e);
+        }
 
         void WindowButton_OnUnloaded(object sender, RoutedEventArgs e) {
             this.Dispose();
