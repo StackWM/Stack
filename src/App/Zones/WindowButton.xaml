@@ -9,6 +9,7 @@
              x:Name="Root"
              MaxWidth="360" MinWidth="40"
              Unloaded="WindowButton_OnUnloaded"
+             DataContextChanged="WindowButton_DataContextChanged"
              d:DataContext="{d:DesignInstance vm:DesignTimeWindow, d:IsDesignTimeCreatable=True}"
              >
   <Button Click="Window_OnClick"

@@ -17,8 +17,7 @@
     /// <summary>
     /// Interaction logic for WindowButton.xaml
     /// </summary>
-    public partial class WindowButton : UserControl, IObjectWithProblems, IDisposable
-    {
+    public partial class WindowButton : UserControl, IObjectWithProblems, IDisposable {
         public WindowButton() {
             this.InitializeComponent();
 
@@ -34,8 +33,8 @@
 #if !PROFILE
             if (App.IsUwp) {
 #endif
-                this.Window?.Activate();
-                return;
+            this.Window?.Activate();
+            return;
 #if !PROFILE
             }
 
@@ -55,46 +54,67 @@
         public IList<string> Problems => new ReadOnlyCollection<string>(this.problems);
         public event EventHandler<ErrorEventArgs> ProblemOccurred;
 
-        bool peaking = false;
+        Peeking peeking;
+        bool IsPeeking() => this.peeking.Window != IntPtr.Zero;
         protected override void OnMouseEnter(MouseEventArgs e) {
             base.OnMouseEnter(e);
 
             var parentWindow = System.Windows.Window.GetWindow(this);
 
-            if (!this.peaking && this.Window is Win32Window win32
+            if (!this.IsPeeking() && this.Window is Win32Window win32
                 && parentWindow is not null
                 && ManagedShell.Interop.NativeMethods.DwmIsCompositionEnabled()) {
-                this.peaking = true;
-                WindowHelper.PeekWindow(true, win32.Handle, new WindowInteropHelper(parentWindow).Handle);
+                this.peeking = new() {
+                    Window = win32.Handle,
+                    Owner = new WindowInteropHelper(parentWindow).Handle,
+                };
+                this.peeking.Peek(true);
             }
         }
 
         protected override void OnMouseLeave(MouseEventArgs e) {
-            var parentWindow = System.Windows.Window.GetWindow(this);
-
-            if (this.peaking && this.Window is Win32Window win32
-                && parentWindow is not null
-                && ManagedShell.Interop.NativeMethods.DwmIsCompositionEnabled()) {
-                WindowHelper.PeekWindow(false, win32.Handle, new WindowInteropHelper(parentWindow).Handle);
-                this.peaking = false;
-            }
+            this.StopPeaking();
 
             base.OnMouseLeave(e);
         }
 
+        void StopPeaking() {
+            if (this.IsPeeking()
+                && ManagedShell.Interop.NativeMethods.DwmIsCompositionEnabled()) {
+                this.peeking.Peek(false);
+                this.peeking = default;
+            }
+        }
+
         void WindowButton_OnUnloaded(object sender, RoutedEventArgs e) {
+            this.StopPeaking();
+
             this.Dispose();
         }
 
         protected override void OnVisualParentChanged(DependencyObject oldParent) {
             base.OnVisualParentChanged(oldParent);
 
+            this.StopPeaking();
+
             if (this.VisualParent == null)
                 this.Dispose();
         }
 
         public void Dispose() {
+            this.StopPeaking();
+
             this.foregroundTracker.Dispose();
+        }
+
+        void WindowButton_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
+            this.StopPeaking();
+        }
+
+        struct Peeking {
+            public IntPtr Owner;
+            public IntPtr Window;
+            public void Peek(bool show) => WindowHelper.PeekWindow(show, this.Window, this.Owner);
         }
     }
 }
