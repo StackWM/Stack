@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.IO;
+    using System.Threading;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
@@ -66,11 +67,19 @@
         protected override void OnMouseEnter(MouseEventArgs e) {
             base.OnMouseEnter(e);
 
-            this.hoverTimer.Interval = TimeSpan.FromMilliseconds(SystemInformation.MouseHoverTime);
-            this.hoverTimer.Start();
+            if (InstantHoverEnabled()) {
+                this.StartPeeking();
+            } else {
+                this.hoverTimer.Interval = TimeSpan.FromMilliseconds(SystemInformation.MouseHoverTime);
+                this.hoverTimer.Start();
+            }
         }
 
         void HoverTimer_Tick(object? sender, EventArgs e) {
+            this.StartPeeking();
+        }
+
+        void StartPeeking() {
             var parentWindow = System.Windows.Window.GetWindow(this);
 
             if (!this.IsPeeking() && this.Window is Win32Window win32
@@ -81,8 +90,32 @@
                     Owner = new WindowInteropHelper(parentWindow).Handle,
                 };
                 this.peeking.Peek(true);
+                EnableInstantHover();
             }
         }
+
+        #region Instant hover
+        static readonly ThreadLocal<DispatcherTimer> instantHover = new(() => {
+            var timer = new DispatcherTimer();
+            timer.Tick += InstantHover_Tick;
+            return timer;
+        });
+        static DispatcherTimer InstantHover => instantHover.Value!;
+        static bool InstantHoverEnabled() => true.Equals(InstantHover.Tag);
+        static void EnableInstantHover() {
+            InstantHover.Tag = true;
+            InstantHover.Stop();
+        }
+        static void DisableInstantHover() {
+            InstantHover.Interval = TimeSpan.FromMilliseconds(SystemInformation.MouseHoverTime);
+            InstantHover.Start();
+        }
+        static void InstantHover_Tick(object? sender, EventArgs e) {
+            var self = (DispatcherTimer)sender!;
+            self.Stop();
+            self.Tag = false;
+        }
+        #endregion
 
         protected override void OnMouseLeave(MouseEventArgs e) {
             this.StopPeaking();
@@ -92,6 +125,7 @@
 
         void StopPeaking() {
             this.hoverTimer.Stop();
+            DisableInstantHover();
 
             if (this.IsPeeking()
                 && ManagedShell.Interop.NativeMethods.DwmIsCompositionEnabled()) {
