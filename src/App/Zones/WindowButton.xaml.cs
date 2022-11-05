@@ -7,6 +7,7 @@
     using System.Windows.Controls;
     using System.Windows.Input;
     using System.Windows.Interop;
+    using System.Windows.Threading;
 
     using LostTech.Stack.Models;
     using LostTech.Stack.ViewModels;
@@ -14,16 +15,21 @@
 
     using ManagedShell.Common.Helpers;
 
+    using SystemInformation = System.Windows.Forms.SystemInformation;
+
     /// <summary>
     /// Interaction logic for WindowButton.xaml
     /// </summary>
     public partial class WindowButton : UserControl, IObjectWithProblems, IDisposable {
+        readonly DispatcherTimer hoverTimer = new();
         public WindowButton() {
             this.InitializeComponent();
 
             this.foregroundTracker = new ForegroundTracker(this,
                 window => this.Window?.Equals(window) == true,
                 IsForegroundPropertyKey);
+
+            this.hoverTimer.Tick += this.HoverTimer_Tick;
         }
 
         public AppWindowViewModel ViewModel => this.DataContext as AppWindowViewModel;
@@ -56,9 +62,15 @@
 
         Peeking peeking;
         bool IsPeeking() => this.peeking.Window != IntPtr.Zero;
+
         protected override void OnMouseEnter(MouseEventArgs e) {
             base.OnMouseEnter(e);
 
+            this.hoverTimer.Interval = TimeSpan.FromMilliseconds(SystemInformation.MouseHoverTime);
+            this.hoverTimer.Start();
+        }
+
+        void HoverTimer_Tick(object? sender, EventArgs e) {
             var parentWindow = System.Windows.Window.GetWindow(this);
 
             if (!this.IsPeeking() && this.Window is Win32Window win32
@@ -79,6 +91,8 @@
         }
 
         void StopPeaking() {
+            this.hoverTimer.Stop();
+
             if (this.IsPeeking()
                 && ManagedShell.Interop.NativeMethods.DwmIsCompositionEnabled()) {
                 this.peeking.Peek(false);
