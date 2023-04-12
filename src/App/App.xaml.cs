@@ -11,6 +11,7 @@
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Forms;
@@ -84,6 +85,8 @@
         LayoutLoader layoutLoader;
         LayoutMappingViewModel layoutMapping;
         int zoneIndex;
+        int sessionLocked;
+        bool SessionLocked => this.sessionLocked != 0;
         readonly Win32WindowFactory win32WindowFactory = new Win32WindowFactory();
 
         public event EventHandler<EventArgs<ScreenLayout>> LayoutLoaded;
@@ -557,6 +560,8 @@
 
             this.layoutsDirectory = new ObservableDirectory(this.layoutsFolder.FullName);
 
+            Microsoft.Win32.SystemEvents.SessionSwitch += this.SystemEvents_SessionSwitch;
+
             var screens = this.screenProvider.Screens;
             var layoutNameCollection = new TransformObservableCollection<string, ObservableFile,
                 ReadOnlyObservableCollection<ObservableFile>>(
@@ -566,72 +571,6 @@
                 layoutNameCollection, this.layoutLoader, this.screenProvider);
 
             this.screenLayouts = new ObservableCollection<ScreenLayout>();
-
-            async Task AddLayoutForScreen(Win32Screen screen)
-            {
-                var layout = new ScreenLayout {
-                    ViewModel = new ScreenLayoutViewModel{Screen = screen},
-                    Title = $"{screen.ID}: {ScreenLayouts.GetDesignation(screen)}"
-                };
-                layout.Closed += this.OnLayoutClosed;
-                layout.QueryContinueDrag += (sender, args) => args.Action = DragAction.Cancel;
-                layout.SizeChanged += LayoutBoundsChanged;
-                layout.LocationChanged += LayoutBoundsChanged;
-
-                this.screenLayouts.Add(layout);
-            }
-
-            var layoutBounds = new Dictionary<ScreenLayout, Rect>();
-            void RemoveLayoutForScreen(Win32Screen screen) {
-                ScreenLayout layout = this.screenLayouts.FirstOrDefault(l => l.Screen?.ID == screen.ID);
-                if (layout != null) {
-                    foreach (Zone zone in layout.Zones)
-                        zone.ProblemOccurred -= this.NonCriticalErrorHandler;
-                    layout.Closed -= this.OnLayoutClosed;
-                    try {
-                        layout.Close();
-                    } catch (InvalidOperationException) { }
-                    layoutBounds.Remove(layout);
-                    this.screenLayouts.Remove(layout);
-                }
-            }
-
-            var changeGroupTasks = new Dictionary<ScreenLayout, Task>();
-            async void LayoutBoundsChanged(object sender, EventArgs e) {
-                var layout = (ScreenLayout)sender;
-                Task delay = Task.Delay(millisecondsDelay: 15);
-                changeGroupTasks[layout] = delay;
-                await delay;
-                if (changeGroupTasks.TryGetValue(layout, out var changeGroupTask) && delay.Equals(changeGroupTask)
-                    && layout.IsLoaded) {
-                    changeGroupTasks.Remove(layout);
-                    Rect? newBounds = layout.TryGetPhysicalBounds();
-                    if (newBounds == null)
-                        return;
-                    if (layoutBounds.TryGetValue(layout, out var bounds) && newBounds.Value.Equals(bounds))
-                        return;
-                    layoutBounds[layout] = newBounds.Value;
-                    await this.ReloadLayout(layout);
-                    layout.TryGetNativeWindow()?.SendToBottom().ReportAsWarning();
-                } else
-                    Debug.WriteLine("grouped updates!");
-            }
-
-            async void ScreenPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
-                var screen = (Win32Screen)sender;
-                switch (e.PropertyName) {
-                case nameof(Win32Screen.WorkingArea):
-                case nameof(Win32Screen.IsActive):
-                    if (!ScreenExtensions.IsValidScreen(screen))
-                        RemoveLayoutForScreen(screen);
-                    else {
-                        var layout = this.screenLayouts.FirstOrDefault(l => l.Screen.ID == screen.ID);
-                        if (layout == null)
-                            await AddLayoutForScreen(screen);
-                    }
-                    return;
-                }
-            }
 
             foreach (Win32Screen screen in screens) {
                 screen.PropertyChanged += ScreenPropertyChanged;
@@ -666,6 +605,90 @@
             settings.LayoutMap.Map.CollectionChanged += this.MapOnCollectionChanged;
         }
 
+        readonly Dictionary<ScreenLayout, Rect> layoutBounds = new();
+        async Task AddLayoutForScreen(Win32Screen screen) {
+            var layout = new ScreenLayout {
+                ViewModel = new ScreenLayoutViewModel { Screen = screen },
+                Title = $"{screen.ID}: {ScreenLayouts.GetDesignation(screen)}"
+            };
+            layout.Closed += this.OnLayoutClosed;
+            layout.QueryContinueDrag += (sender, args) => args.Action = DragAction.Cancel;
+            layout.SizeChanged += LayoutBoundsChanged;
+            layout.LocationChanged += LayoutBoundsChanged;
+
+            this.screenLayouts.Add(layout);
+        }
+
+        void RemoveLayoutForScreen(Win32Screen screen) {
+            ScreenLayout layout = this.screenLayouts.FirstOrDefault(l => l.Screen?.ID == screen.ID);
+            if (layout != null) {
+                foreach (Zone zone in layout.Zones)
+                    zone.ProblemOccurred -= this.NonCriticalErrorHandler;
+                layout.Closed -= this.OnLayoutClosed;
+                try {
+                    layout.Close();
+                } catch (InvalidOperationException) { }
+                layoutBounds.Remove(layout);
+                this.screenLayouts.Remove(layout);
+            }
+        }
+
+        readonly Dictionary<ScreenLayout, Task> changeGroupTasks = new();
+        async void LayoutBoundsChanged(object sender, EventArgs e) {
+            var layout = (ScreenLayout)sender;
+            Task delay = Task.Delay(millisecondsDelay: 15);
+            changeGroupTasks[layout] = delay;
+            await delay;
+            if (changeGroupTasks.TryGetValue(layout, out var changeGroupTask) && delay.Equals(changeGroupTask)
+                && layout.IsLoaded) {
+                changeGroupTasks.Remove(layout);
+                Rect? newBounds = layout.TryGetPhysicalBounds();
+                if (newBounds == null)
+                    return;
+                if (layoutBounds.TryGetValue(layout, out var bounds) && newBounds.Value.Equals(bounds))
+                    return;
+                layoutBounds[layout] = newBounds.Value;
+                await this.ReloadLayout(layout, force: false);
+                layout.TryGetNativeWindow()?.SendToBottom().ReportAsWarning();
+            } else
+                Debug.WriteLine("grouped updates!");
+        }
+
+        async void ScreenPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+            var screen = (Win32Screen)sender;
+            switch (e.PropertyName) {
+            case nameof(Win32Screen.WorkingArea):
+            case nameof(Win32Screen.IsActive):
+                if (ScreenExtensions.IsValidScreen(screen)) {
+                    var layout = this.screenLayouts.FirstOrDefault(l => l.Screen.ID == screen.ID);
+                    if (layout == null)
+                        await AddLayoutForScreen(screen);
+                } else {
+                    if (!this.SessionLocked)
+                        RemoveLayoutForScreen(screen);
+                }
+                return;
+            }
+        }
+
+        void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e) {
+            switch (e.Reason) {
+            case Microsoft.Win32.SessionSwitchReason.SessionLock:
+                Interlocked.Exchange(ref this.sessionLocked, 1);
+                break;
+            case Microsoft.Win32.SessionSwitchReason.SessionUnlock:
+                Interlocked.Exchange(ref this.sessionLocked, 0);
+                this.Dispatcher.Invoke(this.ResetScreens);
+                break;
+            }
+        }
+
+        void ResetScreens() {
+            foreach (var screen in this.screenProvider.Screens)
+                foreach (string property in new[] { nameof(Win32Screen.WorkingArea), nameof(Win32Screen.IsActive) })
+                    this.ScreenPropertyChanged(screen, new System.ComponentModel.PropertyChangedEventArgs(property));
+        }
+
         async Task<TrayIcon> StartTrayIcon(StackSettings settings) {
             var trayIcon = await TrayIcon.StartTrayIcon(this.layoutsFolder, this.layoutsDirectory, settings, this.screenProvider, this.settingsWindow);
             trayIcon.Icon.BalloonTipClicked += (sender, args) => MessageBox.Show(this.trayIcon.Icon.BalloonTipText,
@@ -689,27 +712,31 @@
         async void MapOnCollectionChanged(object o, NotifyCollectionChangedEventArgs change) {
             switch (change.Action) {
             case NotifyCollectionChangedAction.Add:
-            case NotifyCollectionChangedAction.Replace when change.OldItems.Count == 1:
-                var newRecord = change.NewItems.OfType<MutableKeyValuePair<string, string>>().Single();
+            case NotifyCollectionChangedAction.Replace when change.OldItems!.Count == 1:
+                var newRecord = change.NewItems!.OfType<MutableKeyValuePair<string, string>>().Single();
                 var layoutToUpdate = this.screenLayouts.FirstOrDefault(
                     layout => layout.Screen?.ID == newRecord.Key
                     || layout.Screen != null && ScreenLayouts.GetDesignation(layout.Screen) == newRecord.Key);
                 if (layoutToUpdate != null)
-                    await this.ReloadLayout(layoutToUpdate);
+                    await this.ReloadLayout(layoutToUpdate, force: false);
                 break;
             default:
                 return;
             }
         }
         
-        public async Task ReloadLayout([NotNull] ScreenLayout screenLayout) {
+        public async Task ReloadLayout([NotNull] ScreenLayout screenLayout, bool force = true) {
             if (screenLayout == null)
                 throw new ArgumentNullException(nameof(screenLayout));
 
             this.layoutLoader.ProblemOccurred += this.NonCriticalErrorHandler;
+            string? current = screenLayout.Layout is null ? null : Layout.GetSource(screenLayout.Layout);
             try {
-                FrameworkElement element = await this.GetLayoutForScreen(screenLayout.Screen);
+                FrameworkElement? element = await this.GetLayoutForScreen(screenLayout.Screen,
+                                                                          skipLoading: force ? null : current);
+                if (element is null) return;
                 var readiness = new TaskCompletionSource<bool>();
+                Trace.WriteLine($"resetting {screenLayout.Screen} to {Layout.GetSource(element)}\n{new StackTrace()}");
                 Layout.SetReady(element, readiness.Task);
                 element.Loaded += delegate { this.LayoutLoaded?.Invoke(this, Args.Create(screenLayout)); };
                 screenLayout.SetLayout(element).ContinueWith(result => result.Status switch {
@@ -770,9 +797,11 @@
         }
 
         internal static Assembly GetResourceContainer() => Assembly.GetExecutingAssembly();
-        async Task<FrameworkElement> GetLayoutForScreen(Win32Screen screen)
+        async Task<FrameworkElement?> GetLayoutForScreen(Win32Screen screen, string? skipLoading = null)
         {
             string layoutFileName = this.layoutMapping.GetPreferredLayoutFileName(screen);
+            if (string.Equals(skipLoading, layoutFileName, StringComparison.OrdinalIgnoreCase))
+                return null;
             FrameworkElement layout = await this.layoutLoader.LoadLayoutOrDefault(layoutFileName);
             Layout.SetSource(layout, layoutFileName);
             return layout;

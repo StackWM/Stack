@@ -8,7 +8,7 @@
     interface ILayoutsViewModel
     {
         IEnumerable<ScreenLayout> ScreenLayouts { get; }
-        Task ReloadLayout(ScreenLayout screenLayout);
+        Task ReloadLayout(ScreenLayout screenLayout, bool force);
         event EventHandler<EventArgs<ScreenLayout>> LayoutLoaded;
     }
 }

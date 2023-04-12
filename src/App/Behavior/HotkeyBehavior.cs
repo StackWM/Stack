@@ -62,7 +62,7 @@ namespace LostTech.Stack.Behavior
             case Commands.ReloadLayouts:
                 Debug.WriteLine("reloading all layouts");
                 var reloadTasks = this.layoutsViewModel.ScreenLayouts.Active()
-                    .Select(this.layoutsViewModel.ReloadLayout)
+                    .Select(async screen => await this.layoutsViewModel.ReloadLayout(screen, force: true))
                     .ToArray();
                 await Task.WhenAll(reloadTasks);
                 break;
