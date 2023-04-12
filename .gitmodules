@@ -15,13 +15,13 @@
 	url = https://github.com/losttech/Stack.Widgets.git
 [submodule "src/WindowManagement.WPF"]
 	path = src/WindowManagement.WPF
-	url = https://losttech.visualstudio.com/DefaultCollection/Stack/_git/WindowManagement.WPF
+	url = https://github.com/StackWM/WindowManagement.WPF.git
 [submodule "src/Screen.WPF"]
 	path = src/Screen.WPF
-	url = https://losttech.visualstudio.com/DefaultCollection/Stack/_git/Screen.WPF
+	url = https://github.com/StackWM/Screen.WPF.git
 [submodule "src/ScreenTracking"]
 	path = src/ScreenTracking
-	url = https://losttech.visualstudio.com/DefaultCollection/Stack/_git/ScreenTracking
+	url = https://github.com/StackWM/ScreenTracking.git
 [submodule "src/WindowManagement.Win32"]
 	path = src/WindowManagement.Win32
-	url = https://losttech.visualstudio.com/DefaultCollection/Stack/_git/WindowManagement.Win32
+	url = https://github.com/StackWM/WindowManagement.Win32.git
