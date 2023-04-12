@@ -21,6 +21,12 @@ It is a productivity tool, that helps moving windows around.
 
 See [what's new in the latest release](https://losttech.software/stack-whatsnew.html)
 
+## Building
+
+This repository uses git modules.
+
+`git clone --recurse-submodule`, then open and build Stack.sln
+
 ## Windows 7
 
 Windows 7 is not supported in the latest versions, but you can
