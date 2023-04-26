@@ -115,12 +115,19 @@
         void OnWindowAppeared(object sender, EventArgs<IAppWindow> args) {
             if (this.settings.CaptureOnAppStart == true)
                 Task.Factory.StartNew(async () => {
-                            if (!this.EligibleForAutoCapture((Win32Window)args.Subject))
-                                return;
-                            await this.Capture(args.Subject);
-                            await Task.Delay(millisecondsDelay: 300);
-                            await this.Capture(args.Subject);
-                        })
+                    const int checkIntervalMS = 300;
+                    const int totalWaitMS = 5000;
+                    for (int i = 0; i < totalWaitMS / checkIntervalMS; i++)
+                        if (!this.EligibleForAutoCapture((Win32Window)args.Subject))
+                            await Task.Delay(millisecondsDelay: checkIntervalMS);
+
+                    if (!this.EligibleForAutoCapture((Win32Window)args.Subject))
+                        return;
+
+                    await this.Capture(args.Subject);
+                    await Task.Delay(millisecondsDelay: 300);
+                    await this.Capture(args.Subject);
+                })
                     .ReportAsWarning();
         }
 
