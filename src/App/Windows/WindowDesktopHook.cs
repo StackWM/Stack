@@ -8,7 +8,6 @@
 
     using JetBrains.Annotations;
     using WindowsDesktop;
-    using LostTech.Stack.Models;
     using LostTech.Stack.Utils;
     using LostTech.Stack.WindowManagement;
     using Microsoft.AppCenter.Crashes;
@@ -36,8 +35,14 @@
         int strikes;
         void TimerOnTick(object sender, EventArgs _) {
             try {
-                this.DesktopID = VirtualDesktop.IdFromHwnd(this.windowHandle);
-                this.strikes = 0;
+                var error = VirtualDesktop.TryGetIdFromHwnd(this.windowHandle, out var desktop);
+                if (error.Succeeded) {
+                    this.DesktopID = VirtualDesktop.IdFromHwnd(this.windowHandle);
+                    this.strikes = 0;
+                } else {
+                    error.GetException().ReportAsWarning();
+                    this.strikes++;
+                }
             } catch (Win32Exception e) {
                 Crashes.TrackError(e);
                 this.strikes++;

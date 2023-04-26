@@ -3,9 +3,9 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
-	<Platforms>AnyCPU;x64;x86;ARM64</Platforms>
+    <Platforms>AnyCPU;x64;x86;ARM64</Platforms>
     <UseWPF>true</UseWPF>
-	<Nullable>enable</Nullable>
+    <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <Configurations>Debug;Release;ReleaseProfile</Configurations>
     <ReferenceConfiguration>$(Configuration)</ReferenceConfiguration>
@@ -64,7 +64,7 @@
     <PackageReference Include="LostTech.Drawing.Primitives.Extensions" Version="0.0.2" />
     <PackageReference Include="LostTech.Stack.Extensibility" Version="0.2.0-a8" />
     <PackageReference Include="LostTech.Stack.WindowManagement" Version="3.0.0-clean" />
-    <PackageReference Include="LostTech.VirtualDesktop" Version="0.0.6-clean1" />
+    <PackageReference Include="LostTech.VirtualDesktop" Version="0.0.7-pre0" />
     <PackageReference Include="MahApps.Metro" Version="1.6.5" />
     <PackageReference Include="ManagedShell" Version="0.0.196" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
