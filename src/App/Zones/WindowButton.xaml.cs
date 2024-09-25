@@ -10,6 +10,7 @@
     using System.Windows.Interop;
     using System.Windows.Threading;
 
+    using LostTech.Stack.Licensing;
     using LostTech.Stack.Models;
     using LostTech.Stack.ViewModels;
     using LostTech.Stack.WindowManagement;
