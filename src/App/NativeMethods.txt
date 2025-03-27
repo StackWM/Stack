@@ -1,0 +1,4 @@
+AllocConsole
+ATTACH_PARENT_PROCESS
+AttachConsole
+WIN32_ERROR

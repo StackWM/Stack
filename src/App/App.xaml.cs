@@ -1,18 +1,14 @@
 ﻿namespace LostTech.Stack
 {
-    using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.Drawing;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Threading;
-    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Forms;
     using System.Windows.Interop;
@@ -88,12 +84,26 @@
         int sessionLocked;
         bool SessionLocked => this.sessionLocked != 0;
         readonly Win32WindowFactory win32WindowFactory = new Win32WindowFactory();
+        readonly Thread uiThread = Thread.CurrentThread;
+        readonly Microsoft.Extensions.Hosting.IHost host;
+        readonly ILogger<App> log;
 
         public event EventHandler<EventArgs<ScreenLayout>> LayoutLoaded;
 
         internal static readonly bool IsUwp = new DesktopBridge.Helpers().IsRunningAsUwp();
 
         public App() {
+            if (Environment.GetEnvironmentVariable("STACK_CONSOLE") == "1") {
+                try {
+                    ConsoleWindow.Setup();
+                } catch (Exception e) {
+                    Debug.WriteLine(e.ToString());
+                }
+            }
+
+            var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder([]);
+            this.host = builder.Build();
+            this.log = this.host.Services.GetRequiredService<ILogger<App>>();
             this.screenProvider = new Win32ScreenProvider(a => this.Dispatcher.BeginInvoke(a));
         }
 
@@ -594,9 +604,10 @@
                 old.PropertyChanged -= ScreenPropertyChanged;
                 @new.PropertyChanged += ScreenPropertyChanged;
                 ScreenLayout layout = this.screenLayouts.FirstOrDefault(l => l.Screen?.ID == old.ID);
-                if (layout != null)
+                if (layout != null) {
+                    this.log.LogWarning("Old screen not found: {Old} -> {New}", old, @new);
                     layout.ViewModel.Screen = @new;
-                else {
+                }  else {
                     RemoveLayoutForScreen(old);
                     await AddLayoutForScreen(@new);
                 }
@@ -655,6 +666,10 @@
         }
 
         async void ScreenPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+            await this.Dispatcher;
+
+            if (this.uiThread.ManagedThreadId != Thread.CurrentThread.ManagedThreadId)
+                throw new InvalidProgramException("not on UI thread");
             var screen = (Win32Screen)sender;
             switch (e.PropertyName) {
             case nameof(Win32Screen.WorkingArea):
