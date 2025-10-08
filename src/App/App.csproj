@@ -63,7 +63,7 @@
     <PackageReference Include="LostTech.App.Boilerplate" Version="0.2.4" />
     <PackageReference Include="LostTech.App.Boilerplate.WPF" Version="0.0.4-CI-2022-09-08--002" />
     <PackageReference Include="LostTech.Drawing.Primitives.Extensions" Version="0.0.2" />
-    <PackageReference Include="LostTech.Stack.Extensibility" Version="0.2.0-a8" />
+    <PackageReference Include="LostTech.Stack.Extensibility" Version="0.2.0-a9" />
     <PackageReference Include="LostTech.Stack.WindowManagement" Version="3.0.2-a0" />
     <PackageReference Include="LostTech.VirtualDesktop" Version="0.0.8-pre0" />
     <PackageReference Include="MahApps.Metro" Version="1.6.5" />

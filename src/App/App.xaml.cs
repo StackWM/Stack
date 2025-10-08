@@ -608,6 +608,7 @@
                     this.log.LogWarning("Old screen not found: {Old} -> {New}", old, @new);
                     layout.ViewModel.Screen = @new;
                 }  else {
+                    this.log.LogInformation("replacing screen: {Old} -> {New}", old, @new);
                     RemoveLayoutForScreen(old);
                     await AddLayoutForScreen(@new);
                 }
@@ -617,30 +618,41 @@
         }
 
         readonly Dictionary<ScreenLayout, Rect> layoutBounds = new();
-        async Task AddLayoutForScreen(Win32Screen screen) {
-            var layout = new ScreenLayout {
+        async Task AddLayoutForScreen(Win32Screen screen, [CallerMemberName] string caller = "") {
+            var layout = this.screenLayouts.FirstOrDefault(l => l.Screen?.ID == screen.ID);
+
+            if (layout is null) {
+                layout = new ScreenLayout {
                 ViewModel = new ScreenLayoutViewModel { Screen = screen },
                 Title = $"{screen.ID}: {ScreenLayouts.GetDesignation(screen)}"
             };
             layout.Closed += this.OnLayoutClosed;
             layout.QueryContinueDrag += (sender, args) => args.Action = DragAction.Cancel;
-            layout.SizeChanged += LayoutBoundsChanged;
-            layout.LocationChanged += LayoutBoundsChanged;
 
             this.screenLayouts.Add(layout);
+                this.log.LogInformation("screens: {Screens} by {Caller}",
+                                        this.screenLayouts.Count, caller);
+            } else {
+                var element = layout.Content as FrameworkElement;
+                if (element is not null && Layout.GetVersion(element) >= Layout.Version.Min.PermanentlyVisible)
+                    layout.TryShow();
+                this.log.LogInformation("screens: {Screens} by {Caller} (reactivated)",
+                                        this.screenLayouts.Count, caller);
+            }
+            layout.SizeChanged += LayoutBoundsChanged;
+            layout.LocationChanged += LayoutBoundsChanged;
         }
 
-        void RemoveLayoutForScreen(Win32Screen screen) {
+        void RemoveLayoutForScreen(Win32Screen screen, [CallerMemberName] string caller = "") {
             ScreenLayout layout = this.screenLayouts.FirstOrDefault(l => l.Screen?.ID == screen.ID);
             if (layout != null) {
                 foreach (Zone zone in layout.Zones)
                     zone.ProblemOccurred -= this.NonCriticalErrorHandler;
-                layout.Closed -= this.OnLayoutClosed;
-                try {
-                    layout.Close();
-                } catch (InvalidOperationException) { }
-                layoutBounds.Remove(layout);
-                this.screenLayouts.Remove(layout);
+                layout.SizeChanged -= LayoutBoundsChanged;
+                layout.LocationChanged -= LayoutBoundsChanged;
+                layout.TryHide();
+                this.log.LogInformation("screens: {Screens} by {Caller}",
+                                        this.screenLayouts.Count, caller);
             }
         }
 
@@ -674,9 +686,9 @@
             switch (e.PropertyName) {
             case nameof(Win32Screen.WorkingArea):
             case nameof(Win32Screen.IsActive):
+                this.log.LogInformation("{Screen} updated {Property}. Active: {IsActive} Area: {Area}",
+                                        screen.ID, e.PropertyName, screen.IsActive, screen.WorkingArea);
                 if (ScreenExtensions.IsValidScreen(screen)) {
-                    var layout = this.screenLayouts.FirstOrDefault(l => l.Screen.ID == screen.ID);
-                    if (layout == null)
                         await AddLayoutForScreen(screen);
                 } else {
                     if (!this.SessionLocked)

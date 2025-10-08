@@ -1,13 +1,8 @@
 ﻿namespace LostTech.Stack
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Drawing;
     using System.IO;
-    using System.Linq;
     using System.Runtime.InteropServices;
-    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Forms;
     using LostTech.App;
@@ -260,8 +255,8 @@
             foreach (var screen in screenProvider.Screens)
             {
                 var menu = new ToolStripMenuItem(ScreenLayouts.GetDesignation(screen)){DisplayStyle = ToolStripItemDisplayStyle.Text};
-                screen.OnChange(s => s.IsPrimary, val => menu.Font = val ? boldFont : font);
-                screen.OnChange(s => s.IsActive, val => menu.Visible = val);
+                screen.OnChange(s => s.IsPrimary, val => contextMenu.Fire(() => menu.Font = val ? boldFont : font));
+                screen.OnChange(s => s.IsActive, val => contextMenu.Fire(() => menu.Visible = val));
 
                 void SetupFileRenameHandling(ObservableFile observableFile, ToolStripMenuItem layout) =>
                     observableFile.OnChange(f => f.FullName, fullName => {
