@@ -1,0 +1,33 @@
+{
+  "id": "large-horizontal-left",
+  "name": "Large Horizontal Left (approx)",
+  "tabGroups": [
+    { "id": "side", "name": "Side", "zones": ["sideStack", "sideSingle"] },
+    { "id": "main", "name": "Main (all)", "zones": ["main", "leftMain", "rightMain", "topMain", "bottomMain", "topLeft", "topRight", "bottomLeft", "bottomRight"] },
+    { "id": "right", "name": "Right Side", "zones": ["rightStack", "rightSingle"] }
+  ],
+  "zones": [
+    { "id": "sideSingle", "name": "Side Single", "mode": "stack", "rect": { "x": 0.00, "y": 0.00, "w": 0.22, "h": 1.00 } },
+    { "id": "sideStack", "name": "Side Stack", "mode": "tileVertical", "rect": { "x": 0.00, "y": 0.00, "w": 0.22, "h": 1.00 } },
+
+    { "id": "main", "name": "Main", "mode": "stack", "rect": { "x": 0.22, "y": 0.00, "w": 0.56, "h": 1.00 } },
+    { "id": "leftMain", "name": "Left Main", "mode": "stack", "rect": { "x": 0.22, "y": 0.00, "w": 0.28, "h": 1.00 } },
+    { "id": "rightMain", "name": "Right Main", "mode": "stack", "rect": { "x": 0.50, "y": 0.00, "w": 0.28, "h": 1.00 } },
+    { "id": "topMain", "name": "Top Main", "mode": "stack", "rect": { "x": 0.22, "y": 0.00, "w": 0.56, "h": 0.50 } },
+    { "id": "bottomMain", "name": "Bottom Main", "mode": "stack", "rect": { "x": 0.22, "y": 0.50, "w": 0.56, "h": 0.50 } },
+
+    { "id": "topLeft", "name": "Top Left", "mode": "stack", "rect": { "x": 0.22, "y": 0.00, "w": 0.39, "h": 0.50 } },
+    { "id": "topRight", "name": "Top Right", "mode": "stack", "rect": { "x": 0.61, "y": 0.00, "w": 0.17, "h": 0.50 } },
+    { "id": "bottomLeft", "name": "Bottom Left", "mode": "stack", "rect": { "x": 0.22, "y": 0.50, "w": 0.39, "h": 0.50 } },
+    { "id": "bottomRight", "name": "Bottom Right", "mode": "stack", "rect": { "x": 0.61, "y": 0.50, "w": 0.17, "h": 0.50 } },
+
+    { "id": "rightSingle", "name": "Right Single", "mode": "stack", "rect": { "x": 0.78, "y": 0.00, "w": 0.22, "h": 1.00 } },
+    { "id": "rightStack", "name": "Right Stack", "mode": "tileVertical", "rect": { "x": 0.78, "y": 0.00, "w": 0.22, "h": 1.00 } },
+
+    { "id": "sideDropStack", "name": "Side Drop (Stack)", "isDropZone": true, "targetZoneId": "sideStack", "rect": { "x": 0.00, "y": 0.00, "w": 0.22, "h": 1.00 } },
+    { "id": "sideDropSingle", "name": "Side Drop (Single)", "isDropZone": true, "targetZoneId": "sideSingle", "rect": { "x": 0.06, "y": 0.42, "w": 0.10, "h": 0.16 } },
+
+    { "id": "rightDropStack", "name": "Right Drop (Stack)", "isDropZone": true, "targetZoneId": "rightStack", "rect": { "x": 0.78, "y": 0.00, "w": 0.22, "h": 1.00 } },
+    { "id": "rightDropSingle", "name": "Right Drop (Single)", "isDropZone": true, "targetZoneId": "rightSingle", "rect": { "x": 0.84, "y": 0.42, "w": 0.10, "h": 0.16 } }
+  ]
+}

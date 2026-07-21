@@ -1,0 +1,24 @@
+{
+  "id": "oob-horizontal",
+  "name": "OOB Horizontal (approx)",
+  "tabGroups": [
+    { "id": "main", "name": "Main", "zones": ["main"] },
+    { "id": "left", "name": "Left Side", "zones": ["leftSingle", "leftStack"] },
+    { "id": "right", "name": "Right Side", "zones": ["rightSingle", "rightStack"] }
+  ],
+  "zones": [
+    { "id": "main", "name": "Main", "mode": "stack", "rect": { "x": 0.20, "y": 0.00, "w": 0.60, "h": 1.00 } },
+
+    { "id": "leftSingle", "name": "Left Single", "mode": "stack", "rect": { "x": 0.00, "y": 0.00, "w": 0.20, "h": 1.00 } },
+    { "id": "leftStack", "name": "Left Stack", "mode": "tileVertical", "rect": { "x": 0.00, "y": 0.00, "w": 0.20, "h": 1.00 } },
+
+    { "id": "rightSingle", "name": "Right Single", "mode": "stack", "rect": { "x": 0.80, "y": 0.00, "w": 0.20, "h": 1.00 } },
+    { "id": "rightStack", "name": "Right Stack", "mode": "tileVertical", "rect": { "x": 0.80, "y": 0.00, "w": 0.20, "h": 1.00 } },
+
+    { "id": "leftDropStack", "name": "Left Drop (Stack)", "isDropZone": true, "targetZoneId": "leftStack", "rect": { "x": 0.00, "y": 0.00, "w": 0.20, "h": 1.00 } },
+    { "id": "leftDropSingle", "name": "Left Drop (Single)", "isDropZone": true, "targetZoneId": "leftSingle", "rect": { "x": 0.05, "y": 0.42, "w": 0.10, "h": 0.16 } },
+
+    { "id": "rightDropStack", "name": "Right Drop (Stack)", "isDropZone": true, "targetZoneId": "rightStack", "rect": { "x": 0.80, "y": 0.00, "w": 0.20, "h": 1.00 } },
+    { "id": "rightDropSingle", "name": "Right Drop (Single)", "isDropZone": true, "targetZoneId": "rightSingle", "rect": { "x": 0.85, "y": 0.42, "w": 0.10, "h": 0.16 } }
+  ]
+}

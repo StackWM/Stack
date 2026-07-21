@@ -1,0 +1,15 @@
+{
+  "KPackageStructure": "KWin/Script",
+  "KPlugin": {
+    "Id": "losttech.stack",
+    "Name": "Stack (prototype)",
+    "Description": "Zone-based layouts, stacking and tabs (prototype)",
+    "Version": "0.1.0",
+    "License": "MIT",
+    "Authors": [
+      { "Name": "Lost Tech", "Email": "" }
+    ]
+  },
+  "X-Plasma-API": "javascript",
+  "X-Plasma-MainScript": "code/main.js"
+}

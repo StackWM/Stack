@@ -1,0 +1,48 @@
+{
+  "id": "horizontal-info",
+  "name": "Horizontal + Info (approx)",
+  "tabGroups": [
+    { "id": "main", "name": "Main", "zones": ["main"] },
+    { "id": "right", "name": "Right Side", "zones": ["rightSingle", "rightStack"] }
+  ],
+  "zones": [
+    {
+      "id": "info",
+      "name": "Info",
+      "mode": "stack",
+      "rect": { "x": 0.00, "y": 0.00, "w": 0.14, "h": 1.00 }
+    },
+    {
+      "id": "main",
+      "name": "Main",
+      "mode": "stack",
+      "rect": { "x": 0.14, "y": 0.00, "w": 0.62, "h": 1.00 }
+    },
+    {
+      "id": "rightSingle",
+      "name": "Right Single",
+      "mode": "stack",
+      "rect": { "x": 0.76, "y": 0.00, "w": 0.24, "h": 1.00 }
+    },
+    {
+      "id": "rightStack",
+      "name": "Right Stack",
+      "mode": "tileVertical",
+      "rect": { "x": 0.76, "y": 0.00, "w": 0.24, "h": 1.00 }
+    },
+    {
+      "id": "rightStackDrop",
+      "name": "Right Drop",
+      "isDropZone": true,
+      "targetZoneId": "rightStack",
+      "rect": { "x": 0.76, "y": 0.00, "w": 0.24, "h": 1.00 }
+    },
+    {
+      "id": "rightSingleDrop",
+      "name": "Right Drop (Single)",
+      "isDropZone": true,
+      "targetZoneId": "rightSingle",
+      "rect": { "x": 0.83, "y": 0.42, "w": 0.10, "h": 0.16 }
+    }
+  ]
+}
