@@ -559,7 +559,7 @@
         protected override WhatsNew WhatsNew => new(
             Title: "What's New in Stack 3",
             Message:"You have received a Stack update. See what's new") {
-            DetailsUri = new Uri("https://losttech.software/stack-whatsnew-3.0.html"),
+            DetailsUri = new Uri("https://stackwm.github.io/stack-whatsnew-3.0.html"),
         };
 
         async Task StartLayout(StackSettings settings)

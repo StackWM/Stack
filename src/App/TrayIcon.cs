@@ -98,11 +98,11 @@
 
         ToolStripMenuItem CreateHelpMenu() {
             var help = new ToolStripMenuItem("Help", image: null) {DisplayStyle = ToolStripItemDisplayStyle.Text};
-            help.DropDownItems.Add(Link("Making new layouts", "https://github.com/losttech/Stack/blob/master/docs/layouts/README.md"));
-            help.DropDownItems.Add(Link("Blog", "http://stack.blogs.losttech.software/"));
+            help.DropDownItems.Add(Link("Making new layouts", "https://github.com/StackWM/Stack/blob/master/docs/layouts/README.md"));
+            help.DropDownItems.Add(Link("Blog", "https://stackwm.github.io/blog/"));
             help.DropDownItems.Add(Link("Telegram Community","https://t.me/joinchat/HCVquw4yDSmwxky5pxxKZw"));
             help.DropDownItems.Add(Link("Ask a Question", "https://superuser.com/questions/ask?tags=stack%20window-management"));
-            help.DropDownItems.Add(Link("What's New", "https://losttech.software/stack-whatsnew.html"));
+            help.DropDownItems.Add(Link("What's New", "https://stackwm.github.io/stack-whatsnew.html"));
             help.DropDownItems.Add("About", image: null, onClick: (_, __) => {
                 this.aboutWindow.Value.Show();
                 this.aboutWindow.Value.TryGetNativeWindow()?.BringToFront().ReportAsWarning();
