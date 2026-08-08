@@ -21,7 +21,7 @@
     <Authors>Victor Nova</Authors>
     <Company>Lost Tech LLC</Company>
     <Copyright>© Lost Tech LLC 2022</Copyright>
-    <PackageProjectUrl>https://losttech.software/stack.html</PackageProjectUrl>
+    <PackageProjectUrl>https://stackwm.github.io/</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'ReleaseProfile'">

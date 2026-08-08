@@ -4,7 +4,7 @@ It is a productivity tool, that helps moving windows around.
 
 [Get Stack from Microsoft Store](https://www.microsoft.com/store/apps/9P4RJ8RL7QGS?cid=github)
 
-![Screen layout sample](https://losttech.software/img/Stack.gif)
+![Screen layout sample](https://stackwm.github.io/img/Stack.gif)
 
 ## Features
 
@@ -19,7 +19,7 @@ It is a productivity tool, that helps moving windows around.
 
 ## What's new
 
-See [what's new in the latest release](https://losttech.software/stack-whatsnew.html)
+See [what's new in the latest release](https://stackwm.github.io/stack-whatsnew.html)
 
 ## Building
 
@@ -30,4 +30,4 @@ This repository uses git modules.
 ## Windows 7
 
 Windows 7 is not supported in the latest versions, but you can
-[download an old one](https://losttech.software/Downloads/Stack/Free/Stack.Setup.msi?utm_source=github)
+[download an old one](https://stackwm.github.io/Downloads/Stack/Free/Stack.Setup.msi?utm_source=github)
